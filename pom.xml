@@ -56,6 +56,10 @@
 		<dependency>
     		<groupId>com.fasterxml.jackson.core</groupId>
     		<artifactId>jackson-databind</artifactId>
+<<<<<<< HEAD
+=======
+    		<scope>runtime</scope>
+>>>>>>> 48ade014b0b8c60d55b400583078c42fb99da3d9
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
