@@ -388,7 +388,15 @@ function saveTechTicket(t){
   localStorage.setItem('bat-tech-tickets',JSON.stringify(tech));
 }
 function assumeFromModal(){ if(modalId) assumeTicket(modalId); }
-function goToCurrent(){ showToast(T('toast_go_current'),'info'); }
+function goToCurrent(){
+  var curId=getCurrentTicketId();
+  if(curId){
+    showToast(T('toast_go_current'),'info');
+    openModal(curId);
+  } else {
+    showToast(T('no_results'),'err');
+  }
+}
 
 /* ============ MODAL ============ */
 function openModal(id){
