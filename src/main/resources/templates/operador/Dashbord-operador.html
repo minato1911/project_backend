@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BAT Brasil — Dashboard do Operador</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="/css/operador.css"/>
+<script src="/js/op-settings.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content" data-i18n="skip_to_main">Pular para o conteúdo principal</a>
+<div class="toast" id="toast" role="alert" aria-live="polite"><i id="tico" class="fa-solid fa-check-circle" aria-hidden="true"></i><span id="tmsg"></span></div>
+
+<!-- LIBRAS -->
+<div class="libras-wrap">
+  <div class="libras-panel" id="libras-panel" role="dialog" aria-modal="true" aria-label="Painel Libras">
+    <div class="lhd2"><span><i class="fa-solid fa-hands" aria-hidden="true"></i> <span data-i18n="libras_title">Libras</span></span><button class="lcls2" onclick="toggleLibras()" aria-label="Fechar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
+    <div class="lav2"><i class="fa-solid fa-hands" aria-hidden="true"></i><p data-i18n="libras_hint">Intérprete ativo</p></div>
+    <div class="lbd2"><p data-i18n="libras_desc">Dashboard do Operador BAT Brasil. Visualize e gerencie seus chamados técnicos de suporte e manutenção.</p><button class="lmb" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link" aria-hidden="true"></i> VLibras</button></div>
+  </div>
+  <button class="lfab" onclick="toggleLibras()" aria-label="Ativar suporte a Libras"><i class="fa-solid fa-hands" aria-hidden="true"></i></button>
+</div>
+
+<!-- MODAL: NOVO CHAMADO -->
+<div class="mbg" id="modal-new" role="dialog" aria-modal="true" aria-labelledby="modal-new-title">
+  <div class="modal">
+    <div class="mhd"><div class="mico"><i class="fa-solid fa-plus" aria-hidden="true"></i></div><div class="mhd-txt"><h3 id="modal-new-title" data-i18n="modal_new_title">Novo Chamado</h3><p data-i18n="modal_new_sub">Preencha os dados do chamado técnico</p></div><button class="mcls" onclick="closeModal('modal-new')" aria-label="Fechar modal"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
+    <div class="mbody">
+      <div class="fg2">
+        <div class="fg"><label for="nc-sector" data-i18n="lbl_sector">Setor</label><select id="nc-sector"><option>Produção A</option><option>Produção B</option><option>Embalagem</option><option>Logística</option><option>Manutenção</option><option>Tecnologia</option></select></div>
+        <div class="fg"><label for="nc-priority" data-i18n="lbl_priority">Prioridade</label><select id="nc-priority"><option value="alta" data-i18n="prio_high">Alta</option><option value="media" selected data-i18n="prio_med">Média</option><option value="baixa" data-i18n="prio_low">Baixa</option></select></div>
+      </div>
+      <div class="fg"><label for="nc-equip" data-i18n="lbl_equip">Equipamento/Máquina</label><input type="text" id="nc-equip" data-i18n-ph="ph_equip" placeholder="Ex.: Máquina L-03, Esteira ET-05..."/></div>
+      <div class="fg"><label for="nc-problem" data-i18n="lbl_problem">Descrição do Problema</label><textarea id="nc-problem" data-i18n-ph="ph_problem" placeholder="Descreva o problema em detalhes..."></textarea></div>
+      <div class="fg"><label for="nc-cat" data-i18n="lbl_category">Categoria</label><select id="nc-cat"><option data-i18n="cat_mec">Mecânico</option><option data-i18n="cat_elec">Elétrico</option><option data-i18n="cat_auto">Automação</option><option data-i18n="cat_soft">Software</option><option data-i18n="cat_other">Outro</option></select></div>
+    </div>
+    <div class="mft"><button class="btn outline" onclick="closeModal('modal-new')"><span data-i18n="btn_cancel">Cancelar</span></button><button class="btn primary" onclick="submitTicket()"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i><span data-i18n="btn_submit">Abrir Chamado</span></button></div>
+  </div>
+</div>
+
+<!-- MODAL: VIEW TICKET -->
+<div class="mbg" id="modal-view" role="dialog" aria-modal="true" aria-labelledby="modal-view-title">
+  <div class="modal">
+    <div class="mhd"><div class="mico" style="background:var(--bl);color:var(--bm)"><i class="fa-solid fa-eye" aria-hidden="true"></i></div><div class="mhd-txt"><h3 id="modal-view-title"></h3><p id="mv-sub"></p></div><button class="mcls" onclick="closeModal('modal-view')" aria-label="Fechar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
+    <div class="mbody" id="mv-body"></div>
+    <div class="mft"><button class="btn outline" onclick="closeModal('modal-view')"><span data-i18n="btn_close">Fechar</span></button></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu principal">
+  <div class="sb-brand"><div class="sb-logo" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></div><div class="sb-bt"><strong data-i18n="sys_name">BAT Brasil</strong><span data-i18n="op_panel">Painel do Operador</span></div></div>
+  <div class="sb-user">
+    <div class="sb-av" id="sb-av" aria-hidden="true">JP</div>
+    <div class="sb-ui"><strong id="sb-name">João Pedro Silva</strong><span data-i18n="op_role">Operador de Produção</span><div class="on-pill"><span aria-hidden="true"></span><span data-i18n="online_status">Online</span></div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec" data-i18n="nav_main">Principal</div>
+    <button class="ni active" onclick="goTo('dashboard',this)" aria-current="page"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i><span data-i18n="nav_dashboard">Dashboard</span></button>
+    <button class="ni" onclick="openNewTicket()">
+    <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
+    <span data-i18n="nav_new">Novo Chamado</span>
+</button>
+    <div class="sb-sec" data-i18n="nav_tickets_sec">Chamados</div>
+<button class="ni" onclick="openMyTickets()">
+    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+    <span data-i18n="nav_my_tickets">Meus Chamados</span>
+    <span class="nb" id="nb-open" aria-label="chamados abertos">0</span>
+</button>
+    <button class="ni" onclick="openHistory()">
+    <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+    <span data-i18n="nav_history">Histórico</span>
+</button>
+    <div class="sb-sec" data-i18n="nav_acc">Conta</div>
+  <button class="ni" onclick="openProfile()">
+    <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+    <span data-i18n="nav_profile">Meu Perfil</span>
+</button>
+
+<button class="ni" onclick="openSettings()">
+    <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+    <span data-i18n="nav_settings">Configurações</span>
+</button>
+    <div class="sb-sec"></div>
+   <button class="ni" onclick="logout()" style="color:rgba(229,62,62,.7)">
+    <i class="fa-solid fa-arrow-right-from-bracket" style="color:rgba(229,62,62,.7)" aria-hidden="true"></i> <span data-i18n="nav_logout">Sair</span></button>
+  </nav>
+</aside>
+<div class="overlay" id="overlay" onclick="closeSB()"></div>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <header class="hdr" role="banner">
+    <button class="hbr" onclick="toggleSB()" aria-label="Abrir menu"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+    <div class="ht"><h1 id="hdr-t" data-i18n="nav_dashboard">Dashboard</h1><p id="hdr-s" data-i18n="hdr_sub_dash">BAT Brasil · Visão Geral dos Chamados</p></div>
+    <div class="ha">
+      <button class="hb" onclick="toggleTheme()" aria-label="Alternar tema"><i id="theme-ico" class="fa-solid fa-moon" aria-hidden="true"></i></button>
+      <div class="notif-wrap">
+        <button class="hb" onclick="toggleNotif()" aria-label="Notificações" aria-haspopup="true" aria-expanded="false" id="notif-btn"><i class="fa-solid fa-bell" aria-hidden="true"></i><span class="nd" id="notif-dot" aria-hidden="true"></span></button>
+        <div class="notif-dd" id="notif-dd" role="menu" aria-label="Notificações">
+          <div class="notif-dd-hd"><strong data-i18n="notif_title">Notificações</strong><span onclick="clearNotifs()" data-i18n="notif_clear" style="cursor:pointer">Marcar todas como lidas</span></div>
+          <div id="notif-list"></div>
+        </div>
+      </div>
+      <div class="lw">
+        <button class="lang-btn" onclick="toggleLangMenu()" aria-haspopup="listbox" aria-expanded="false" id="lang-btn"><i class="fa-solid fa-globe" aria-hidden="true"></i><span id="lang-label">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px" aria-hidden="true"></i></button>
+        <div class="lm" id="lm" role="listbox" aria-label="Idioma">
+          <div class="lo active" onclick="setLang('pt')" role="option">🇧🇷 Português</div>
+          <div class="lo" onclick="setLang('en')" role="option">🇺🇸 English</div>
+          <div class="lo" onclick="setLang('es')" role="option">🇪🇸 Español</div>
+          <div class="lo" onclick="setLang('de')" role="option">🇩🇪 Deutsch</div>
+          <div class="lo" onclick="setLang('ru')" role="option">🇷🇺 Русский</div>
+        </div>
+      </div>
+      <div class="hdr-user" onclick="goTo('profile',null)" aria-label="Perfil do operador">
+        <div class="hdr-av" id="hdr-av" aria-hidden="true">JP</div>
+        <div class="hdr-ui"><strong id="hdr-name">João Pedro Silva</strong><span data-i18n="online_status">Online</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content" id="main-content" role="main">
+
+<!-- =========== DASHBOARD =========== -->
+<div class="view active" id="view-dashboard">
+<div class="bc"><i class="fa-solid fa-house" aria-hidden="true"></i> Home <i class="fa-solid fa-chevron-right" aria-hidden="true"></i><span data-i18n="nav_dashboard">Dashboard</span></div>
+<div class="pg-hd"><div class="pg-hd-l"><h2 data-i18n="nav_dashboard">Dashboard</h2><p id="dash-greet">Olá! Acompanhe seus chamados.</p></div><button class="btn primary sm" onclick="openNewTicket()"><i class="fa-solid fa-plus" aria-hidden="true"></i><span data-i18n="btn_new_ticket">Novo Chamado</span></button></div>
+<div class="sg" role="region" aria-label="Resumo de chamados">
+  <article class="sc blue" style="animation-delay:.04s"><div class="sc-bg" aria-hidden="true"></div><div class="sc-top"><div class="sc-ico" aria-hidden="true"><i class="fa-solid fa-folder-open"></i></div><span class="sc-trend neu" aria-label="estável">—</span></div><div class="sc-val" id="cnt-open">0</div><div class="sc-lbl" data-i18n="stat_open">Chamados Abertos</div><div class="sc-sub" data-i18n="stat_open_sub">Aguardando técnico</div></article>
+  <article class="sc warn" style="animation-delay:.08s"><div class="sc-bg" aria-hidden="true"></div><div class="sc-top"><div class="sc-ico" aria-hidden="true"><i class="fa-solid fa-spinner"></i></div></div><div class="sc-val" id="cnt-atend">0</div><div class="sc-lbl" data-i18n="stat_atend">Em Atendimento</div><div class="sc-sub" data-i18n="stat_atend_sub">Técnico em campo</div></article>
+  <article class="sc ok" style="animation-delay:.12s"><div class="sc-bg" aria-hidden="true"></div><div class="sc-top"><div class="sc-ico" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></div><span class="sc-trend up" aria-label="aumento">+2</span></div><div class="sc-val" id="cnt-done">0</div><div class="sc-lbl" data-i18n="stat_done">Finalizados</div><div class="sc-sub" data-i18n="stat_done_sub">Este mês</div></article>
+  <article class="sc red" style="animation-delay:.16s"><div class="sc-bg" aria-hidden="true"></div><div class="sc-top"><div class="sc-ico" aria-hidden="true"><i class="fa-solid fa-fire"></i></div></div><div class="sc-val" id="cnt-urg">0</div><div class="sc-lbl" data-i18n="stat_urg">Urgentes</div><div class="sc-sub" data-i18n="stat_urg_sub">Alta prioridade</div></article>
+</div>
+<div class="charts-grid">
+  <div class="panel" style="animation-delay:.2s">
+    <div class="panel-hd"><div class="panel-hd-l"><h3 data-i18n="chart_by_sector">Chamados por Setor</h3><p data-i18n="chart_by_sector_sub">Distribuição por área</p></div></div>
+    <div class="chart-body"><div class="bar-chart" id="bar-chart" role="img" aria-label="Gráfico de chamados por setor"></div></div>
+  </div>
+  <div class="panel" style="animation-delay:.25s">
+    <div class="panel-hd"><div class="panel-hd-l"><h3 data-i18n="chart_by_prio">Chamados por Prioridade</h3><p data-i18n="chart_by_prio_sub">Alta, Média e Baixa</p></div></div>
+    <div class="chart-body"><div style="display:flex;align-items:center;justify-content:center;gap:0"><div class="donut-wrap" id="donut-wrap" role="img" aria-label="Gráfico de chamados por prioridade"><svg width="180" height="180" viewBox="0 0 180 180" aria-hidden="true"><circle cx="90" cy="90" r="70" fill="none" stroke="var(--br)" stroke-width="24"/><circle id="arc-alta" cx="90" cy="90" r="70" fill="none" stroke="var(--dn)" stroke-width="24" stroke-dasharray="440" stroke-dashoffset="440" style="transition:stroke-dashoffset 1.2s ease"/><circle id="arc-media" cx="90" cy="90" r="70" fill="none" stroke="var(--wn)" stroke-width="24" stroke-dasharray="440" stroke-dashoffset="440" style="transition:stroke-dashoffset 1.2s ease .2s"/><circle id="arc-baixa" cx="90" cy="90" r="70" fill="none" stroke="var(--bm)" stroke-width="24" stroke-dasharray="440" stroke-dashoffset="440" style="transition:stroke-dashoffset 1.2s ease .4s"/></svg><div class="donut-center"><strong id="donut-total">0</strong><span data-i18n="total_label">Total</span></div></div><div class="donut-legend" id="donut-legend"></div></div></div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 290px;gap:22px">
+  <div class="panel" style="animation-delay:.3s">
+    <div class="panel-hd"><div class="panel-hd-l"><h3 data-i18n="recent_title">Chamados Recentes</h3><p data-i18n="recent_sub">Últimos abertos</p></div><button class="btn primary xs" onclick="goTo('my-tickets',null)"><span data-i18n="btn_see_all">Ver todos</span></button></div>
+    <div class="tw"><table aria-label="Chamados recentes"><thead><tr><th scope="col">ID</th><th scope="col" data-i18n="col_equip">Equipamento</th><th scope="col" data-i18n="col_sector">Setor</th><th scope="col" data-i18n="col_priority">Prioridade</th><th scope="col">Status</th><th scope="col" data-i18n="col_date">Data</th></tr></thead><tbody id="dash-tbody"></tbody></table></div>
+  </div>
+  <div class="tl-panel" style="animation-delay:.35s">
+    <div class="tl-hd"><h3 data-i18n="tl_title">Atividades Recentes</h3><p data-i18n="tl_sub">Linha do tempo</p></div>
+    <div class="tl-body" id="tl-body" role="log" aria-live="polite" aria-label="Atividades recentes"></div>
+  </div>
+</div>
+</div>
+
+<!-- =========== MY TICKETS =========== -->
+<div class="view" id="view-my-tickets">
+<div class="bc"><i class="fa-solid fa-house" aria-hidden="true"></i> Home <i class="fa-solid fa-chevron-right" aria-hidden="true"></i><span data-i18n="nav_my_tickets">Meus Chamados</span></div>
+<div class="pg-hd"><div class="pg-hd-l"><h2 data-i18n="nav_my_tickets">Meus Chamados</h2><p data-i18n="my_tickets_sub">Chamados abertos e em atendimento</p></div><button class="btn primary sm" onclick="openNewTicket()"><i class="fa-solid fa-plus" aria-hidden="true"></i><span data-i18n="btn_new_ticket">Novo Chamado</span></button></div>
+<div class="sr">
+  <div class="srch"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="mt-search" data-i18n-ph="search_ph" placeholder="Buscar chamado..." oninput="renderMyTickets()" aria-label="Buscar chamado"/></div>
+  <select class="fsl" id="mt-prio" onchange="renderMyTickets()" aria-label="Filtrar por prioridade"><option value="" data-i18n="filter_all_prio">Todas Prioridades</option><option value="alta" data-i18n="prio_high">Alta</option><option value="media" data-i18n="prio_med">Média</option><option value="baixa" data-i18n="prio_low">Baixa</option></select>
+  <select class="fsl" id="mt-status" onchange="renderMyTickets()" aria-label="Filtrar por status"><option value="" data-i18n="filter_all_status">Todos Status</option><option value="aberto" data-i18n="status_open">Aberto</option><option value="atendimento" data-i18n="status_atend">Em Atendimento</option></select>
+  <select class="fsl" id="mt-sector" onchange="renderMyTickets()" aria-label="Filtrar por setor"><option value="" data-i18n="filter_all_sectors">Todos Setores</option><option>Produção A</option><option>Produção B</option><option>Embalagem</option><option>Logística</option><option>Manutenção</option><option>Tecnologia</option></select>
+</div>
+<div class="panel">
+  <div class="panel-hd"><div class="panel-hd-l"><h3 data-i18n="nav_my_tickets">Meus Chamados</h3><p id="mt-count"></p></div></div>
+  <div class="tw"><table aria-label="Lista de chamados"><thead><tr><th scope="col">ID</th><th scope="col" data-i18n="col_equip">Equipamento</th><th scope="col" data-i18n="col_sector">Setor</th><th scope="col" data-i18n="col_problem">Problema</th><th scope="col" data-i18n="col_priority">Prioridade</th><th scope="col">Status</th><th scope="col" data-i18n="col_tech">Técnico</th><th scope="col" data-i18n="col_date">Data</th><th scope="col" data-i18n="col_actions">Ações</th></tr></thead><tbody id="mt-tbody"></tbody></table></div>
+  <div class="pag"><div class="pag-info" id="mt-pag-info"></div><div class="pag-btns" id="mt-pag-btns"></div></div>
+</div>
+</div>
+
+<!-- =========== HISTORY =========== -->
+<div class="view" id="view-history">
+<div class="bc"><i class="fa-solid fa-house" aria-hidden="true"></i> Home <i class="fa-solid fa-chevron-right" aria-hidden="true"></i><span data-i18n="nav_history">Histórico</span></div>
+<div class="pg-hd"><div class="pg-hd-l"><h2 data-i18n="nav_history">Histórico de Chamados</h2><p data-i18n="history_sub">Chamados finalizados</p></div></div>
+<div class="sr">
+  <div class="srch"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="hist-search" data-i18n-ph="search_ph" placeholder="Buscar chamado..." oninput="renderHistory()" aria-label="Buscar no histórico"/></div>
+  <select class="fsl" id="hist-prio" onchange="renderHistory()" aria-label="Filtrar por prioridade"><option value="" data-i18n="filter_all_prio">Todas Prioridades</option><option value="alta" data-i18n="prio_high">Alta</option><option value="media" data-i18n="prio_med">Média</option><option value="baixa" data-i18n="prio_low">Baixa</option></select>
+</div>
+<div class="panel">
+  <div class="panel-hd"><div class="panel-hd-l"><h3 data-i18n="nav_history">Histórico</h3><p id="hist-count"></p></div></div>
+  <div class="tw"><table aria-label="Histórico de chamados finalizados"><thead><tr><th scope="col">ID</th><th scope="col" data-i18n="col_equip">Equipamento</th><th scope="col" data-i18n="col_sector">Setor</th><th scope="col" data-i18n="col_priority">Prioridade</th><th scope="col" data-i18n="col_tech">Técnico</th><th scope="col" data-i18n="col_date_end">Data Finaliz.</th><th scope="col" data-i18n="col_actions">Detalhes</th></tr></thead><tbody id="hist-tbody"></tbody></table></div>
+  <div class="pag"><div class="pag-info" id="hist-pag-info"></div><div class="pag-btns" id="hist-pag-btns"></div></div>
+</div>
+</div>
+
+<!-- =========== PROFILE =========== -->
+<div class="view" id="view-profile">
+<div class="bc"><i class="fa-solid fa-house" aria-hidden="true"></i> Home <i class="fa-solid fa-chevron-right" aria-hidden="true"></i><span data-i18n="nav_profile">Meu Perfil</span></div>
+<div class="p-card">
+  <div class="p-hero">
+    <div class="p-av" id="prof-av" aria-hidden="true">JP</div>
+    <div class="p-info">
+      <strong id="prof-name">João Pedro Silva</strong>
+      <div class="role" data-i18n="op_role">Operador de Produção</div>
+      <div class="email" id="prof-email">joao.pedro@bat.com</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px">
+    <div style="background:var(--sf2);border-radius:10px;border:1px solid var(--br);padding:14px;text-align:center"><div id="pstat-open" style="font-size:22px;font-weight:700;color:var(--tx)">0</div><div style="font-size:11px;color:var(--mu);margin-top:3px" data-i18n="stat_open">Abertos</div></div>
+    <div style="background:var(--sf2);border-radius:10px;border:1px solid var(--br);padding:14px;text-align:center"><div id="pstat-atend" style="font-size:22px;font-weight:700;color:var(--tx)">0</div><div style="font-size:11px;color:var(--mu);margin-top:3px" data-i18n="stat_atend">Em Atendimento</div></div>
+    <div style="background:var(--sf2);border-radius:10px;border:1px solid var(--br);padding:14px;text-align:center"><div id="pstat-done" style="font-size:22px;font-weight:700;color:var(--tx)">0</div><div style="font-size:11px;color:var(--mu);margin-top:3px" data-i18n="stat_done">Finalizados</div></div>
+  </div>
+</div>
+<div class="p-card">
+  <p style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:14px" data-i18n="edit_profile">Editar Perfil</p>
+  <div class="fg2">
+    <div class="fg"><label for="pf-name" data-i18n="lbl_name">Nome Completo</label><input type="text" id="pf-name" value="João Pedro Silva" oninput="updateOpName(this.value)"/></div>
+    <div class="fg"><label for="pf-email" data-i18n="lbl_email">E-mail</label><input type="email" id="pf-email" value="joao.pedro@bat.com"/></div>
+  </div>
+  <div class="fg2">
+    <div class="fg"><label for="pf-sector" data-i18n="lbl_sector">Setor</label><select id="pf-sector"><option>Produção A</option><option>Produção B</option><option>Embalagem</option><option>Logística</option><option>Manutenção</option></select></div>
+    <div class="fg"><label for="pf-reg" data-i18n="lbl_reg">Matrícula</label><input type="text" id="pf-reg" value="BAT-OP-0128" readonly style="opacity:.6"/></div>
+  </div>
+  <button class="btn primary" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span data-i18n="btn_save">Salvar</span></button>
+</div>
+</div>
+
+<!-- =========== SETTINGS =========== -->
+<div class="view" id="view-settings">
+<div class="bc"><i class="fa-solid fa-house" aria-hidden="true"></i> Home <i class="fa-solid fa-chevron-right" aria-hidden="true"></i><span data-i18n="nav_settings">Configurações</span></div>
+<div class="pg-hd"><div class="pg-hd-l"><h2 data-i18n="nav_settings">Configurações</h2><p data-i18n="settings_sub">Personalize sua experiência</p></div><button class="btn primary" onclick="showToast((TR[CL]||TR.pt).toast_saved,'suc')"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span data-i18n="btn_save">Salvar</span></button></div>
+<div class="p-card">
+  <p style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:14px" data-i18n="appearance_title">Aparência</p>
+  <div class="tc-grid">
+    <div class="tc sel" id="tc-light" onclick="selectTheme('light',this)"><div class="ti">☀️</div><div class="tl" data-i18n="theme_light">Claro</div></div>
+    <div class="tc" id="tc-dark" onclick="selectTheme('dark',this)"><div class="ti">🌙</div><div class="tl" data-i18n="theme_dark">Escuro</div></div>
+    <div class="tc" id="tc-auto" onclick="selectTheme('auto',this)"><div class="ti">⚙️</div><div class="tl" data-i18n="theme_auto">Automático</div></div>
+  </div>
+  <div class="sw-row"><div class="sw-info"><strong data-i18n="setting_anim">Ativar Animações</strong><span data-i18n="setting_anim_d">Transições suaves na interface</span></div><label class="sw" aria-label="Ativar animações"><input type="checkbox" id="sw-anim" checked/><span class="swt"></span></label></div>
+</div>
+<div class="p-card">
+  <p style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:14px" data-i18n="a11y_title">Acessibilidade</p>
+  <div class="a11y-grid">
+    <div class="a11y-card" id="a11y-hc"><div class="a11y-ico"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></div><div class="a11y-txt"><strong data-i18n="a11y_contrast">Alto Contraste</strong><span data-i18n="a11y_contrast_d">Aumenta visibilidade</span></div><label class="sw" style="margin-left:auto;flex-shrink:0" aria-label="Alto contraste"><input type="checkbox" id="sw-hc" onchange="toggleHC(this)"/><span class="swt"></span></label></div>
+    <div class="a11y-card" id="a11y-kbrd"><div class="a11y-ico"><i class="fa-solid fa-keyboard" aria-hidden="true"></i></div><div class="a11y-txt"><strong data-i18n="a11y_keyboard">Navegação por Teclado</strong><span data-i18n="a11y_keyboard_d">Foco visível aprimorado</span></div><label class="sw" style="margin-left:auto;flex-shrink:0" aria-label="Navegação por teclado"><input type="checkbox" id="sw-kbrd" checked onchange="toggleA11y('a11y-kbrd',this)"/><span class="swt"></span></label></div>
+    <div class="a11y-card" id="a11y-reader"><div class="a11y-ico"><i class="fa-solid fa-volume-high" aria-hidden="true"></i></div><div class="a11y-txt"><strong data-i18n="a11y_reader">Leitor de Tela</strong><span data-i18n="a11y_reader_d">ARIA labels em todos elementos</span></div><label class="sw" style="margin-left:auto;flex-shrink:0" aria-label="Leitor de tela"><input type="checkbox" id="sw-reader" onchange="toggleA11y('a11y-reader',this)"/><span class="swt"></span></label></div>
+    <div class="a11y-card on" id="a11y-lib"><div class="a11y-ico"><i class="fa-solid fa-hands" aria-hidden="true"></i></div><div class="a11y-txt"><strong data-i18n="a11y_libras">Libras</strong><span data-i18n="a11y_libras_d">Widget ativo</span></div><label class="sw" style="margin-left:auto;flex-shrink:0" aria-label="Widget Libras"><input type="checkbox" id="sw-lib" checked onchange="toggleA11y('a11y-lib',this)"/><span class="swt"></span></label></div>
+    <div class="a11y-card" id="a11y-rm"><div class="a11y-ico"><i class="fa-solid fa-person-walking" aria-hidden="true"></i></div><div class="a11y-txt"><strong data-i18n="a11y_reduce_anim">Reduzir Animações</strong><span data-i18n="a11y_reduce_anim_d">Minimiza efeitos visuais</span></div><label class="sw" style="margin-left:auto;flex-shrink:0" aria-label="Reduzir animações"><input type="checkbox" id="sw-rm" onchange="toggleReduceMotion(this)"/><span class="swt"></span></label></div>
+    <div class="a11y-card" id="a11y-font"><div class="a11y-ico"><i class="fa-solid fa-text-height" aria-hidden="true"></i></div><div class="a11y-txt"><strong data-i18n="a11y_font">Fonte Maior</strong><span data-i18n="a11y_font_d">Textos maiores para leitura</span></div><label class="sw" style="margin-left:auto;flex-shrink:0" aria-label="Fonte maior"><input type="checkbox" id="sw-font" onchange="toggleBigFont(this)"/><span class="swt"></span></label></div>
+  </div>
+  <div style="padding:13px 0;border-top:1px solid var(--br);display:flex;align-items:center;gap:14px" role="group" aria-label="Tamanho da fonte">
+    <span style="font-size:12px;color:var(--mu);min-width:55px" data-i18n="font_small">Pequeno</span>
+    <input type="range" id="font-range" min=".85" max="1.3" step=".05" value="1" oninput="changeFontSize(this.value)" aria-label="Tamanho da fonte" style="flex:1;accent-color:var(--bm)"/>
+    <span style="font-size:12px;color:var(--mu)" data-i18n="font_large">Grande</span>
+    <span id="font-val" style="font-size:12px;font-weight:600;color:var(--bm);min-width:40px;text-align:right">100%</span>
+  </div>
+</div>
+</div>
+
+  </main>
+</div>
+<script src="/js/operador.js"></script>
+</body>
+</html>

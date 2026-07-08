@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BAT Brasil — Meus Chamados</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="/css/op.meus-chamados.css"/>
+<script src="/js/op-settings.js"></script>
+</head>
+<body>
+
+<div class="toast" id="toast"><i id="tico" class="fa-solid fa-check-circle"></i><span id="tmsg"></span></div>
+
+<!-- LIBRAS -->
+<div class="libras-wrap">
+  <div class="lib-panel" id="lib-panel">
+    <div class="lib-hd"><span><i class="fa-solid fa-hands"></i> <span id="lib-t">Libras</span></span><button class="lib-cls" onclick="document.getElementById('lib-panel').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="lib-av"><i class="fa-solid fa-hands"></i></div>
+    <div class="lib-bd"><p id="lib-d">Meus Chamados BAT Brasil. Acompanhe o status de todos os seus chamados técnicos em tempo real.</p><button class="lib-btn" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button></div>
+  </div>
+  <button class="lfab" onclick="document.getElementById('lib-panel').classList.toggle('open')"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- MODAL -->
+<div class="mbg" id="modal">
+  <div class="modal">
+    <div class="m-hd">
+      <div class="m-hd-main">
+        <div class="m-num" id="m-num">#4821</div>
+        <div class="m-equip" id="m-equip">Equipamento</div>
+        <div class="m-badges" id="m-badges"></div>
+      </div>
+      <button class="mcls" onclick="document.getElementById('modal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="m-tabs">
+      <div class="m-tab active" onclick="switchTab('ov')"><i class="fa-solid fa-circle-info"></i><span id="tl-ov">Visão Geral</span></div>
+      <div class="m-tab" onclick="switchTab('st')"><i class="fa-solid fa-route"></i><span id="tl-st">Status</span></div>
+      <div class="m-tab" onclick="switchTab('ob')"><i class="fa-solid fa-notes-medical"></i><span id="tl-ob">Observações</span></div>
+      <div class="m-tab" onclick="switchTab('im')"><i class="fa-solid fa-images"></i><span id="tl-im">Imagens</span></div>
+      <div class="m-tab" onclick="switchTab('hi')"><i class="fa-solid fa-clock-rotate-left"></i><span id="tl-hi">Histórico</span></div>
+    </div>
+    <div class="m-body">
+      <div class="tabp active" id="tabp-ov">
+        <div class="dg" id="m-dg"></div>
+        <div class="dl" id="m-desc-lbl" style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:6px">Descrição do Problema</div>
+        <div class="ddesc" id="m-desc"></div>
+        <div class="timer-row" id="m-timers"></div>
+      </div>
+      <div class="tabp" id="tabp-st">
+        <div class="pipeline" id="m-pipeline"></div>
+        <div id="m-tech"></div>
+      </div>
+      <div class="tabp" id="tabp-ob"><div id="m-obs"></div></div>
+      <div class="tabp" id="tabp-im"><div id="m-imgs"></div></div>
+      <div class="tabp" id="tabp-hi"><div class="hist-list" id="m-hist"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand"><div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div><div class="sb-bt"><strong>BAT Brasil</strong><span id="sb-panel">Painel do Operador</span></div></div>
+  <div class="sb-user"><div class="sb-av" id="sb-av">JP</div><div class="sb-ui"><strong id="sb-name">João Pedro Silva</strong><span id="sb-role">Operador de Produção</span><div class="on-pill"><span class="dot"></span><span id="sb-on">Online</span></div></div></div>
+  <nav class="sb-nav">
+    <div class="sb-sec" id="sb-s1">Principal</div>
+    
+<button class="ni" onclick="openDashboard()">
+    <i class="fa-solid fa-gauge-high"></i>
+    <span id="n-dash">Dashboard</span>
+</button>
+
+<button class="ni" onclick="openNewTicket()">
+    <i class="fa-solid fa-plus-circle"></i>
+    <span id="n-new">Novo Chamado</span>
+</button>
+
+<div class="sb-sec" id="sb-s2">Chamados</div>
+
+<button class="ni active" onclick="openMyTickets()">
+    <i class="fa-solid fa-ticket"></i>
+    <span id="n-mine">Meus Chamados</span>
+    <span class="nb" id="nb-open">0</span>
+</button>
+
+<button class="ni" onclick="openHistory()">
+    <i class="fa-solid fa-clock-rotate-left"></i>
+    <span id="n-hist">Histórico</span>
+</button>
+
+<div class="sb-sec" id="sb-s3">Conta</div>
+
+<button class="ni" onclick="openProfile()">
+    <i class="fa-solid fa-circle-user"></i>
+    <span id="n-prof">Meu Perfil</span>
+</button>
+
+<button class="ni" onclick="openSettings()">
+    <i class="fa-solid fa-sliders"></i>
+    <span id="n-cfg">Configurações</span>
+</button>
+
+
+    <div class="sb-sec"></div>
+   <button class="ni"
+        onclick="logout()"
+        style="color:rgba(229,62,62,.7)">
+    <i class="fa-solid fa-arrow-right-from-bracket"
+       style="color:rgba(229,62,62,.7)"
+       aria-hidden="true"></i>
+    <span data-i18n="nav_logout">Sair</span>
+</button>
+  </nav>
+</aside>
+<div class="overlay" id="overlay" onclick="closeSB()"></div>
+
+<div class="main-wrap">
+  <header class="hdr">
+    <button class="hbr" onclick="toggleSB()"><i class="fa-solid fa-bars"></i></button>
+    <div class="ht"><h1 id="hdr-t">Meus Chamados</h1><p id="hdr-s">BAT Brasil · Acompanhamento de Chamados Técnicos</p></div>
+    <div class="ha">
+      <button class="hb" onclick="toggleTheme()"><i id="theme-ico" class="fa-solid fa-moon"></i></button>
+      <button class="hb" style="position:relative"><i class="fa-solid fa-bell"></i><span class="nd"></span></button>
+      <div class="lw">
+        <button class="lang-btn" onclick="toggleLM()" id="lang-btn"><i class="fa-solid fa-globe"></i><span id="lang-lbl">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></button>
+        <div class="lm" id="lm">
+          <div class="lo active" onclick="setLang('pt')">🇧🇷 Português</div>
+          <div class="lo" onclick="setLang('en')">🇺🇸 English</div>
+          <div class="lo" onclick="setLang('es')">🇪🇸 Español</div>
+          <div class="lo" onclick="setLang('de')">🇩🇪 Deutsch</div>
+          <div class="lo" onclick="setLang('ru')">🇷🇺 Русский</div>
+        </div>
+      </div>
+      <div class="hdr-user">
+        <div class="hdr-av" id="hdr-av">JP</div>
+        <div class="hdr-ui"><strong id="hdr-name">João Pedro Silva</strong><span id="hdr-on">Online</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="bc"><i class="fa-solid fa-house"></i> Home <i class="fa-solid fa-chevron-right"></i><span id="bc-label">Meus Chamados</span></div>
+    <!-- PAGE HEAD -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;animation:fu .4s ease">
+      <div><h2 style="font-size:22px;font-weight:700;color:var(--tx)" id="page-h2">Meus Chamados</h2><p style="font-size:13px;color:var(--mu);margin-top:4px" id="page-sub">Acompanhe o status de todos os seus chamados técnicos</p></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="auto-badge"><span class="dot"></span><span id="auto-lbl">Atualização automática</span></div>
+        <span style="font-size:11.5px;color:var(--mu)" id="upd-lbl">Atualizado: <strong id="upd-time">agora</strong></span>
+        <button class="btn primary sm" onclick="forceRefresh()"><i class="fa-solid fa-rotate-right"></i><span id="btn-refresh">Atualizar</span></button>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="sg" id="sg">
+      <div class="sc c0" id="sc-all" onclick="filterSt('')"><div class="sc-bg"></div><div class="sc-ico"><i class="fa-solid fa-ticket"></i></div><div class="sc-val" id="cnt-all">0</div><div class="sc-lbl" id="lbl-all">Total de Chamados</div></div>
+      <div class="sc c1" id="sc-0" onclick="filterSt('0')"><div class="sc-bg"></div><div class="sc-ico"><i class="fa-solid fa-hourglass-half"></i></div><div class="sc-val" id="cnt-0">0</div><div class="sc-lbl" id="lbl-0">Aguardando Técnico</div></div>
+      <div class="sc c2" id="sc-1" onclick="filterSt('1')"><div class="sc-bg"></div><div class="sc-ico"><i class="fa-solid fa-truck-moving"></i></div><div class="sc-val" id="cnt-1">0</div><div class="sc-lbl" id="lbl-1">Em Deslocamento</div></div>
+      <div class="sc c3" id="sc-2" onclick="filterSt('2')"><div class="sc-bg"></div><div class="sc-ico"><i class="fa-solid fa-location-dot"></i></div><div class="sc-val" id="cnt-2">0</div><div class="sc-lbl" id="lbl-2">No Local</div></div>
+      <div class="sc c4" id="sc-3" onclick="filterSt('3')"><div class="sc-bg"></div><div class="sc-ico"><i class="fa-solid fa-wrench"></i></div><div class="sc-val" id="cnt-3">0</div><div class="sc-lbl" id="lbl-3">Em Atendimento</div></div>
+      <div class="sc c5" id="sc-4" onclick="filterSt('4')"><div class="sc-bg"></div><div class="sc-ico"><i class="fa-solid fa-circle-check"></i></div><div class="sc-val" id="cnt-4">0</div><div class="sc-lbl" id="lbl-4">Finalizados</div></div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="tr1">
+        <div class="srch"><i class="fa-solid fa-magnifying-glass"></i><input id="srch" placeholder="Buscar por número, equipamento, setor, técnico..." oninput="renderTable()"/></div>
+        <select class="fsl" id="f-st" onchange="renderTable()">
+          <option value="" id="o-all-st">Todos os Status</option>
+          <option value="0" id="o-st0">Aguardando Técnico</option>
+          <option value="1" id="o-st1">Em Deslocamento</option>
+          <option value="2" id="o-st2">No Local</option>
+          <option value="3" id="o-st3">Em Atendimento</option>
+          <option value="4" id="o-st4">Finalizado</option>
+        </select>
+        <select class="fsl" id="f-pr" onchange="renderTable()">
+          <option value="" id="o-all-p">Todas Prioridades</option>
+          <option value="alta" id="o-high">Alta</option>
+          <option value="media" id="o-med">Média</option>
+          <option value="baixa" id="o-low">Baixa</option>
+        </select>
+        <select class="fsl" id="f-sec" onchange="renderTable()">
+          <option value="" id="o-all-s">Todos Setores</option>
+          <option>Produção A</option><option>Produção B</option><option>Produção C</option>
+          <option>Embalagem</option><option>Logística</option><option>Manutenção</option><option>Tecnologia</option>
+        </select>
+        <div class="date-pair">
+          <input type="date" id="f-d1" onchange="renderTable()" title="Data inicial"/>
+          <span>–</span>
+          <input type="date" id="f-d2" onchange="renderTable()" title="Data final"/>
+        </div>
+        <div class="tl-btns">
+          <button class="btn ghost sm" onclick="clearFilters()"><i class="fa-solid fa-filter-circle-xmark"></i><span id="btn-clr">Limpar</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL -->
+    <div class="panel">
+      <div class="phd">
+        <div class="phd-l"><h3 id="panel-title">Lista de Chamados</h3><p id="panel-sub"></p></div>
+        <div class="phd-r">
+          <span style="font-size:12px;color:var(--mu)" id="sort-lbl">Ordenar:</span>
+          <select class="fsl" id="f-sort" onchange="renderTable()" style="min-width:130px">
+            <option value="new" id="o-srt-new">Mais recente</option>
+            <option value="old" id="o-srt-old">Mais antigo</option>
+            <option value="prio" id="o-srt-p">Prioridade</option>
+            <option value="st" id="o-srt-st">Status</option>
+          </select>
+        </div>
+      </div>
+      <div class="tw">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="srt('id')" id="th-id">Número <i class="fa-solid fa-sort si"></i></th>
+              <th onclick="srt('date')" id="th-date">Data/Hora <i class="fa-solid fa-sort si"></i></th>
+              <th onclick="srt('equip')" id="th-equip">Equipamento <i class="fa-solid fa-sort si"></i></th>
+              <th onclick="srt('sector')" id="th-sec">Setor <i class="fa-solid fa-sort si"></i></th>
+              <th onclick="srt('prio')" id="th-prio">Prioridade <i class="fa-solid fa-sort si"></i></th>
+              <th onclick="srt('status')" id="th-status">Status <i class="fa-solid fa-sort si"></i></th>
+              <th id="th-tech">Técnico</th>
+              <th id="th-travel">Deslocamento</th>
+              <th id="th-service">Atendimento</th>
+              <th id="th-act">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="pag">
+        <div class="pg-inf" id="pg-inf"></div>
+        <div class="pg-btns" id="pg-btns"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/js/op.meus-chamados.js"></script>
+</body>
+</html>

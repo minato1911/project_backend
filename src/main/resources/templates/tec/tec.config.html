@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BAT Brasil — Configurações Técnicas</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="/css/tec.config.css">
+<script src="/js/tc.config.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main" id="skip-link">Pular para o conteúdo principal</a>
+<div class="toast" id="toast"><i id="tico" class="fa-solid fa-check-circle"></i><span id="tmsg"></span></div>
+
+<div class="libras-wrap">
+  <div class="lib-panel" id="lib-panel">
+    <div class="lib-hd"><span><i class="fa-solid fa-hands"></i> <span id="lib-t">Libras</span></span><button class="lib-cls" onclick="document.getElementById('lib-panel').classList.remove('open')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="lib-av"><i class="fa-solid fa-hands"></i></div>
+    <div class="lib-bd"><p id="lib-d">Configurações Técnicas BAT Brasil. Personalize aparência, idioma, acessibilidade, notificações, atendimento e segurança.</p><button class="lib-btn" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button></div>
+  </div>
+  <button class="lfab" onclick="document.getElementById('lib-panel').classList.toggle('open')" aria-label="Ativar Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- MODAL ALTERAR SENHA -->
+<div class="mbg" id="modal-pw" role="dialog" aria-modal="true" aria-labelledby="mpw-title">
+  <div class="modal">
+    <div class="m-hd"><div class="m-hd-ico"><i class="fa-solid fa-key"></i></div><div class="m-hd-t"><h3 id="mpw-title">Alterar Senha</h3><p id="mpw-sub">Confirme a senha atual e defina a nova</p></div><button class="mcls" onclick="closeModal('modal-pw')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="m-body">
+      <div class="fg"><label id="mpw-l-cur">Senha Atual</label><div class="fi"><input type="password" id="mpw-cur" placeholder="Digite a senha atual"/><button class="pw-toggle" onclick="togglePw('mpw-cur',this)" aria-label="Mostrar"><i class="fa-solid fa-eye"></i></button></div></div>
+      <div class="fg"><label id="mpw-l-new">Nova Senha</label><div class="fi"><input type="password" id="mpw-new" placeholder="Mínimo 8 caracteres"/><button class="pw-toggle" onclick="togglePw('mpw-new',this)" aria-label="Mostrar"><i class="fa-solid fa-eye"></i></button></div></div>
+      <div class="fg"><label id="mpw-l-conf">Confirmar Nova Senha</label><div class="fi"><input type="password" id="mpw-conf" placeholder="Repita a nova senha"/><button class="pw-toggle" onclick="togglePw('mpw-conf',this)" aria-label="Mostrar"><i class="fa-solid fa-eye"></i></button></div></div>
+    </div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal('modal-pw')"><span id="mpw-cancel">Cancelar</span></button><button class="btn primary" onclick="confirmChangePw()"><i class="fa-solid fa-check"></i><span id="mpw-save">Alterar</span></button></div>
+  </div>
+</div>
+
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu principal">
+  <div class="sb-brand"><div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div><div class="sb-bt"><strong>BAT Brasil</strong><span id="sb-panel">Painel do Técnico</span></div></div>
+  <div class="sb-user"><div class="sb-av" id="sb-av">CM</div><div class="sb-ui"><strong id="sb-name">Carlos Mendes</strong><span id="sb-role">Técnico de Manutenção</span><div class="on-pill"><span class="dot"></span><span id="sb-on">Online</span></div></div></div>
+  <nav class="sb-nav">
+    <div class="sb-sec" id="sb-s1">Principal</div>
+    <button class="ni" onclick="window.location.href='/tecnico/dashboard'"><i class="fa-solid fa-gauge-high"></i><span id="n-dash">Dashboard</span></button>
+    <button class="ni" onclick="window.location.href='/tecnico/chamados-disponiveis'"><i class="fa-solid fa-inbox"></i><span id="n-avail">Chamados Disponíveis</span></button>
+    <button class="ni" onclick="window.location.href='/tecnico/chamados-disponiveis'"><i class="fa-solid fa-screwdriver-wrench"></i><span id="n-current">Meu Chamado Atual</span></button>
+    <div class="sb-sec" id="sb-s2">Registros</div>
+    <button class="ni" onclick="window.location.href='/tecnico/historico'"><i class="fa-solid fa-clock-rotate-left"></i><span id="n-hist">Histórico de Atendimentos</span></button>
+    <div class="sb-sec" id="sb-s3">Conta</div>
+    <button class="ni" onclick="window.location.href='/tecnico/perfil'"><i class="fa-solid fa-circle-user"></i><span id="n-prof">Meu Perfil</span></button>
+    <button class="ni active" aria-current="page"><i class="fa-solid fa-sliders"></i><span id="n-cfg">Configurações</span></button>
+    <div class="sb-sec"></div>
+    <button class="ni" style="color:rgba(229,62,62,.7)"><i class="fa-solid fa-arrow-right-from-bracket" style="color:rgba(229,62,62,.7)"></i><span id="n-out">Sair</span></button>
+  </nav>
+</aside>
+<div class="overlay" id="overlay" onclick="closeSB()"></div>
+
+<div class="main-wrap">
+  <header class="hdr" role="banner">
+    <button class="hbr" onclick="toggleSB()" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="ht"><h1 id="hdr-t">Configurações Técnicas</h1><p id="hdr-s">BAT Brasil · Personalização do Ambiente</p></div>
+    <div class="ha">
+      <button class="hb" onclick="toggleTheme()" aria-label="Alternar tema"><i id="theme-ico" class="fa-solid fa-moon"></i></button>
+      <div class="lw">
+        <button class="lang-btn" onclick="toggleLM()" id="lang-btn" aria-haspopup="true"><i class="fa-solid fa-globe"></i><span id="lang-lbl">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></button>
+        <div class="lm" id="lm" role="menu">
+          <div class="lo active" onclick="setLang('pt')" role="menuitem">🇧🇷 Português</div>
+          <div class="lo" onclick="setLang('en')" role="menuitem">🇺🇸 English</div>
+          <div class="lo" onclick="setLang('es')" role="menuitem">🇪🇸 Español</div>
+          <div class="lo" onclick="setLang('de')" role="menuitem">🇩🇪 Deutsch</div>
+          <div class="lo" onclick="setLang('ru')" role="menuitem">🇷🇺 Русский</div>
+        </div>
+      </div>
+      <div class="hdr-user"><div class="hdr-av" id="hdr-av">CM</div><div class="hdr-ui"><strong id="hdr-name">Carlos Mendes</strong><span id="hdr-on">Online</span></div></div>
+    </div>
+  </header>
+
+  <main class="content" id="main" role="main">
+    <div class="bc"><i class="fa-solid fa-house"></i> Home <i class="fa-solid fa-chevron-right"></i><span id="bc-label">Configurações Técnicas</span></div>
+    <div class="page-top"><div><h2 id="page-h2">Configurações Técnicas</h2><p id="page-sub">Personalize completamente o ambiente de trabalho do técnico</p></div>
+      <button class="btn ghost sm" onclick="resetAll()"><i class="fa-solid fa-rotate-left"></i><span id="btn-reset-all">Restaurar Padrões</span></button>
+    </div>
+
+    <!-- APARÊNCIA -->
+    <div class="card">
+      <div class="card-hd"><div class="card-ico blue"><i class="fa-solid fa-palette"></i></div><div class="card-hd-t"><h3 id="ap-title">Aparência</h3><p id="ap-sub">Escolha o tema do sistema</p></div></div>
+      <div class="card-body">
+        <div class="theme-grid">
+          <div class="theme-card" id="tc-light" onclick="selectTheme('light')"><div class="theme-preview tp-light"><div class="tp-bar"></div></div><div class="tc-ico">☀️</div><div class="tc-name" id="th-light">Claro</div></div>
+          <div class="theme-card" id="tc-dark" onclick="selectTheme('dark')"><div class="theme-preview tp-dark"><div class="tp-bar"></div></div><div class="tc-ico">🌙</div><div class="tc-name" id="th-dark">Escuro</div></div>
+          <div class="theme-card" id="tc-auto" onclick="selectTheme('auto')"><div class="theme-preview tp-auto"><div class="tp-bar"></div></div><div class="tc-ico">⚙️</div><div class="tc-name" id="th-auto">Automático</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IDIOMA -->
+    <div class="card">
+      <div class="card-hd"><div class="card-ico gold"><i class="fa-solid fa-language"></i></div><div class="card-hd-t"><h3 id="lg-title">Idiomas</h3><p id="lg-sub">Selecione o idioma da interface</p></div></div>
+      <div class="card-body">
+        <div class="lang-grid">
+          <div class="lang-card" id="lc-pt" onclick="selectLang('pt')"><span class="lang-flag">🇧🇷</span><span class="lang-name">Português</span><i class="fa-solid fa-check lang-check"></i></div>
+          <div class="lang-card" id="lc-en" onclick="selectLang('en')"><span class="lang-flag">🇺🇸</span><span class="lang-name">English</span><i class="fa-solid fa-check lang-check"></i></div>
+          <div class="lang-card" id="lc-es" onclick="selectLang('es')"><span class="lang-flag">🇪🇸</span><span class="lang-name">Español</span><i class="fa-solid fa-check lang-check"></i></div>
+          <div class="lang-card" id="lc-de" onclick="selectLang('de')"><span class="lang-flag">🇩🇪</span><span class="lang-name">Deutsch</span><i class="fa-solid fa-check lang-check"></i></div>
+          <div class="lang-card" id="lc-ru" onclick="selectLang('ru')"><span class="lang-flag">🇷🇺</span><span class="lang-name">Русский</span><i class="fa-solid fa-check lang-check"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACESSIBILIDADE -->
+    <div class="card">
+      <div class="card-hd"><div class="card-ico green"><i class="fa-solid fa-universal-access"></i></div><div class="card-hd-t"><h3 id="ac-title">Acessibilidade</h3><p id="ac-sub">Recursos para melhor experiência</p></div></div>
+      <div class="card-body">
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-hands"></i></div><div><strong id="ac-libras">Libras</strong><span id="ac-libras-d">Widget de intérprete de Libras (VLibras)</span></div></div></div><label class="sw" aria-label="Libras"><input type="checkbox" id="sw-libras" checked onchange="toggleLibrasWidget(this)"/><span class="swt"></span></label></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-circle-half-stroke"></i></div><div><strong id="ac-hc">Alto Contraste</strong><span id="ac-hc-d">Aumenta o contraste de cores</span></div></div></div><label class="sw" aria-label="Alto contraste"><input type="checkbox" id="sw-hc" onchange="toggleHC(this)"/><span class="swt"></span></label></div>
+        <div class="font-control"><div class="tr-info" style="flex:0 0 auto;min-width:140px"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-text-height"></i></div><div><strong id="ac-font">Aumentar Fonte</strong></div></div></div><span class="fc-small">A</span><input type="range" id="font-range" min="0.85" max="1.35" step="0.05" value="1" oninput="changeFont(this.value)" aria-label="Tamanho da fonte"/><span class="fc-large">A</span><span class="font-val" id="font-val">100%</span></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-person-walking"></i></div><div><strong id="ac-rm">Reduzir Animações</strong><span id="ac-rm-d">Minimiza transições e efeitos visuais</span></div></div></div><label class="sw" aria-label="Reduzir animações"><input type="checkbox" id="sw-rm" onchange="toggleRM(this)"/><span class="swt"></span></label></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-list-check"></i></div><div><strong id="ac-simple">Navegação Simplificada</strong><span id="ac-simple-d">Interface com menos elementos e foco no essencial</span></div></div></div><label class="sw" aria-label="Navegação simplificada"><input type="checkbox" id="sw-simple" onchange="toggleSimple(this)"/><span class="swt"></span></label></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-volume-high"></i></div><div><strong id="ac-reader">Leitor de Tela</strong><span id="ac-reader-d">Otimiza ARIA labels para leitores de tela</span></div></div></div><label class="sw" aria-label="Leitor de tela"><input type="checkbox" id="sw-reader" onchange="saveToggle('reader',this)"/><span class="swt"></span></label></div>
+      </div>
+    </div>
+
+    <!-- NOTIFICAÇÕES -->
+    <div class="card">
+      <div class="card-hd"><div class="card-ico purple"><i class="fa-solid fa-bell"></i></div><div class="card-hd-t"><h3 id="nt-title">Notificações</h3><p id="nt-sub">Quando deseja ser alertado</p></div></div>
+      <div class="card-body">
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-inbox"></i></div><div><strong id="nt-new">Novos Chamados</strong><span id="nt-new-d">Alertar quando surgir um chamado disponível</span></div></div></div><label class="sw" aria-label="Novos chamados"><input type="checkbox" id="sw-new" checked onchange="saveToggle('notif-new',this)"/><span class="swt"></span></label></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-triangle-exclamation"></i></div><div><strong id="nt-urgent">Chamados Urgentes</strong><span id="nt-urgent-d">Alertar sobre chamados de prioridade alta</span></div></div></div><label class="sw" aria-label="Chamados urgentes"><input type="checkbox" id="sw-urgent" checked onchange="saveToggle('notif-urgent',this)"/><span class="swt"></span></label></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-clock"></i></div><div><strong id="nt-exceeded">Tempo Excedido</strong><span id="nt-exceeded-d">Alertar quando o atendimento ultrapassar o limite</span></div></div></div><label class="sw" aria-label="Tempo excedido"><input type="checkbox" id="sw-exceeded" checked onchange="saveToggle('notif-exceeded',this)"/><span class="swt"></span></label></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-music"></i></div><div><strong id="nt-sound">Sons</strong><span id="nt-sound-d">Tocar som ao receber notificações</span></div></div></div><label class="sw" aria-label="Sons"><input type="checkbox" id="sw-sound" onchange="saveToggle('notif-sound',this)"/><span class="swt"></span></label></div>
+      </div>
+    </div>
+
+    <!-- ATENDIMENTO -->
+    <div class="card">
+      <div class="card-hd"><div class="card-ico teal"><i class="fa-solid fa-screwdriver-wrench"></i></div><div class="card-hd-t"><h3 id="at-title">Atendimento</h3><p id="at-sub">Parâmetros do fluxo de atendimento</p></div></div>
+      <div class="card-body">
+        <div class="svc-row">
+          <div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-stopwatch"></i></div><div><strong id="at-time">Tempo Padrão de Atendimento</strong><span id="at-time-d">Duração da contagem regressiva de cada chamado</span></div></div></div>
+          <div class="stepper"><button onclick="stepTime(-5)" aria-label="Diminuir"><i class="fa-solid fa-minus"></i></button><input type="number" id="svc-time" value="30" min="5" max="180" step="5" onchange="saveSvcTime()" aria-label="Tempo padrão"/><span class="unit" id="at-unit">min</span><button onclick="stepTime(5)" aria-label="Aumentar"><i class="fa-solid fa-plus"></i></button></div>
+        </div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-bell-concierge"></i></div><div><strong id="at-alerts">Alertas Automáticos</strong><span id="at-alerts-d">Avisar automaticamente quando o tempo estiver acabando</span></div></div></div><label class="sw" aria-label="Alertas automáticos"><input type="checkbox" id="sw-auto-alert" checked onchange="saveToggle('auto-alert',this)"/><span class="swt"></span></label></div>
+        <div class="svc-row">
+          <div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-pause"></i></div><div><strong id="at-pause">Configuração de Pausa</strong><span id="at-pause-d">Limite máximo de pausa durante o atendimento</span></div></div></div>
+          <div class="stepper"><button onclick="stepPause(-1)" aria-label="Diminuir"><i class="fa-solid fa-minus"></i></button><input type="number" id="pause-limit" value="10" min="1" max="60" step="1" onchange="savePauseLimit()" aria-label="Limite de pausa"/><span class="unit" id="at-pause-unit">min</span><button onclick="stepPause(1)" aria-label="Aumentar"><i class="fa-solid fa-plus"></i></button></div>
+        </div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-info-top"><div class="tr-ico"><i class="fa-solid fa-hand"></i></div><div><strong id="at-pause-allow">Permitir Pausa</strong><span id="at-pause-allow-d">Habilitar o botão de pausar atendimento</span></div></div></div><label class="sw" aria-label="Permitir pausa"><input type="checkbox" id="sw-pause-allow" checked onchange="saveToggle('pause-allow',this)"/><span class="swt"></span></label></div>
+      </div>
+    </div>
+
+    <!-- SEGURANÇA -->
+    <div class="card">
+      <div class="card-hd"><div class="card-ico red"><i class="fa-solid fa-shield-halved"></i></div><div class="card-hd-t"><h3 id="pv-title">Segurança</h3><p id="pv-sub">Senha, sessões e dispositivos</p></div></div>
+      <div class="card-body">
+        <div class="priv-item"><div class="priv-ico"><i class="fa-solid fa-key"></i></div><div class="priv-info"><strong id="pv-pw">Alterar Senha</strong><span id="pv-pw-d">Atualize sua senha de acesso ao sistema</span></div><button class="btn ghost sm" onclick="openModal('modal-pw')"><i class="fa-solid fa-pen"></i><span id="pv-pw-btn">Alterar</span></button></div>
+        <div class="priv-item" style="flex-wrap:wrap"><div class="priv-ico"><i class="fa-solid fa-laptop-mobile"></i></div><div class="priv-info"><strong id="pv-sessions">Sessões Ativas</strong><span id="pv-sessions-d">Sessões conectadas à sua conta</span></div><div class="session-list" id="session-list" style="width:100%"></div></div>
+        <div class="priv-item" style="flex-wrap:wrap"><div class="priv-ico"><i class="fa-solid fa-clock-rotate-left"></i></div><div class="priv-info"><strong id="pv-login">Histórico de Login</strong><span id="pv-login-d">Últimos acessos registrados</span></div><div class="session-list" id="login-list" style="width:100%"></div></div>
+        <div class="priv-item" style="flex-wrap:wrap"><div class="priv-ico"><i class="fa-solid fa-mobile-screen-button"></i></div><div class="priv-info"><strong id="pv-devices">Dispositivos Conectados</strong><span id="pv-devices-d">Aparelhos com acesso autorizado</span></div><div class="session-list" id="devices-list" style="width:100%"></div></div>
+      </div>
+    </div>
+
+    <!-- SAVE BAR -->
+    <div class="card" style="margin-bottom:0">
+      <div class="save-bar">
+        <div class="save-bar-info"><i class="fa-solid fa-circle-check"></i><span id="save-info">Todas as alterações são salvas automaticamente</span></div>
+        <div class="save-actions"><button class="btn ghost sm" onclick="resetAll()"><i class="fa-solid fa-rotate-left"></i><span id="btn-reset2">Restaurar</span></button><button class="btn primary sm" onclick="saveAll()"><i class="fa-solid fa-floppy-disk"></i><span id="btn-save-all">Salvar Tudo</span></button></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

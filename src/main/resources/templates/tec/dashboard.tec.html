@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BAT Brasil — Dashboard Técnico</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="/css/dashbord.tce.css">
+<script src="/js/dashbord.tec.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main" id="skip-link">Pular para o conteúdo principal</a>
+<div class="toast" id="toast"><i id="tico" class="fa-solid fa-check-circle"></i><span id="tmsg"></span></div>
+
+<div class="libras-wrap">
+  <div class="lib-panel" id="lib-panel">
+    <div class="lib-hd"><span><i class="fa-solid fa-hands"></i> <span id="lib-t">Libras</span></span><button class="lib-cls" onclick="document.getElementById('lib-panel').classList.remove('open')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="lib-av"><i class="fa-solid fa-hands"></i></div>
+    <div class="lib-bd"><p id="lib-d">Dashboard Técnico BAT Brasil. Visão geral dos chamados técnicos disponíveis e em atendimento.</p><button class="lib-btn" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button></div>
+  </div>
+  <button class="lfab" onclick="document.getElementById('lib-panel').classList.toggle('open')" aria-label="Ativar Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu principal">
+  <div class="sb-brand"><div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div><div class="sb-bt"><strong>BAT Brasil</strong><span id="sb-panel">Painel do Técnico</span></div></div>
+  <div class="sb-user"><div class="sb-av" id="sb-av">CM</div><div class="sb-ui"><strong id="sb-name">Carlos Mendes</strong><span id="sb-role">Técnico de Manutenção</span><div class="on-pill"><span class="dot"></span><span id="sb-on">Online</span></div></div></div>
+  <nav class="sb-nav">
+    <div class="sb-sec" id="sb-s1">Principal</div>
+    <button class="ni active" aria-current="page"><i class="fa-solid fa-gauge-high"></i><span id="n-dash">Dashboard</span></button>
+    <button class="ni" onclick="window.location.href='/tecnico/chamados-disponiveis'"><i class="fa-solid fa-inbox"></i><span id="n-avail">Chamados Disponíveis</span><span class="nb" id="nb-avail">0</span></button>
+    <button class="ni" onclick="window.location.href='/tecnico/chamados-disponiveis'"><i class="fa-solid fa-screwdriver-wrench"></i><span id="n-current">Meu Chamado Atual</span><span class="nb green" id="nb-current">0</span></button>
+    <div class="sb-sec" id="sb-s2">Registros</div>
+    <button class="ni" onclick="window.location.href='/tecnico/historico'"><i class="fa-solid fa-clock-rotate-left"></i><span id="n-hist">Histórico de Atendimentos</span></button>
+    <div class="sb-sec" id="sb-s3">Conta</div>
+    <button class="ni" onclick="window.location.href='/tecnico/perfil'"><i class="fa-solid fa-circle-user"></i><span id="n-prof">Meu Perfil</span></button>
+    <button class="ni" onclick="window.location.href='/tecnico/configuracoes'"><i class="fa-solid fa-sliders"></i><span id="n-cfg">Configurações</span></button>
+    <div class="sb-sec"></div>
+    <button class="ni" style="color:rgba(229,62,62,.7)"><i class="fa-solid fa-arrow-right-from-bracket" style="color:rgba(229,62,62,.7)"></i><span id="n-out">Sair</span></button>
+  </nav>
+</aside>
+<div class="overlay" id="overlay" onclick="closeSB()"></div>
+
+<div class="main-wrap">
+  <header class="hdr" role="banner">
+    <button class="hbr" onclick="toggleSB()" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="ht"><h1 id="hdr-t">Dashboard Técnico</h1><p id="hdr-s">BAT Brasil · Visão Geral dos Chamados</p></div>
+    <div class="ha">
+      <button class="hb" onclick="toggleTheme()" aria-label="Alternar tema" id="theme-btn"><i id="theme-ico" class="fa-solid fa-moon"></i></button>
+      <div class="notif-wrap">
+        <button class="hb" onclick="toggleNotif()" aria-label="Notificações" aria-haspopup="true"><i class="fa-solid fa-bell"></i><span class="nd" id="notif-dot" style="display:none"></span></button>
+        <div class="notif-menu" id="notif-menu" role="menu">
+          <div class="notif-hd"><strong id="notif-title">Notificações</strong><button onclick="clearNotifs()" id="notif-clear">Limpar</button></div>
+          <div class="notif-list" id="notif-list"></div>
+        </div>
+      </div>
+      <div class="lw">
+        <button class="lang-btn" onclick="toggleLM()" id="lang-btn" aria-haspopup="true"><i class="fa-solid fa-globe"></i><span id="lang-lbl">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></button>
+        <div class="lm" id="lm" role="menu">
+          <div class="lo active" onclick="setLang('pt')" role="menuitem">🇧🇷 Português</div>
+          <div class="lo" onclick="setLang('en')" role="menuitem">🇺🇸 English</div>
+          <div class="lo" onclick="setLang('es')" role="menuitem">🇪🇸 Español</div>
+          <div class="lo" onclick="setLang('de')" role="menuitem">🇩🇪 Deutsch</div>
+          <div class="lo" onclick="setLang('ru')" role="menuitem">🇷🇺 Русский</div>
+        </div>
+      </div>
+      <div class="hdr-user"><div class="hdr-av" id="hdr-av">CM</div><div class="hdr-ui"><strong id="hdr-name">Carlos Mendes</strong><span id="hdr-on">Online</span></div></div>
+    </div>
+  </header>
+
+  <main class="content" id="main" role="main">
+    <div class="bc"><i class="fa-solid fa-house"></i> Home <i class="fa-solid fa-chevron-right"></i><span id="bc-label">Dashboard</span></div>
+    <div class="page-top"><div><h2 id="page-h2">Bem-vindo, Carlos</h2><p id="page-sub">Aqui está a visão geral dos chamados técnicos de hoje</p></div>
+      <button class="btn primary sm" onclick="refreshData()"><i class="fa-solid fa-rotate-right"></i><span id="btn-refresh">Atualizar</span></button>
+    </div>
+
+    <div class="alerts" id="alerts"></div>
+
+    <div class="sg">
+      <div class="sc c0"><div class="sc-bg"></div><div class="sc-top"><div class="sc-ico"><i class="fa-solid fa-inbox"></i></div><span class="sc-tag none" id="tag-avail">—</span></div><div class="sc-val" id="cnt-avail">0</div><div class="sc-lbl" id="lbl-avail">Chamados Disponíveis</div><div class="sc-sub"><i class="fa-solid fa-circle-info" style="color:var(--bm)"></i> <span id="sub-avail">Aguardando atribuição</span></div></div>
+      <div class="sc c1"><div class="sc-bg"></div><div class="sc-top"><div class="sc-ico"><i class="fa-solid fa-screwdriver-wrench"></i></div><span class="sc-tag none" id="tag-current">—</span></div><div class="sc-val" id="cnt-current">0</div><div class="sc-lbl" id="lbl-current">Chamado Atual</div><div class="sc-sub"><i class="fa-solid fa-spinner" style="color:var(--gdk)"></i> <span id="sub-current">Em atendimento agora</span></div></div>
+      <div class="sc c2"><div class="sc-bg"></div><div class="sc-top"><div class="sc-ico"><i class="fa-solid fa-triangle-exclamation"></i></div><span class="sc-tag none" id="tag-urgent">—</span></div><div class="sc-val" id="cnt-urgent">0</div><div class="sc-lbl" id="lbl-urgent">Chamados Urgentes</div><div class="sc-sub"><i class="fa-solid fa-bolt" style="color:var(--dn)"></i> <span id="sub-urgent">Prioridade alta</span></div></div>
+      <div class="sc c3"><div class="sc-bg"></div><div class="sc-top"><div class="sc-ico"><i class="fa-solid fa-circle-check"></i></div><span class="sc-tag up" id="tag-done">Hoje</span></div><div class="sc-val" id="cnt-done">0</div><div class="sc-lbl" id="lbl-done">Finalizados Hoje</div><div class="sc-sub"><i class="fa-solid fa-trophy" style="color:var(--ok)"></i> <span id="sub-done">Atendimentos concluídos</span></div></div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-hd"><h3 id="ch1-title">Chamados por Prioridade</h3><p id="ch1-sub">Distribuição atual</p></div>
+        <div class="chart-body"><div class="donut-wrap"><div class="donut"><svg width="120" height="120" viewBox="0 0 120 120" id="donut-svg" role="img" aria-label="Gráfico de prioridades"></svg><div class="donut-center"><strong id="donut-total">0</strong><span id="donut-lbl">Total</span></div></div><div class="donut-legend" id="donut-legend"></div></div></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-hd"><h3 id="ch2-title">Chamados por Setor</h3><p id="ch2-sub">Volume por área</p></div>
+        <div class="chart-body"><div class="bars" id="sector-bars"></div></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-hd"><h3 id="ch3-title">Tempo Médio de Atendimento</h3><p id="ch3-sub">Desempenho geral</p></div>
+        <div class="chart-body"><div class="gauge"><div class="gauge-circle"><svg width="130" height="130" viewBox="0 0 130 130" id="gauge-svg" role="img" aria-label="Tempo médio"></svg><div class="gauge-center"><strong id="gauge-val">0min</strong><span id="gauge-lbl">média</span></div></div><div class="gauge-info"><div class="gauge-stat"><strong id="gauge-fast">—</strong><span id="gauge-fast-l">Mais rápido</span></div><div class="gauge-stat"><strong id="gauge-slow">—</strong><span id="gauge-slow-l">Mais lento</span></div></div></div></div>
+      </div>
+    </div>
+
+    <div class="tl-grid">
+      <div class="tl-card">
+        <div class="tl-hd"><div class="tl-hd-ico recv"><i class="fa-solid fa-inbox"></i></div><h3 id="tl1-title">Últimos Chamados Recebidos</h3></div>
+        <div class="tl-body" id="tl-received"></div>
+      </div>
+      <div class="tl-card">
+        <div class="tl-hd"><div class="tl-hd-ico done"><i class="fa-solid fa-circle-check"></i></div><h3 id="tl2-title">Últimos Finalizados</h3></div>
+        <div class="tl-body" id="tl-finished"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

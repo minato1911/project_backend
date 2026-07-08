@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BAT Brasil — Meu Perfil (Operador)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="/css/op.meu-perfil.css"/>
+<script src="/js/op-settings.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main" id="skip-link">Pular para o conteúdo principal</a>
+<div class="toast" id="toast"><i id="tico" class="fa-solid fa-check-circle"></i><span id="tmsg"></span></div>
+
+<!-- LIBRAS -->
+<div class="libras-wrap">
+  <div class="lib-panel" id="lib-panel">
+    <div class="lib-hd"><span><i class="fa-solid fa-hands"></i> <span id="lib-t">Libras</span></span><button class="lib-cls" onclick="document.getElementById('lib-panel').classList.remove('open')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="lib-av"><i class="fa-solid fa-hands"></i></div>
+    <div class="lib-bd"><p id="lib-d">Meu Perfil BAT Brasil. Gerencie seus dados pessoais, foto, senha e contatos.</p><button class="lib-btn" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button></div>
+  </div>
+  <button class="lfab" onclick="document.getElementById('lib-panel').classList.toggle('open')" aria-label="Ativar Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- MODAL: ALTERAR FOTO -->
+<div class="mbg" id="modal-photo" role="dialog" aria-modal="true" aria-labelledby="mp-title">
+  <div class="modal">
+    <div class="m-hd"><div class="m-hd-ico"><i class="fa-solid fa-camera"></i></div><div class="m-hd-t"><h3 id="mp-title">Alterar Foto</h3><p id="mp-sub">Envie uma nova foto de perfil</p></div><button class="mcls" onclick="closeModal('modal-photo')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="m-body">
+      <div class="avatar-preview" id="photo-preview">JP</div>
+      <div class="upload-photo">
+        <input type="file" id="photo-input" accept="image/*" onchange="previewPhoto(this)" aria-label="Selecionar foto"/>
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <p id="up-photo-t">Clique ou arraste uma imagem</p>
+        <span id="up-photo-s">PNG, JPG até 5MB</span>
+      </div>
+    </div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal('modal-photo')"><span id="mp-cancel">Cancelar</span></button><button class="btn primary" onclick="savePhoto()"><i class="fa-solid fa-check"></i><span id="mp-save">Salvar Foto</span></button></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu principal">
+  <div class="sb-brand"><div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div><div class="sb-bt"><strong>BAT Brasil</strong><span id="sb-panel">Painel do Operador</span></div></div>
+  <div class="sb-user"><div class="sb-av" id="sb-av">JP</div><div class="sb-ui"><strong id="sb-name">João Pedro Silva</strong><span id="sb-role">Operador de Produção</span><div class="on-pill"><span class="dot"></span><span id="sb-on">Online</span></div></div></div>
+  <nav class="sb-nav">
+    <div class="sb-sec" id="sb-s1">Principal</div>
+    
+    <button class="ni" onclick="openDashboard()">
+    <i class="fa-solid fa-gauge-high"></i>
+    <span id="n-dash">Dashboard</span>
+</button>
+
+<button class="ni" onclick="openNewTicket()">
+    <i class="fa-solid fa-plus-circle"></i>
+    <span id="n-new">Novo Chamado</span>
+</button>
+
+<div class="sb-sec" id="sb-s2">Chamados</div>
+
+<button class="ni" onclick="openMyTickets()">
+    <i class="fa-solid fa-ticket"></i>
+    <span id="n-mine">Meus Chamados</span>
+</button>
+
+<button class="ni" onclick="openHistory()">
+    <i class="fa-solid fa-clock-rotate-left"></i>
+    <span id="n-hist">Histórico</span>
+</button>
+
+<div class="sb-sec" id="sb-s3">Conta</div>
+
+<button class="ni active" aria-current="page" onclick="openProfile()">
+    <i class="fa-solid fa-circle-user"></i>
+    <span id="n-prof">Meu Perfil</span>
+</button>
+
+<button class="ni" onclick="openSettings()">
+    <i class="fa-solid fa-sliders"></i>
+    <span id="n-cfg">Configurações</span>
+</button>
+
+    <div class="sb-sec"></div>
+       <button class="ni"
+        onclick="logout()"
+        style="color:rgba(229,62,62,.7)">
+    <i class="fa-solid fa-arrow-right-from-bracket"
+       style="color:rgba(229,62,62,.7)"
+       aria-hidden="true"></i>
+    <span data-i18n="nav_logout">Sair</span>
+</button>
+  </nav>
+</aside>
+<div class="overlay" id="overlay" onclick="closeSB()"></div>
+
+<div class="main-wrap">
+  <header class="hdr" role="banner">
+    <button class="hbr" onclick="toggleSB()" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="ht"><h1 id="hdr-t">Meu Perfil</h1><p id="hdr-s">BAT Brasil · Gerenciamento de Dados do Operador</p></div>
+    <div class="ha">
+      <button class="hb" onclick="toggleTheme()" aria-label="Alternar tema"><i id="theme-ico" class="fa-solid fa-moon"></i></button>
+      <div class="lw">
+        <button class="lang-btn" onclick="toggleLM()" id="lang-btn" aria-haspopup="true"><i class="fa-solid fa-globe"></i><span id="lang-lbl">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></button>
+        <div class="lm" id="lm" role="menu">
+          <div class="lo active" onclick="setLang('pt')" role="menuitem">🇧🇷 Português</div>
+          <div class="lo" onclick="setLang('en')" role="menuitem">🇺🇸 English</div>
+          <div class="lo" onclick="setLang('es')" role="menuitem">🇪🇸 Español</div>
+          <div class="lo" onclick="setLang('de')" role="menuitem">🇩🇪 Deutsch</div>
+          <div class="lo" onclick="setLang('ru')" role="menuitem">🇷🇺 Русский</div>
+        </div>
+      </div>
+      <div class="hdr-user">
+        <div class="hdr-av" id="hdr-av">JP</div>
+        <div class="hdr-ui"><strong id="hdr-name">João Pedro Silva</strong><span id="hdr-on">Online</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content" id="main" role="main">
+    <div class="bc"><i class="fa-solid fa-house"></i> Home <i class="fa-solid fa-chevron-right"></i><span id="bc-label">Meu Perfil</span></div>
+    <div class="page-top"><h2 id="page-h2">Meu Perfil</h2><p id="page-sub">Gerencie seus dados pessoais, segurança e preferências de contato</p></div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-banner"></div>
+      <div class="hero-body">
+        <div class="hero-photo-wrap">
+          <div class="hero-photo" id="hero-photo">JP</div>
+          <button class="hero-cam" onclick="openModal('modal-photo')" aria-label="Alterar foto"><i class="fa-solid fa-camera"></i></button>
+        </div>
+        <div class="hero-info">
+          <h3 id="hero-name">João Pedro Silva</h3>
+          <div class="hero-role"><i class="fa-solid fa-id-badge"></i> <span id="hero-role">Operador de Produção</span></div>
+          <div class="hero-meta">
+            <span class="hero-meta-item"><i class="fa-solid fa-hashtag"></i> <span id="hero-reg">BAT-OP-0128</span></span>
+            <span class="hero-meta-item"><i class="fa-solid fa-building"></i> <span id="hero-sector">Produção A</span></span>
+            <span class="hero-meta-item"><i class="fa-solid fa-envelope"></i> <span id="hero-email">joao.pedro@bat.com</span></span>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <button class="btn gold sm" onclick="openModal('modal-photo')"><i class="fa-solid fa-camera"></i><span id="btn-change-photo">Alterar Foto</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID: DADOS + CONTATO -->
+    <div class="grid2">
+      <!-- INFORMAÇÕES PESSOAIS -->
+      <div class="card">
+        <div class="card-hd"><div class="card-ico blue"><i class="fa-solid fa-user"></i></div><div class="card-hd-t"><h3 id="info-title">Informações Pessoais</h3><p id="info-sub">Dados de identificação</p></div></div>
+        <div class="card-body">
+          <div class="fg"><label id="l-name">Nome Completo</label><div class="fi"><i class="fa-solid fa-user ico"></i><input type="text" id="f-name" value="João Pedro Silva" readonly/></div></div>
+          <div class="row2">
+            <div class="fg"><label id="l-reg">Matrícula</label><div class="fi"><i class="fa-solid fa-hashtag ico"></i><input type="text" id="f-reg" value="BAT-OP-0128" readonly/></div></div>
+            <div class="fg"><label id="l-cargo">Cargo</label><div class="fi"><i class="fa-solid fa-id-badge ico"></i><input type="text" id="f-cargo" value="Operador de Produção" readonly/></div></div>
+          </div>
+          <div class="fg"><label id="l-sector">Setor</label><div class="fi"><i class="fa-solid fa-building ico"></i><input type="text" id="f-sector" value="Produção A" readonly/></div></div>
+          <p class="hint" id="info-hint"><i class="fa-solid fa-lock" style="font-size:10px"></i> Estes dados são gerenciados pelo RH e não podem ser editados.</p>
+        </div>
+      </div>
+
+      <!-- CONTATO -->
+      <div class="card">
+        <div class="card-hd"><div class="card-ico gold"><i class="fa-solid fa-address-book"></i></div><div class="card-hd-t"><h3 id="contact-title">Dados de Contato</h3><p id="contact-sub">E-mail e telefone editáveis</p></div></div>
+        <div class="card-body">
+          <div class="fg">
+            <label id="l-email">E-mail</label>
+            <div class="fi"><i class="fa-solid fa-envelope ico"></i><input type="email" id="f-email" value="joao.pedro@bat.com" oninput="validateEmail()"/></div>
+            <div class="err-txt" id="e-email"><i class="fa-solid fa-circle-exclamation"></i><span id="e-email-t">E-mail inválido.</span></div>
+          </div>
+          <div class="fg">
+            <label id="l-phone">Telefone</label>
+            <div class="fi"><i class="fa-solid fa-phone ico"></i><input type="tel" id="f-phone" value="(11) 98765-4321" oninput="maskPhone(this)"/></div>
+            <div class="hint" id="phone-hint">Formato: (DD) 90000-0000</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn ghost" onclick="resetContact()"><span id="btn-reset">Desfazer</span></button>
+          <button class="btn primary" onclick="saveContact()"><i class="fa-solid fa-floppy-disk"></i><span id="btn-save-contact">Salvar Contato</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEGURANÇA: ALTERAR SENHA -->
+    <div class="card grid-full">
+      <div class="card-hd"><div class="card-ico red"><i class="fa-solid fa-shield-halved"></i></div><div class="card-hd-t"><h3 id="sec-title">Segurança e Senha</h3><p id="sec-sub">Altere sua senha de acesso</p></div></div>
+      <div class="card-body">
+        <div class="row2">
+          <div class="fg">
+            <label id="l-curpw">Senha Atual</label>
+            <div class="fi has-toggle"><i class="fa-solid fa-lock ico"></i><input type="password" id="f-curpw" placeholder="Digite sua senha atual" oninput="checkPwForm()"/><button class="pw-toggle" onclick="togglePw('f-curpw',this)" aria-label="Mostrar senha"><i class="fa-solid fa-eye"></i></button></div>
+            <div class="err-txt" id="e-curpw"><i class="fa-solid fa-circle-exclamation"></i><span id="e-curpw-t">Confirme sua senha atual.</span></div>
+          </div>
+          <div></div>
+        </div>
+        <div class="row2">
+          <div class="fg">
+            <label id="l-newpw">Nova Senha</label>
+            <div class="fi has-toggle"><i class="fa-solid fa-key ico"></i><input type="password" id="f-newpw" placeholder="Mínimo 8 caracteres" oninput="checkStrength();checkPwForm()"/><button class="pw-toggle" onclick="togglePw('f-newpw',this)" aria-label="Mostrar senha"><i class="fa-solid fa-eye"></i></button></div>
+            <div class="pw-strength" id="pw-strength" style="display:none">
+              <div class="pw-bar"><div class="pw-seg" id="seg1"></div><div class="pw-seg" id="seg2"></div><div class="pw-seg" id="seg3"></div><div class="pw-seg" id="seg4"></div></div>
+              <div class="pw-label" id="pw-label"></div>
+            </div>
+          </div>
+          <div class="fg">
+            <label id="l-confpw">Confirmar Nova Senha</label>
+            <div class="fi has-toggle"><i class="fa-solid fa-key ico"></i><input type="password" id="f-confpw" placeholder="Repita a nova senha" oninput="checkPwForm()"/><button class="pw-toggle" onclick="togglePw('f-confpw',this)" aria-label="Mostrar senha"><i class="fa-solid fa-eye"></i></button></div>
+            <div class="err-txt" id="e-confpw"><i class="fa-solid fa-circle-exclamation"></i><span id="e-confpw-t">As senhas não coincidem.</span></div>
+            <div class="ok-txt" id="ok-confpw"><i class="fa-solid fa-circle-check"></i><span id="ok-confpw-t">As senhas coincidem.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn primary" id="btn-change-pw" onclick="changePassword()" disabled><i class="fa-solid fa-shield-halved"></i><span id="btn-change-pw-t">Alterar Senha</span></button>
+      </div>
+    </div>
+
+    <!-- EXTRAS: HISTÓRICO DE ACESSOS -->
+    <div class="card grid-full">
+      <div class="card-hd"><div class="card-ico green"><i class="fa-solid fa-clock-rotate-left"></i></div><div class="card-hd-t"><h3 id="access-title">Histórico de Acessos</h3><p id="access-sub">Últimos logins e dispositivos utilizados</p></div></div>
+      <div class="card-body">
+        <!-- LAST LOGIN HIGHLIGHT -->
+        <div class="last-login">
+          <div class="ll-ico"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="ll-info">
+            <p id="ll-label">Último Login</p>
+            <strong id="ll-time">Hoje, 08:42</strong>
+            <span><i class="fa-solid fa-laptop" id="ll-dev-ico"></i> <span id="ll-device">Windows 11 · Chrome · 192.168.0.45</span></span>
+          </div>
+        </div>
+        <!-- ACCESS LIST -->
+        <div class="access-list" id="access-list"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+<script src="/js/op.meu-perfil.js"></script>
+</body>
+</html>

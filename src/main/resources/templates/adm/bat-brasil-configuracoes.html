@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BAT Brasil — Configurações</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="/css/configuracao.adm.css"/>
+<script src="/js/bat-settings.js"></script>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSB()"></div>
+<div class="toast" id="toast"><i id="tico" class="fa-solid fa-check-circle"></i><span id="tmsg"></span></div>
+
+<!-- LIBRAS -->
+<div class="libras-wrap">
+  <div class="libras-panel" id="lp">
+    <div class="lh"><span><i class="fa-solid fa-hands"></i> <span data-i18n="libras_title">Libras</span></span><button class="lc" onclick="toggleL()"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="lav"><i class="fa-solid fa-hands"></i><p data-i18n="libras_hint">Intérprete ativo</p></div>
+    <div class="lbd"><p data-i18n="libras_desc">Esta é a página de Configurações do sistema BAT Brasil. Aqui você personaliza aparência, segurança, notificações e preferências do sistema.</p><button class="lmb" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button></div>
+  </div>
+  <button class="lfab" onclick="toggleL()" title="Acessibilidade em Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand"><div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div><div class="sb-bt"><strong>BAT Brasil</strong><span data-i18n="admin_panel">Painel Adm.</span></div></div>
+  <nav class="sb-nav">
+    <div class="sb-sec" data-i18n="nav_main">Principal</div>
+    <a class="ni" href="#"><i class="fa-solid fa-gauge-high"></i><span data-i18n="nav_dashboard">Dashboard</span></a>
+    <div class="sb-sec" data-i18n="nav_management">Gerenciamento</div>
+    <a class="ni" href="#"><i class="fa-solid fa-gears"></i><span data-i18n="nav_machines">Máquinas</span><span class="nb">247</span></a>
+    <a class="ni" href="#"><i class="fa-solid fa-users"></i><span data-i18n="nav_users">Usuários</span></a>
+    <a class="ni" href="#"><i class="fa-solid fa-ticket"></i><span data-i18n="nav_tickets">Chamados</span><span class="nb">18</span></a>
+    <div class="sb-sec" data-i18n="nav_account">Conta</div>
+    <a class="ni" href="#"><i class="fa-solid fa-circle-user"></i><span data-i18n="nav_profile">Meu Perfil</span></a>
+    <a class="ni active"><i class="fa-solid fa-sliders"></i><span data-i18n="nav_settings">Configurações</span></a>
+  </nav>
+  <div class="sb-ft"><div class="sb-av"><i class="fa-solid fa-user"></i></div><div class="sb-u"><strong data-i18n="user_name">Admin BAT</strong><span data-i18n="user_role">Administrador</span></div><button class="sb-lo"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <header class="hdr">
+    <button class="hbr" onclick="toggleSB()"><i class="fa-solid fa-bars"></i></button>
+    <div class="ht"><h1 data-i18n="page_title">Configurações</h1><p data-i18n="page_sub">BAT Brasil · Preferências do Sistema</p></div>
+    <div class="tlb">
+      <button class="tbb" onclick="toggleTheme()"><i id="ti" class="fa-solid fa-moon"></i><span id="tl" data-i18n="theme_dark">Escuro</span></button>
+      <div class="lw"><button class="tbb" onclick="toggleLM()"><i class="fa-solid fa-globe"></i><span id="ll">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></button>
+        <div class="lm" id="lm">
+          <div class="lo active" onclick="setLang('pt-BR')">🇧🇷 Português (BR)</div>
+          <div class="lo" onclick="setLang('en')">🇺🇸 English</div>
+          <div class="lo" onclick="setLang('es')">🇪🇸 Español</div>
+          <div class="lo" onclick="setLang('de')">🇩🇪 Deutsch</div>
+          <div class="lo" onclick="setLang('ru')">🇷🇺 Русский</div>
+          <div class="lo" onclick="setLang('zh')">🇨🇳 中文</div>
+        </div>
+      </div>
+    </div>
+    <div class="ha">
+      <button class="hb"><i class="fa-solid fa-bell"></i><span class="nd"></span></button>
+      <div class="hu"><div class="hav"><i class="fa-solid fa-user"></i></div><div class="hui"><strong data-i18n="user_name">Admin BAT</strong><span data-i18n="user_role">Administrador</span></div></div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="bc"><i class="fa-solid fa-house"></i> Home <i class="fa-solid fa-chevron-right"></i><span data-i18n="nav_settings">Configurações</span></div>
+
+    <div class="settings-wrap">
+
+      <!-- CFG NAV -->
+      <div class="cfg-nav">
+        <div class="cfg-nav-hd" data-i18n="cfg_categories">Categorias</div>
+        <div class="cfg-nav-item active" onclick="showSec('geral',this)"><i class="fa-solid fa-gear"></i><span data-i18n="sec_general">Geral</span></div>
+        <div class="cfg-nav-item" onclick="showSec('aparencia',this)"><i class="fa-solid fa-palette"></i><span data-i18n="sec_appearance">Aparência</span></div>
+        <div class="cfg-nav-item" onclick="showSec('seguranca',this)"><i class="fa-solid fa-shield-halved"></i><span data-i18n="sec_security">Segurança</span></div>
+        <div class="cfg-nav-item" onclick="showSec('notif',this)"><i class="fa-solid fa-bell"></i><span data-i18n="sec_notif">Notificações</span></div>
+        <div class="cfg-nav-item" onclick="showSec('sistema',this)"><i class="fa-solid fa-server"></i><span data-i18n="sec_system">Sistema</span></div>
+        <div class="cfg-nav-item" onclick="showSec('backup',this)"><i class="fa-solid fa-database"></i><span data-i18n="sec_backup">Backup</span></div>
+        <div class="cfg-nav-item" onclick="showSec('conta',this)"><i class="fa-solid fa-circle-user"></i><span data-i18n="sec_account">Conta</span></div>
+        <div class="cfg-nav-item" onclick="showSec('a11y',this)"><i class="fa-solid fa-universal-access"></i><span data-i18n="sec_a11y">Acessibilidade</span></div>
+      </div>
+
+      <!-- CFG MAIN -->
+      <div class="cfg-main">
+
+        <!-- HEADER BAR -->
+        <div class="cfg-hd-bar">
+          <div class="cfg-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="cfg-search-inp" data-i18n-ph="search_ph" placeholder="Buscar configuração..."/></div>
+          <button class="btn-save-all" id="btn-save-all" onclick="saveAll()">
+            <div class="sp"></div>
+            <i class="fa-solid fa-floppy-disk sv-ico"></i>
+            <span class="sv-txt" data-i18n="btn_save_all">Salvar Alterações</span>
+          </button>
+        </div>
+
+        <!-- ══ GERAL ══ -->
+        <div class="sc visible" id="sec-geral">
+          <div class="sc-hd"><div class="sc-ico blue"><i class="fa-solid fa-gear"></i></div><div class="sc-ht"><h3 data-i18n="sec_general">Geral</h3><p data-i18n="sec_general_sub">Configurações básicas do sistema</p></div></div>
+          <div class="sc-body">
+            <div class="fg2">
+              <div class="fg"><label data-i18n="lbl_company">Nome da Empresa</label><input type="text" id="g-company" value="British American Tobacco Brasil"/></div>
+              <div class="fg"><label data-i18n="lbl_sysname">Nome do Sistema</label><input type="text" id="g-sysname" value="BAT Admin Portal"/></div>
+            </div>
+            <div class="fg2">
+              <div class="fg"><label data-i18n="lbl_adm_email">E-mail Administrativo</label><input type="email" id="g-email" value="admin@bat.com.br"/></div>
+              <div class="fg"><label data-i18n="lbl_support_phone">Telefone de Suporte</label><input type="text" id="g-phone" value="+55 (11) 3456-7890"/></div>
+            </div>
+            <div class="fg2">
+              <div class="fg"><label data-i18n="lbl_sys_lang">Idioma do Sistema</label>
+                <select id="g-lang">
+                  <option>Português (BR)</option><option>English</option><option>Español</option><option>Deutsch</option><option>Русский</option><option>中文</option>
+                </select>
+              </div>
+              <div class="fg"><label data-i18n="lbl_timezone">Fuso Horário</label>
+                <select id="g-tz">
+                  <option>America/Sao_Paulo (UTC-3)</option><option>America/Manaus (UTC-4)</option><option>America/Fortaleza (UTC-3)</option><option>America/Belem (UTC-3)</option><option>UTC</option>
+                </select>
+              </div>
+            </div>
+            <div class="fg2">
+              <div class="fg"><label data-i18n="lbl_date_fmt">Formato de Data</label>
+                <select><option>DD/MM/AAAA</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select>
+              </div>
+              <div class="fg"><label data-i18n="lbl_currency">Moeda</label>
+                <select><option>BRL — Real Brasileiro</option><option>USD — Dólar</option><option>EUR — Euro</option></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ APARÊNCIA ══ -->
+        <div class="sc" id="sec-aparencia">
+          <div class="sc-hd"><div class="sc-ico gold"><i class="fa-solid fa-palette"></i></div><div class="sc-ht"><h3 data-i18n="sec_appearance">Aparência</h3><p data-i18n="sec_appearance_sub">Personalize a interface do sistema</p></div></div>
+          <div class="sc-body">
+            <p style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:12px" data-i18n="theme_label">Tema do Sistema</p>
+            <div class="theme-cards">
+              <div class="theme-card selected" onclick="selectTheme('light',this)" id="tc-light"><div class="ti">☀️</div><div class="tl" data-i18n="theme_light">Claro</div><div class="ts" data-i18n="theme_light_d">Fundo branco padrão</div></div>
+              <div class="theme-card" onclick="selectTheme('dark',this)" id="tc-dark"><div class="ti">🌙</div><div class="tl" data-i18n="theme_dark_card">Escuro</div><div class="ts" data-i18n="theme_dark_d">Modo noturno</div></div>
+              <div class="theme-card" onclick="selectTheme('auto',this)" id="tc-auto"><div class="ti">⚙️</div><div class="tl" data-i18n="theme_auto">Automático</div><div class="ts" data-i18n="theme_auto_d">Segue o sistema</div></div>
+            </div>
+            <p style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin:16px 0 12px" data-i18n="accent_color">Cor de Destaque</p>
+            <div class="color-row">
+              <div class="color-dot selected" style="background:#005691" onclick="selectColor('#005691',this)" title="Azul BAT"></div>
+              <div class="color-dot" style="background:#002B5B" onclick="selectColor('#002B5B',this)" title="Azul Escuro"></div>
+              <div class="color-dot" style="background:#C8A96B" onclick="selectColor('#C8A96B',this)" title="Dourado"></div>
+              <div class="color-dot" style="background:#2D9E6B" onclick="selectColor('#2D9E6B',this)" title="Verde"></div>
+              <div class="color-dot" style="background:#6B46C1" onclick="selectColor('#6B46C1',this)" title="Roxo"></div>
+              <div class="color-dot" style="background:#E53E3E" onclick="selectColor('#E53E3E',this)" title="Vermelho"></div>
+              <div class="color-dot" style="background:#E8A020" onclick="selectColor('#E8A020',this)" title="Âmbar"></div>
+            </div>
+            <p style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin:16px 0 10px" data-i18n="font_size">Tamanho da Fonte</p>
+            <div class="font-size-row">
+              <span data-i18n="font_small">Pequena</span>
+              <input type="range" id="fs-range" min="12" max="20" value="14" oninput="onFontInput(this)"/>
+              <span data-i18n="font_large">Grande</span>
+              <span class="font-sz-val" id="fsv">14px</span>
+            </div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="compact_menu">Compactar Menu Lateral</strong><span data-i18n="compact_menu_d">Reduz o tamanho da sidebar para mais espaço</span></div><label class="sw"><input type="checkbox"/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="animations">Ativar Animações</strong><span data-i18n="animations_d">Transições e efeitos visuais suaves</span></div><label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="glass_fx">Efeito Glassmorphism</strong><span data-i18n="glass_fx_d">Transparência suave nos cards e painéis</span></div><label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label></div>
+          </div>
+        </div>
+
+        <!-- ══ SEGURANÇA ══ -->
+        <div class="sc" id="sec-seguranca">
+          <div class="sc-hd"><div class="sc-ico red"><i class="fa-solid fa-shield-halved"></i></div><div class="sc-ht"><h3 data-i18n="sec_security">Segurança</h3><p data-i18n="sec_security_sub">Gerencie a segurança da sua conta</p></div></div>
+          <div class="sc-body">
+            <!-- Score -->
+            <div class="sec-score">
+              <div class="sec-ring" id="sec-ring">87</div>
+              <div class="sec-txt"><strong data-i18n="sec_score_title">Segurança da Conta: Boa</strong><span data-i18n="sec_score_sub">Ative a autenticação em duas etapas para aumentar a proteção.</span></div>
+            </div>
+            <!-- Alterar senha -->
+            <p style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:12px" data-i18n="change_pass">Alterar Senha</p>
+            <div class="fg2">
+              <div class="fg"><label data-i18n="lbl_curr_pass">Senha Atual</label><div class="ic-inp"><input type="password" id="s-cur" placeholder="••••••••"/><span class="ic" onclick="tp('s-cur','ico-sc')"><i id="ico-sc" class="fa-solid fa-eye"></i></span></div></div>
+              <div class="fg"><label data-i18n="lbl_new_pass">Nova Senha</label><div class="ic-inp"><input type="password" id="s-new" data-i18n-ph="ph_min8" placeholder="Mín. 8 caracteres" oninput="chkStr()"/><span class="ic" onclick="tp('s-new','ico-sn')"><i id="ico-sn" class="fa-solid fa-eye"></i></span></div><div class="ps-bar"><div class="ps-fill" id="ps-fill"></div></div></div>
+            </div>
+            <div class="fg"><label data-i18n="lbl_conf_pass">Confirmar Nova Senha</label><div class="ic-inp"><input type="password" id="s-conf" data-i18n-ph="ph_repeat" placeholder="Repita a nova senha"/><span class="ic" onclick="tp('s-conf','ico-sf')"><i id="ico-sf" class="fa-solid fa-eye"></i></span></div></div>
+            <!-- Switches segurança -->
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="2fa">Autenticação em Duas Etapas</strong><span data-i18n="2fa_d">Adiciona uma camada extra de proteção ao login</span></div><label class="sw"><input type="checkbox" onchange="showToast((TR[currentLang]||TR['pt-BR']).toast_2fa,'info')"/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="sess_timeout">Tempo de Sessão Automática</strong><span data-i18n="sess_timeout_d">Desconectar após 30 minutos de inatividade</span></div><label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="login_hist">Histórico de Login</strong><span data-i18n="login_hist_d">Registrar todos os acessos no sistema</span></div><label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label></div>
+            <!-- Dispositivos -->
+            <p style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin:20px 0 12px" data-i18n="devices">Dispositivos Conectados</p>
+            <div class="dev-list">
+              <div class="dev-item"><div class="dev-ico win"><i class="fa-brands fa-windows"></i></div><div class="dev-info"><strong>Chrome 124 — Windows 11</strong><span>São Paulo, SP · 177.84.xx.xx<span class="dev-curr" data-i18n="curr_sess">Sessão atual</span></span></div></div>
+              <div class="dev-item"><div class="dev-ico mob"><i class="fa-solid fa-mobile-screen"></i></div><div class="dev-info"><strong>Safari — iPhone 15</strong><span>São Paulo, SP · Ontem, 19:42</span></div><button class="btn-revoke" onclick="revokeDevice(this)" data-i18n="btn_revoke">Revogar</button></div>
+              <div class="dev-item"><div class="dev-ico mac"><i class="fa-brands fa-apple"></i></div><div class="dev-info"><strong>Chrome 124 — macOS</strong><span>Campinas, SP · 21/05, 14:30</span></div><button class="btn-revoke" onclick="revokeDevice(this)" data-i18n="btn_revoke">Revogar</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ NOTIFICAÇÕES ══ -->
+        <div class="sc" id="sec-notif">
+          <div class="sc-hd"><div class="sc-ico warn"><i class="fa-solid fa-bell"></i></div><div class="sc-ht"><h3 data-i18n="sec_notif">Notificações</h3><p data-i18n="sec_notif_sub">Configure seus alertas e preferências</p></div></div>
+          <div class="sc-body">
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="notif_sys">Notificações do Sistema</strong><span data-i18n="notif_sys_d">Alertas gerais de status e atualizações</span></div><label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="notif_email">Alertas por E-mail</strong><span data-i18n="notif_email_d">Receba notificações no e-mail corporativo</span></div><label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="notif_sound">Sons de Notificação</strong><span data-i18n="notif_sound_d">Reproduzir áudio ao receber alertas</span></div><label class="sw"><input type="checkbox"/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="notif_urgent">Chamados Urgentes</strong><span data-i18n="notif_urgent_d">Notificar imediatamente chamados de alta prioridade</span></div><label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="notif_daily">Resumo Diário</strong><span data-i18n="notif_daily_d">Receber relatório automático às 08:00</span></div><label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="notif_maint">Alertas de Manutenção</strong><span data-i18n="notif_maint_d">Notificar quando máquinas precisam de manutenção</span></div><label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label></div>
+            <div class="sw-row"><div class="sw-info"><strong data-i18n="notif_new_user">Novos Usuários</strong><span data-i18n="notif_new_user_d">Alertar quando um novo usuário for cadastrado</span></div><label class="sw"><input type="checkbox"/><span class="sw-track"></span></label></div>
+          </div>
+        </div>
+
+        <!-- ══ SISTEMA ══ -->
+        <div class="sc" id="sec-sistema">
+          <div class="sc-hd"><div class="sc-ico purple"><i class="fa-solid fa-server"></i></div><div class="sc-ht"><h3 data-i18n="sec_system">Sistema</h3><p data-i18n="sec_system_sub">Informações técnicas e monitoramento</p></div></div>
+          <div class="sc-body">
+            <div class="sys-cards">
+              <div class="sys-card"><div class="sc-t" data-i18n="sys_version">Versão</div><div class="sc-v">v4.2.1</div><div class="sc-s" data-i18n="sys_latest">Versão mais recente</div></div>
+              <div class="sys-card"><div class="sc-t" data-i18n="sys_status">Status</div><div class="sc-v"><span class="status-dot ok"></span><span data-i18n="status_operational">Operacional</span></div><div class="sc-s" data-i18n="sys_uptime">Uptime: 99,8%</div></div>
+              <div class="sys-card"><div class="sc-t" data-i18n="sys_last_update">Última Atualização</div><div class="sc-v">15/05/2026</div><div class="sc-s" data-i18n="sys_by_admin">por Administrador</div></div>
+              <div class="sys-card"><div class="sc-t" data-i18n="sys_env">Ambiente</div><div class="sc-v">Produção</div><div class="sc-s" data-i18n="sys_brazil">Brasil — São Paulo</div></div>
+            </div>
+            <div style="margin-top:20px">
+              <div class="sys-item"><div class="sys-item-hd"><span data-i18n="sys_cpu">CPU</span><strong>38%</strong></div><div class="bar-bg"><div class="bar-fill blue" style="width:0" data-w="38"></div></div></div>
+              <div class="sys-item"><div class="sys-item-hd"><span data-i18n="sys_ram">Memória RAM</span><strong>72% — 5,7 GB / 8 GB</strong></div><div class="bar-bg"><div class="bar-fill gold" style="width:0" data-w="72"></div></div></div>
+              <div class="sys-item"><div class="sys-item-hd"><span data-i18n="sys_storage">Armazenamento</span><strong>54% — 270 GB / 500 GB</strong></div><div class="bar-bg"><div class="bar-fill green" style="width:0" data-w="54"></div></div></div>
+              <div class="sys-item"><div class="sys-item-hd"><span data-i18n="sys_net">Rede</span><strong>12 Mbps</strong></div><div class="bar-bg"><div class="bar-fill blue" style="width:0" data-w="24"></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ BACKUP ══ -->
+        <div class="sc" id="sec-backup">
+          <div class="sc-hd"><div class="sc-ico green"><i class="fa-solid fa-database"></i></div><div class="sc-ht"><h3 data-i18n="sec_backup">Backup</h3><p data-i18n="sec_backup_sub">Gerencie backups e restaurações do sistema</p></div></div>
+          <div class="sc-body">
+            <div class="backup-btns">
+              <button class="btn-backup prim" onclick="doBackup()"><i class="fa-solid fa-cloud-arrow-up"></i><span data-i18n="btn_do_backup">Realizar Backup</span></button>
+              <button class="btn-backup sec" onclick="doRestore()"><i class="fa-solid fa-clock-rotate-left"></i><span data-i18n="btn_restore">Restaurar Sistema</span></button>
+              <button class="btn-backup dl" onclick="doDownload()"><i class="fa-solid fa-arrow-down-to-line"></i><span data-i18n="btn_download">Baixar Último Backup</span></button>
+            </div>
+            <p style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:12px" data-i18n="backup_history">Histórico de Backups</p>
+            <div class="bk-list" id="bk-list">
+              <div class="bk-item"><div class="bk-ico"><i class="fa-solid fa-database"></i></div><div class="bk-info"><strong data-i18n="backup_full">Backup Completo</strong><span>25/05/2026 — 02:00 · Automático</span></div><span class="bk-size">4,2 GB</span><button class="btn-backup dl" style="padding:5px 10px;font-size:11px" onclick="doDownload()"><i class="fa-solid fa-download"></i></button></div>
+              <div class="bk-item"><div class="bk-ico"><i class="fa-solid fa-database"></i></div><div class="bk-info"><strong data-i18n="backup_diff">Backup Diferencial</strong><span>24/05/2026 — 02:00 · Automático</span></div><span class="bk-size">1,8 GB</span><button class="btn-backup dl" style="padding:5px 10px;font-size:11px" onclick="doDownload()"><i class="fa-solid fa-download"></i></button></div>
+              <div class="bk-item"><div class="bk-ico"><i class="fa-solid fa-database"></i></div><div class="bk-info"><strong data-i18n="backup_manual">Backup Manual</strong><span>20/05/2026 — 15:32 · Admin BAT</span></div><span class="bk-size">4,1 GB</span><button class="btn-backup dl" style="padding:5px 10px;font-size:11px" onclick="doDownload()"><i class="fa-solid fa-download"></i></button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ CONTA ══ -->
+        <div class="sc" id="sec-conta">
+          <div class="sc-hd"><div class="sc-ico blue"><i class="fa-solid fa-circle-user"></i></div><div class="sc-ht"><h3 data-i18n="sec_account">Conta</h3><p data-i18n="sec_account_sub">Gerencie suas informações pessoais</p></div></div>
+          <div class="sc-body">
+            <div class="acc-hero">
+              <div class="acc-av" onclick="fakeAvUpload()" id="acc-av">AC<div class="acc-av-ov"><i class="fa-solid fa-camera"></i></div></div>
+              <div class="acc-info">
+                <strong id="acc-name">Ana Carolina Lima</strong>
+                <div class="role">Diretora de Operações</div>
+                <div class="email"><i class="fa-solid fa-envelope" style="font-size:11px;margin-right:4px"></i>ana.lima@bat.com</div>
+                <div class="since"><i class="fa-solid fa-calendar" style="font-size:11px;margin-right:4px"></i><span data-i18n="joined_since">Membro desde</span> Março 2019</div>
+                <button class="btn-upl" onclick="fakeAvUpload()"><i class="fa-solid fa-arrow-up-from-bracket"></i><span data-i18n="btn_change_photo">Alterar Foto</span></button>
+              </div>
+            </div>
+            <div class="fg2">
+              <div class="fg"><label data-i18n="lbl_name">Nome Completo</label><input type="text" id="acc-nm" value="Ana Carolina Lima" oninput="document.getElementById('acc-name').textContent=this.value"/></div>
+              <div class="fg"><label data-i18n="lbl_email">E-mail</label><input type="email" value="ana.lima@bat.com"/></div>
+            </div>
+            <div class="fg2">
+              <div class="fg"><label data-i18n="lbl_phone">Telefone</label><input type="text" value="+55 (11) 9 8765-4321"/></div>
+              <div class="fg"><label data-i18n="lbl_role">Cargo</label><input type="text" value="Diretora de Operações"/></div>
+            </div>
+            <div class="fg"><label data-i18n="lbl_dept">Departamento</label><select><option>Operações</option><option>Tecnologia</option><option>RH</option><option>Financeiro</option></select></div>
+          </div>
+        </div>
+
+        <!-- ══ ACESSIBILIDADE ══ -->
+        <div class="sc" id="sec-a11y">
+          <div class="sc-hd"><div class="sc-ico purple"><i class="fa-solid fa-universal-access"></i></div><div class="sc-ht"><h3 data-i18n="sec_a11y">Acessibilidade</h3><p data-i18n="sec_a11y_sub">Adapte a interface às suas necessidades</p></div></div>
+          <div class="sc-body">
+            <div class="a11y-grid">
+              <div class="a11y-card" id="a11y-hc">
+                <div class="a11y-card-ico"><i class="fa-solid fa-circle-half-stroke"></i></div>
+                <div class="a11y-card-txt"><strong data-i18n="a11y_contrast">Alto Contraste</strong><span data-i18n="a11y_contrast_d">Aumenta o contraste para melhor visibilidade</span></div>
+                <label class="sw a11y-sw"><input type="checkbox" onchange="toggleHC(this)"/><span class="sw-track"></span></label>
+              </div>
+              <div class="a11y-card" id="a11y-font">
+                <div class="a11y-card-ico"><i class="fa-solid fa-text-height"></i></div>
+                <div class="a11y-card-txt"><strong data-i18n="a11y_font">Aumentar Fonte</strong><span data-i18n="a11y_font_d">Textos maiores para facilitar leitura</span></div>
+                <label class="sw a11y-sw"><input type="checkbox" onchange="toggleBigFont(this)"/><span class="sw-track"></span></label>
+              </div>
+              <div class="a11y-card" id="a11y-sr">
+                <div class="a11y-card-ico"><i class="fa-solid fa-volume-high"></i></div>
+                <div class="a11y-card-txt"><strong data-i18n="a11y_reader">Leitor de Tela</strong><span data-i18n="a11y_reader_d">Compatível com NVDA e VoiceOver</span></div>
+                <label class="sw a11y-sw"><input type="checkbox" onchange="toggleSR(this)"/><span class="sw-track"></span></label>
+              </div>
+              <div class="a11y-card" id="a11y-nav">
+                <div class="a11y-card-ico"><i class="fa-solid fa-sitemap"></i></div>
+                <div class="a11y-card-txt"><strong data-i18n="a11y_nav">Navegação Simplificada</strong><span data-i18n="a11y_nav_d">Interface mais simples e direta</span></div>
+                <label class="sw a11y-sw"><input type="checkbox" onchange="toggleNav(this)"/><span class="sw-track"></span></label>
+              </div>
+              <div class="a11y-card" id="a11y-anim">
+                <div class="a11y-card-ico"><i class="fa-solid fa-person-walking"></i></div>
+                <div class="a11y-card-txt"><strong data-i18n="a11y_reduce_anim">Redução de Animações</strong><span data-i18n="a11y_reduce_anim_d">Minimiza efeitos visuais em movimento</span></div>
+                <label class="sw a11y-sw"><input type="checkbox" onchange="toggleReduceAnim(this)"/><span class="sw-track"></span></label>
+              </div>
+              <div class="a11y-card on" id="a11y-libras">
+                <div class="a11y-card-ico"><i class="fa-solid fa-hands"></i></div>
+                <div class="a11y-card-txt"><strong data-i18n="a11y_libras">Libras (Língua de Sinais)</strong><span data-i18n="a11y_libras_d">Widget de acessibilidade em Libras ativo</span></div>
+                <label class="sw a11y-sw"><input type="checkbox" checked onchange="toggleLibrasCfg(this)"/><span class="sw-track"></span></label>
+              </div>
+            </div>
+            <!-- Keyboard nav hint -->
+            <div style="margin-top:16px;padding:14px;background:var(--bl);border-radius:9px;border-left:3px solid var(--bm)">
+              <p style="font-size:12px;color:var(--bm);font-weight:600;margin-bottom:4px"><i class="fa-solid fa-keyboard" style="margin-right:7px"></i><span data-i18n="kbd_nav">Atalhos de Teclado</span></p>
+              <p style="font-size:11.5px;color:var(--mu);line-height:1.7" data-i18n="kbd_nav_d">Pressione <kbd style="background:var(--sf);border:1px solid var(--br);border-radius:4px;padding:2px 6px;font-size:11px">Tab</kbd> para navegar entre elementos e <kbd style="background:var(--sf);border:1px solid var(--br);border-radius:4px;padding:2px 6px;font-size:11px">Enter</kbd> para confirmar ações.</p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /cfg-main -->
+    </div><!-- /settings-wrap -->
+  </main>
+</div>
+<script src="/js/configuracao.adm.js"></script>
+</body>
+</html>

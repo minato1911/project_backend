@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAT Brasil — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="/css/login.css"/>
+  <script src="/js/login.js" defer></script>
+</head>
+
+<!-- ── TOOLBAR ── -->
+<div class="toolbar">
+  <button class="toolbar-btn" onclick="toggleTheme()" title="Alternar tema">
+    <i id="theme-icon" class="fa-solid fa-moon"></i>
+    <span id="theme-label">Escuro</span>
+  </button>
+  <div class="lang-wrap">
+    <button class="toolbar-btn" onclick="toggleLangMenu()">
+      <i class="fa-solid fa-globe"></i>
+      <span id="lang-label">PT</span>
+      <i class="fa-solid fa-chevron-down" style="font-size:9px"></i>
+    </button>
+    <div class="lang-menu" id="lang-menu">
+      <div class="lang-opt active" onclick="setLang('pt-BR')"><span class="flag">🇧🇷</span>Português (BR)</div>
+      <div class="lang-opt" onclick="setLang('en')"><span class="flag">🇺🇸</span>English</div>
+      <div class="lang-opt" onclick="setLang('es')"><span class="flag">🇪🇸</span>Español</div>
+      <div class="lang-opt" onclick="setLang('de')"><span class="flag">🇩🇪</span>Deutsch</div>
+      <div class="lang-opt" onclick="setLang('ru')"><span class="flag">🇷🇺</span>Русский</div>
+      <div class="lang-opt" onclick="setLang('zh')"><span class="flag">🇨🇳</span>中文</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LIBRAS WIDGET ── -->
+<div class="libras-wrap">
+  <div class="libras-panel" id="libras-panel">
+    <div class="libras-header">
+      <span><i class="fa-solid fa-hands"></i> <span data-i18n="libras_title">Acessibilidade em Libras</span></span>
+      <button class="libras-close" onclick="toggleLibras()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="libras-avatar">
+      <i class="fa-solid fa-hands"></i>
+      <p data-i18n="libras_hint">Intérprete de Libras ativo</p>
+    </div>
+    <div class="libras-body">
+      <p data-i18n="libras_desc">Esta página é a tela de acesso ao Portal Corporativo BAT Brasil. Utilize o formulário para entrar com e-mail e senha.</p>
+      <button class="libras-btn-main" onclick="window.open('https://www.vlibras.gov.br/','_blank')">
+        <i class="fa-solid fa-external-link"></i> VLibras
+      </button>
+    </div>
+  </div>
+  <button class="libras-fab" onclick="toggleLibras()" title="Acessibilidade em Libras">
+    <i class="fa-solid fa-hands"></i>
+  </button>
+</div>
+
+<!-- ── PAINEL ESQUERDO ── -->
+<div class="panel-left">
+  <div class="brand">
+    <div class="brand-logo">
+      <div class="logo-icon"><i class="fa-solid fa-layer-group"></i></div>
+      <div>
+        <div class="brand-name">BAT Brasil</div>
+        <div class="brand-sub" data-i18n="corporate_portal">Portal Corporativo</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel-mid">
+    <h1 class="headline" data-i18n="tagline">Transformando o futuro com <em>propósito</em> e inovação.</h1>
+    <div class="divider"></div>
+    <p class="panel-desc" data-i18n="panel_desc">Acesso exclusivo para colaboradores e parceiros autorizados da British American Tobacco Brasil.</p>
+    <div class="badges">
+      <span class="badge-pill" data-i18n="b1">RH &amp; Benefícios</span>
+      <span class="badge-pill" data-i18n="b2">Operações</span>
+      <span class="badge-pill" data-i18n="b3">Compliance</span>
+      <span class="badge-pill" data-i18n="b4">Relatórios</span>
+    </div>
+  </div>
+  <div class="panel-footer">&copy; 2026 British American Tobacco Brasil S.A.</div>
+</div>
+
+<!-- ── PAINEL DIREITO ── -->
+<div class="panel-right">
+  <div class="login-box">
+    <div class="form-topbar"></div>
+    <h2 class="login-title" data-i18n="welcome">Bem-vindo(a)</h2>
+    <p class="login-sub" data-i18n="subtitle">Faça login para acessar o portal corporativo</p>
+
+    <div class="form-group">
+      <label class="form-label" data-i18n="email_label">E-mail corporativo</label>
+      <input type="email" id="email" data-i18n-ph="email_ph" placeholder="seu.nome@bat.com" autocomplete="username"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" data-i18n="password_label">Senha</label>
+      <div class="input-wrap">
+        <input type="password" id="senha" data-i18n-ph="password_ph" placeholder="••••••••" autocomplete="current-password"/>
+        <button class="eye-btn" onclick="togglePwd()" aria-label="Mostrar senha">
+          <i id="eye-icon" class="fa-solid fa-eye"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="check-label">
+        <input type="checkbox" id="remember"/>
+        <span data-i18n="remember">Manter conectado</span>
+      </label>
+      <a href="#" class="forgot" data-i18n="forgot">Esqueci minha senha</a>
+    </div>
+
+    <button class="btn-login" id="btnLogin" onclick="doLogin()">
+      <div class="spinner"></div>
+      <span class="btn-text" data-i18n="login_btn">Entrar no Portal</span>
+      <i class="fa-solid fa-arrow-right btn-arr"></i>
+    </button>
+
+    <div class="sep"><hr/><span data-i18n="or">ou acesse com</span><hr/></div>
+
+    <button class="btn-sso">
+      <i class="fa-solid fa-lock"></i>
+      <span data-i18n="sso_btn">Entrar via SSO corporativo</span>
+    </button>
+
+    <div class="register">
+      <span data-i18n="first_access_q">Primeiro acesso?</span>
+      <a href="#" data-i18n="first_access_a">Solicitar credenciais</a>
+    </div>
+
+    <div class="security">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span data-i18n="security_note">Conexão protegida por criptografia SSL. Seus dados estão seguros.</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

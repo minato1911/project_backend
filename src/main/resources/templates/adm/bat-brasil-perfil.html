@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAT Brasil — Meu Perfil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="/css/perfil.adm.css"/>
+  <script src="/js/bat-settings.js"></script>
+ 
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i id="toast-ico" class="fa-solid fa-check-circle"></i><span id="toast-msg"></span></div>
+
+<!-- ══ LIBRAS ══ -->
+<div class="libras-wrap">
+  <div class="libras-panel" id="libras-panel">
+    <div class="libras-hd">
+      <span><i class="fa-solid fa-hands"></i> <span data-i18n="libras_title">Libras</span></span>
+      <button class="libras-cls" onclick="toggleLibras()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="libras-av"><i class="fa-solid fa-hands"></i><p data-i18n="libras_hint">Intérprete ativo</p></div>
+    <div class="libras-bd">
+      <p data-i18n="libras_desc">Esta é a página Meu Perfil do sistema BAT Brasil. Aqui você visualiza e edita suas informações pessoais, senha e preferências.</p>
+      <button class="libras-mb" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button>
+    </div>
+  </div>
+  <button class="libras-fab" onclick="toggleLibras()" title="Acessibilidade em Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div>
+    <div class="sb-brand-txt"><strong>BAT Brasil</strong><span data-i18n="admin_panel">Painel Adm.</span></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec" data-i18n="nav_main">Principal</div>
+    <a class="nav-item" href="#"><i class="fa-solid fa-gauge-high"></i><span data-i18n="nav_dashboard">Dashboard</span></a>
+    <div class="sb-sec" data-i18n="nav_management">Gerenciamento</div>
+    <a class="nav-item" href="#"><i class="fa-solid fa-gears"></i><span data-i18n="nav_machines">Máquinas</span><span class="nav-badge">247</span></a>
+    <a class="nav-item" href="#"><i class="fa-solid fa-users"></i><span data-i18n="nav_users">Usuários</span></a>
+    <a class="nav-item" href="#"><i class="fa-solid fa-ticket"></i><span data-i18n="nav_tickets">Chamados</span><span class="nav-badge">18</span></a>
+    <div class="sb-sec" data-i18n="nav_account">Conta</div>
+    <a class="nav-item active"><i class="fa-solid fa-circle-user"></i><span data-i18n="nav_profile">Meu Perfil</span></a>
+    <a class="nav-item" href="#"><i class="fa-solid fa-sliders"></i><span data-i18n="nav_settings">Configurações</span></a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-av"><i class="fa-solid fa-user"></i></div>
+    <div class="sb-user"><strong data-i18n="user_name">Admin BAT</strong><span data-i18n="user_role">Administrador</span></div>
+    <button class="sb-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main-wrap">
+  <header class="header">
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div class="header-title">
+      <h1 data-i18n="page_title">Meu Perfil</h1>
+      <p data-i18n="page_sub">BAT Brasil · Informações da Conta</p>
+    </div>
+    <div class="toolbar">
+      <button class="tb-btn" onclick="toggleTheme()">
+        <i id="theme-icon" class="fa-solid fa-moon"></i>
+        <span id="theme-label" data-i18n="theme_dark">Escuro</span>
+      </button>
+      <div class="lang-wrap">
+        <button class="tb-btn" onclick="toggleLangMenu()">
+          <i class="fa-solid fa-globe"></i>
+          <span id="lang-label">PT</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:9px"></i>
+        </button>
+        <div class="lang-menu" id="lang-menu">
+          <div class="lang-opt active" onclick="setLang('pt-BR')">🇧🇷 Português (BR)</div>
+          <div class="lang-opt" onclick="setLang('en')">🇺🇸 English</div>
+          <div class="lang-opt" onclick="setLang('es')">🇪🇸 Español</div>
+          <div class="lang-opt" onclick="setLang('de')">🇩🇪 Deutsch</div>
+          <div class="lang-opt" onclick="setLang('ru')">🇷🇺 Русский</div>
+          <div class="lang-opt" onclick="setLang('zh')">🇨🇳 中文</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="h-btn"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></button>
+      <div class="h-user">
+        <div class="h-avatar-w"><i class="fa-solid fa-user"></i></div>
+        <div class="h-user-info">
+          <strong data-i18n="user_name">Admin BAT</strong>
+          <span data-i18n="user_role">Administrador</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="breadcrumb">
+      <i class="fa-solid fa-house"></i> Home
+      <i class="fa-solid fa-chevron-right"></i>
+      <span data-i18n="nav_profile">Meu Perfil</span>
+    </div>
+
+    <!-- ══ HERO CARD ══ -->
+    <div class="profile-hero">
+      <div class="hero-cover"><div class="hero-cover-pattern"></div></div>
+      <div class="hero-body">
+        <div class="hero-avatar-row">
+          <div class="profile-avatar-wrap" onclick="fakeUploadAvatar()">
+            <div class="profile-avatar" id="main-avatar">
+              <span id="main-av-txt">AC</span>
+              <div class="avatar-overlay"><i class="fa-solid fa-camera"></i></div>
+            </div>
+            <span class="avatar-online"></span>
+          </div>
+          <div class="hero-actions">
+            <button class="btn-edit-profile" onclick="scrollToEdit()">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span data-i18n="btn_edit_profile">Editar Perfil</span>
+            </button>
+            <button class="btn-outline">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span data-i18n="btn_logout">Sair</span>
+            </button>
+          </div>
+        </div>
+        <div class="hero-info">
+          <h2 id="hero-name">Ana Carolina Lima</h2>
+          <div class="role" id="hero-role">Diretora de Operações</div>
+          <div class="hero-meta">
+            <div class="hero-meta-item"><i class="fa-solid fa-building"></i><span id="hero-dept" data-i18n-val="dept">Operações</span></div>
+            <div class="hero-meta-item"><i class="fa-solid fa-envelope"></i><span id="hero-email">ana.lima@bat.com</span></div>
+            <div class="hero-meta-item"><i class="fa-solid fa-phone"></i><span id="hero-phone">+55 (11) 9 8765-4321</span></div>
+            <div class="hero-meta-item"><i class="fa-solid fa-calendar-days"></i><span data-i18n="joined_prefix">Desde</span> <span id="hero-joined">Mar 2019</span></div>
+          </div>
+          <div class="perm-pills">
+            <span class="perm-pill admin" data-i18n="perm_admin">Administrador</span>
+            <span class="perm-pill full"  data-i18n="perm_full_access">Acesso Total</span>
+            <span class="perm-pill viewer" data-i18n="perm_audit">Auditoria</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PROFILE GRID ══ -->
+    <div class="profile-grid">
+
+      <!-- COLUNA ESQUERDA -->
+      <div style="display:flex;flex-direction:column;gap:22px">
+
+        <!-- DADOS GERAIS (somente leitura) -->
+        <div class="panel">
+          <div class="panel-hd">
+            <div class="panel-hd-ico blue"><i class="fa-solid fa-id-card"></i></div>
+            <div class="panel-hd-txt">
+              <h3 data-i18n="section_info">Informações do Colaborador</h3>
+              <p data-i18n="section_info_sub">Dados cadastrais registrados no sistema</p>
+            </div>
+          </div>
+          <div class="info-grid">
+            <div class="info-item"><div class="info-lbl" data-i18n="lbl_id">Matrícula</div><div class="info-val"><i class="fa-solid fa-hashtag"></i>BAT-002847</div></div>
+            <div class="info-item"><div class="info-lbl" data-i18n="lbl_dept">Departamento</div><div class="info-val"><i class="fa-solid fa-building"></i><span data-i18n="dept_operations">Operações</span></div></div>
+            <div class="info-item"><div class="info-lbl" data-i18n="lbl_role">Cargo</div><div class="info-val"><i class="fa-solid fa-briefcase"></i><span data-i18n="role_director">Diretora de Operações</span></div></div>
+            <div class="info-item"><div class="info-lbl" data-i18n="lbl_profile">Perfil</div><div class="info-val"><i class="fa-solid fa-shield-halved"></i><span data-i18n="perm_admin">Administrador</span></div></div>
+            <div class="info-item"><div class="info-lbl" data-i18n="lbl_joined">Data de Entrada</div><div class="info-val"><i class="fa-solid fa-calendar"></i>15/03/2019</div></div>
+            <div class="info-item"><div class="info-lbl" data-i18n="lbl_status">Status</div><div class="info-val"><i class="fa-solid fa-circle-check" style="color:var(--success)"></i><span data-i18n="status_active" style="color:var(--success);font-weight:600">Ativo</span></div></div>
+          </div>
+        </div>
+
+        <!-- EDITAR PERFIL -->
+        <div class="panel" id="edit-section">
+          <div class="panel-hd">
+            <div class="panel-hd-ico gold"><i class="fa-solid fa-user-pen"></i></div>
+            <div class="panel-hd-txt">
+              <h3 data-i18n="section_edit">Editar Perfil</h3>
+              <p data-i18n="section_edit_sub">Atualize suas informações pessoais</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <!-- Upload avatar -->
+            <div class="avatar-upload">
+              <div class="av-up-circle" id="av-up-circle" style="background:#005691">AC</div>
+              <div class="av-up-right">
+                <strong data-i18n="photo_label">Foto de Perfil</strong>
+                <p data-i18n="photo_hint">PNG ou JPG, máx. 5MB. Clique no avatar acima para alterar.</p>
+                <button class="btn-upload" onclick="fakeUploadAvatar()"><i class="fa-solid fa-arrow-up-from-bracket"></i><span data-i18n="btn_upload">Enviar nova foto</span></button>
+              </div>
+            </div>
+
+            <div class="form-grid2">
+              <div class="form-grp">
+                <label data-i18n="lbl_name">Nome Completo</label>
+                <input type="text" id="f-name" value="Ana Carolina Lima" oninput="syncHeroName()"/>
+              </div>
+              <div class="form-grp">
+                <label data-i18n="lbl_email">E-mail</label>
+                <input type="email" id="f-email" value="ana.lima@bat.com" oninput="syncHeroEmail()"/>
+              </div>
+            </div>
+            <div class="form-grid2">
+              <div class="form-grp">
+                <label data-i18n="lbl_phone">Telefone</label>
+                <input type="text" id="f-phone" value="+55 (11) 9 8765-4321" oninput="syncHeroPhone()"/>
+              </div>
+              <div class="form-grp">
+                <label data-i18n="lbl_dept">Departamento</label>
+                <select id="f-dept" onchange="syncHeroDept()">
+                  <option selected data-i18n="dept_operations">Operações</option>
+                  <option data-i18n="dept_tech">Tecnologia</option>
+                  <option data-i18n="dept_hr">RH</option>
+                  <option data-i18n="dept_finance">Financeiro</option>
+                  <option data-i18n="dept_logistics">Logística</option>
+                  <option data-i18n="dept_compliance">Compliance</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- SENHA -->
+            <div class="form-grid2">
+              <div class="form-grp">
+                <label data-i18n="lbl_current_pass">Senha Atual</label>
+                <div class="input-ico">
+                  <input type="password" id="f-pass-cur" placeholder="••••••••"/>
+                  <span class="ico" onclick="togglePass('f-pass-cur','ico-cur')"><i id="ico-cur" class="fa-solid fa-eye"></i></span>
+                </div>
+              </div>
+              <div class="form-grp">
+                <label data-i18n="lbl_new_pass">Nova Senha</label>
+                <div class="input-ico">
+                  <input type="password" id="f-pass-new" data-i18n-ph="ph_new_pass" placeholder="Mín. 8 caracteres" oninput="checkStrength()"/>
+                  <span class="ico" onclick="togglePass('f-pass-new','ico-new')"><i id="ico-new" class="fa-solid fa-eye"></i></span>
+                </div>
+                <div class="pass-strength" id="pass-strength"></div>
+              </div>
+            </div>
+            <div class="form-grid1">
+              <div class="form-grp">
+                <label data-i18n="lbl_confirm_pass">Confirmar Nova Senha</label>
+                <div class="input-ico">
+                  <input type="password" id="f-pass-conf" data-i18n-ph="ph_confirm_pass" placeholder="Repita a nova senha"/>
+                  <span class="ico" onclick="togglePass('f-pass-conf','ico-conf')"><i id="ico-conf" class="fa-solid fa-eye"></i></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="save-row">
+              <button class="btn-save" id="btn-save" onclick="saveProfile()">
+                <div class="spinner"></div>
+                <i class="fa-solid fa-floppy-disk save-ico"></i>
+                <span class="save-txt" data-i18n="btn_save">Salvar Alterações</span>
+              </button>
+              <div class="save-success" id="save-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span data-i18n="save_ok">Perfil atualizado com sucesso!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /col left -->
+
+      <!-- COLUNA DIREITA -->
+      <div style="display:flex;flex-direction:column;gap:22px">
+
+        <!-- ÚLTIMOS ACESSOS -->
+        <div class="panel">
+          <div class="panel-hd">
+            <div class="panel-hd-ico green"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
+            <div class="panel-hd-txt">
+              <h3 data-i18n="section_accesses">Últimos Acessos</h3>
+              <p data-i18n="section_accesses_sub">Histórico de login recente</p>
+            </div>
+          </div>
+          <div class="panel-body" style="padding:0">
+            <ul class="access-list" style="padding:0 18px">
+              <li class="access-item">
+                <div class="access-ico win"><i class="fa-brands fa-windows"></i></div>
+                <div class="access-txt">
+                  <strong>Chrome 124 — Windows 11</strong>
+                  <span>São Paulo, SP · 177.84.xx.xx</span>
+                </div>
+                <div class="access-time">Agora<span class="access-current" data-i18n="this_session">Sessão atual</span></div>
+              </li>
+              <li class="access-item">
+                <div class="access-ico mob"><i class="fa-solid fa-mobile-screen"></i></div>
+                <div class="access-txt">
+                  <strong>Safari — iPhone 15</strong>
+                  <span>São Paulo, SP · 191.23.xx.xx</span>
+                </div>
+                <div class="access-time">Ontem, 19:42</div>
+              </li>
+              <li class="access-item">
+                <div class="access-ico win"><i class="fa-brands fa-windows"></i></div>
+                <div class="access-txt">
+                  <strong>Edge 124 — Windows 11</strong>
+                  <span>São Paulo, SP · 177.84.xx.xx</span>
+                </div>
+                <div class="access-time">23/05, 08:15</div>
+              </li>
+              <li class="access-item">
+                <div class="access-ico mac"><i class="fa-brands fa-apple"></i></div>
+                <div class="access-txt">
+                  <strong>Chrome 124 — macOS</strong>
+                  <span>Campinas, SP · 200.11.xx.xx</span>
+                </div>
+                <div class="access-time">21/05, 14:30</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ATIVIDADES RECENTES -->
+        <div class="panel">
+          <div class="panel-hd">
+            <div class="panel-hd-ico blue"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div class="panel-hd-txt">
+              <h3 data-i18n="section_activity">Atividades Recentes</h3>
+              <p data-i18n="section_activity_sub">Ações realizadas na plataforma</p>
+            </div>
+          </div>
+          <div class="panel-body" style="padding:0 18px">
+            <div class="activity-list">
+              <div class="act-item">
+                <div class="act-dot login"><i class="fa-solid fa-right-to-bracket"></i></div>
+                <div class="act-txt"><strong data-i18n="act_login">Login realizado</strong><span data-i18n="act_login_d">Acesso ao painel administrativo</span></div>
+                <span class="act-time">09:14</span>
+              </div>
+              <div class="act-item">
+                <div class="act-dot edit"><i class="fa-solid fa-pen"></i></div>
+                <div class="act-txt"><strong data-i18n="act_edit_ticket">Chamado editado</strong><span data-i18n="act_edit_ticket_d">Atualizou status do chamado #4819</span></div>
+                <span class="act-time">08:50</span>
+              </div>
+              <div class="act-item">
+                <div class="act-dot view"><i class="fa-solid fa-eye"></i></div>
+                <div class="act-txt"><strong data-i18n="act_viewed">Relatório visualizado</strong><span data-i18n="act_viewed_d">Relatório de produção — Maio 2026</span></div>
+                <span class="act-time">Ontem</span>
+              </div>
+              <div class="act-item">
+                <div class="act-dot pass"><i class="fa-solid fa-key"></i></div>
+                <div class="act-txt"><strong data-i18n="act_pass_changed">Senha alterada</strong><span data-i18n="act_pass_changed_d">Senha de acesso atualizada com sucesso</span></div>
+                <span class="act-time">20/05</span>
+              </div>
+              <div class="act-item">
+                <div class="act-dot edit"><i class="fa-solid fa-user-pen"></i></div>
+                <div class="act-txt"><strong data-i18n="act_profile_edit">Perfil atualizado</strong><span data-i18n="act_profile_edit_d">Informações de contato atualizadas</span></div>
+                <span class="act-time">18/05</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PERMISSÕES -->
+        <div class="panel">
+          <div class="panel-hd">
+            <div class="panel-hd-ico purple"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="panel-hd-txt">
+              <h3 data-i18n="section_perms">Permissões do Usuário</h3>
+              <p data-i18n="section_perms_sub">Nível de acesso no sistema</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="perm-grid">
+              <div class="perm-item"><div class="perm-icon ok"><i class="fa-solid fa-gears"></i></div><div class="perm-txt"><strong data-i18n="nav_machines">Máquinas</strong><span data-i18n="perm_full">Leitura e escrita</span></div><span class="perm-badge ok" data-i18n="perm_full_short">Total</span></div>
+              <div class="perm-item"><div class="perm-icon ok"><i class="fa-solid fa-users"></i></div><div class="perm-txt"><strong data-i18n="nav_users">Usuários</strong><span data-i18n="perm_full">Leitura e escrita</span></div><span class="perm-badge ok" data-i18n="perm_full_short">Total</span></div>
+              <div class="perm-item"><div class="perm-icon ok"><i class="fa-solid fa-ticket"></i></div><div class="perm-txt"><strong data-i18n="nav_tickets">Chamados</strong><span data-i18n="perm_full">Leitura e escrita</span></div><span class="perm-badge ok" data-i18n="perm_full_short">Total</span></div>
+              <div class="perm-item"><div class="perm-icon ok"><i class="fa-solid fa-chart-bar"></i></div><div class="perm-txt"><strong data-i18n="perm_reports">Relatórios</strong><span data-i18n="perm_full">Leitura e escrita</span></div><span class="perm-badge ok" data-i18n="perm_full_short">Total</span></div>
+              <div class="perm-item"><div class="perm-icon ok"><i class="fa-solid fa-sliders"></i></div><div class="perm-txt"><strong data-i18n="perm_settings">Configurações</strong><span data-i18n="perm_full">Leitura e escrita</span></div><span class="perm-badge ok" data-i18n="perm_full_short">Total</span></div>
+              <div class="perm-item"><div class="perm-icon ok"><i class="fa-solid fa-database"></i></div><div class="perm-txt"><strong data-i18n="perm_export">Exportação</strong><span data-i18n="perm_full">Leitura e escrita</span></div><span class="perm-badge ok" data-i18n="perm_full_short">Total</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /col right -->
+    </div><!-- /profile-grid -->
+  </main>
+</div>
+<script src="/js/perfil.adm.js"></script>
+</body>
+</html>

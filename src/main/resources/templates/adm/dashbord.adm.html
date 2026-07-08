@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAT Brasil — Painel Administrativo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="/css/dashboard.adm.css"/>
+  <script src="/js/bat-settings.js"></script>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ── LIBRAS ── -->
+<div class="libras-wrap">
+  <div class="libras-panel" id="libras-panel">
+    <div class="libras-hd">
+      <span><i class="fa-solid fa-hands"></i> <span data-i18n="libras_title">Libras</span></span>
+      <button class="libras-cls" onclick="toggleLibras()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="libras-av"><i class="fa-solid fa-hands"></i><p data-i18n="libras_hint">Intérprete ativo</p></div>
+    <div class="libras-bd">
+      <p data-i18n="libras_desc">Este é o Painel Administrativo BAT Brasil. Aqui você visualiza métricas do sistema, chamados, status e atividades recentes.</p>
+      <button class="libras-main-btn" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button>
+    </div>
+  </div>
+  <button class="libras-fab" onclick="toggleLibras()" title="Acessibilidade em Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div>
+    <div class="sb-brand-txt"><strong>BAT Brasil</strong><span data-i18n="admin_panel">Painel Adm.</span></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec" data-i18n="nav_main">Principal</div>
+    <a class="nav-item active" onclick="switchView('dashboard',this)"><i class="fa-solid fa-gauge-high"></i><span data-i18n="nav_dashboard">Dashboard</span></a>
+    <div class="sb-sec" data-i18n="nav_management">Gerenciamento</div>
+    <a class="nav-item" onclick="switchView('maquinas',this)"><i class="fa-solid fa-gears"></i><span data-i18n="nav_machines">Máquinas</span><span class="nav-badge">247</span></a>
+    <a class="nav-item" onclick="switchView('usuarios',this)"><i class="fa-solid fa-users"></i><span data-i18n="nav_users">Usuários</span></a>
+    <a class="nav-item" onclick="switchView('chamados',this)"><i class="fa-solid fa-ticket"></i><span data-i18n="nav_tickets">Chamados</span><span class="nav-badge">18</span></a>
+    <div class="sb-sec" data-i18n="nav_account">Conta</div>
+    <a class="nav-item" onclick="switchView('perfil',this)"><i class="fa-solid fa-circle-user"></i><span data-i18n="nav_profile">Meu Perfil</span></a>
+    <a class="nav-item"><i class="fa-solid fa-sliders"></i><span data-i18n="nav_settings">Configurações</span></a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+    <div class="sb-user"><strong data-i18n="user_name">Admin BAT</strong><span data-i18n="user_role">Administrador</span></div>
+    <button class="sb-logout" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main-wrap">
+  <header class="header">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div class="header-title">
+      <h1 data-i18n="admin_panel_title">Painel Administrativo</h1>
+      <p id="header-sub">Dashboard · Visão Geral</p>
+    </div>
+    <div class="toolbar">
+      <button class="tb-btn" onclick="toggleTheme()"><i id="theme-icon" class="fa-solid fa-moon"></i><span id="theme-label" data-i18n="theme_dark">Escuro</span></button>
+      <div class="lang-wrap">
+        <button class="tb-btn" onclick="toggleLangMenu()"><i class="fa-solid fa-globe"></i><span id="lang-label">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></button>
+        <div class="lang-menu" id="lang-menu">
+          <div class="lang-opt active" onclick="setLang('pt-BR')"><span class="flag">🇧🇷</span>Português (BR)</div>
+          <div class="lang-opt" onclick="setLang('en')"><span class="flag">🇺🇸</span>English</div>
+          <div class="lang-opt" onclick="setLang('es')"><span class="flag">🇪🇸</span>Español</div>
+          <div class="lang-opt" onclick="setLang('de')"><span class="flag">🇩🇪</span>Deutsch</div>
+          <div class="lang-opt" onclick="setLang('ru')"><span class="flag">🇷🇺</span>Русский</div>
+          <div class="lang-opt" onclick="setLang('zh')"><span class="flag">🇨🇳</span>中文</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="h-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <button class="h-btn"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></button>
+      <div class="h-user">
+        <div class="h-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="h-user-info"><strong data-i18n="user_name">Admin BAT</strong><span data-i18n="user_role">Administrador</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="breadcrumb"><i class="fa-solid fa-house"></i> Home <i class="fa-solid fa-chevron-right"></i><span id="breadcrumb-cur">Dashboard</span></div>
+
+    <!-- VIEW DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+      <p class="sec-title" data-i18n="overview">Visão Geral</p>
+      <div class="cards-grid">
+        <div class="m-card blue"><div class="bg-circle"></div>
+          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-gears"></i></div><span class="c-trend up"><i class="fa-solid fa-arrow-up"></i> +3,2%</span></div>
+          <div class="c-val" data-target="247">0</div><div class="c-lbl" data-i18n="total_machines">Total de Máquinas</div>
+          <div class="c-sub"><strong>231</strong> <span data-i18n="operational">operacionais</span> · <strong>16</strong> <span data-i18n="in_maintenance">em manutenção</span></div>
+        </div>
+        <div class="m-card gold"><div class="bg-circle"></div>
+          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-users"></i></div><span class="c-trend up"><i class="fa-solid fa-arrow-up"></i> +1,8%</span></div>
+          <div class="c-val" data-target="1842">0</div><div class="c-lbl" data-i18n="active_users">Usuários Ativos</div>
+          <div class="c-sub"><strong>1.782</strong> <span data-i18n="online_today">online hoje</span> · <strong>60</strong> <span data-i18n="new_users">novos</span></div>
+        </div>
+        <div class="m-card danger"><div class="bg-circle"></div>
+          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-ticket"></i></div><span class="c-trend down"><i class="fa-solid fa-arrow-down"></i> -5,4%</span></div>
+          <div class="c-val" data-target="18">0</div><div class="c-lbl" data-i18n="pending_tickets">Chamados Pendentes</div>
+          <div class="c-sub"><strong>5</strong> <span data-i18n="critical">críticos</span> · <strong>13</strong> <span data-i18n="in_analysis">em análise</span></div>
+        </div>
+        <div class="m-card success"><div class="bg-circle"></div>
+          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-server"></i></div><span class="c-trend stable" data-i18n="stable">Estável</span></div>
+          <div class="c-val">99,8%</div><div class="c-lbl" data-i18n="system_uptime">Uptime do Sistema</div>
+          <div class="c-sub"><span data-i18n="last_check">Última verificação:</span> <strong data-i18n="mins_ago">há 2 min</strong></div>
+        </div>
+      </div>
+      <div class="bottom-grid">
+        <div class="panel">
+          <div class="panel-hd"><div><h3 data-i18n="recent_tickets">Chamados Recentes</h3><p data-i18n="recent_tickets_sub">Últimas ocorrências registradas</p></div><button class="btn-sm" data-i18n="see_all">Ver todos</button></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>ID</th><th data-i18n="th_desc">Descrição</th><th data-i18n="th_priority">Prioridade</th><th data-i18n="th_responsible">Responsável</th><th>Status</th><th data-i18n="th_date">Data</th></tr></thead>
+              <tbody>
+                <tr><td class="td-id">#4821</td><td data-i18n="t1_desc">Falha no sensor da Máq. L-03</td><td><span class="prio-dot alta"></span><span data-i18n="high">Alta</span></td><td>João Mendes</td><td><span class="badge critico"><i class="fa-solid fa-circle-exclamation"></i><span data-i18n="critical">Crítico</span></span></td><td>25/05/2026</td></tr>
+                <tr><td class="td-id">#4819</td><td data-i18n="t2_desc">Atualização de firmware — Linha 7</td><td><span class="prio-dot media"></span><span data-i18n="medium">Média</span></td><td>Carla Souza</td><td><span class="badge andamento"><i class="fa-solid fa-rotate"></i><span data-i18n="in_progress">Em andamento</span></span></td><td>24/05/2026</td></tr>
+                <tr><td class="td-id">#4816</td><td data-i18n="t3_desc">Solicitação de acesso — RH</td><td><span class="prio-dot baixa"></span><span data-i18n="low">Baixa</span></td><td>Ana Lima</td><td><span class="badge pendente"><i class="fa-solid fa-clock"></i><span data-i18n="pending">Pendente</span></span></td><td>24/05/2026</td></tr>
+                <tr><td class="td-id">#4813</td><td data-i18n="t4_desc">Substituição de rolamento — B-11</td><td><span class="prio-dot alta"></span><span data-i18n="high">Alta</span></td><td>Ricardo Alves</td><td><span class="badge andamento"><i class="fa-solid fa-rotate"></i><span data-i18n="in_progress">Em andamento</span></span></td><td>23/05/2026</td></tr>
+                <tr><td class="td-id">#4810</td><td data-i18n="t5_desc">Reinicialização preventiva — Srv A2</td><td><span class="prio-dot media"></span><span data-i18n="medium">Média</span></td><td>Fernanda Costa</td><td><span class="badge resolvido"><i class="fa-solid fa-check"></i><span data-i18n="resolved">Resolvido</span></span></td><td>22/05/2026</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="side-panels">
+          <div class="status-panel">
+            <h3 data-i18n="system_status">Status do Sistema</h3><p data-i18n="realtime">Monitoramento em tempo real</p>
+            <div class="s-item"><span class="s-dot ok"></span><span class="s-name" data-i18n="srv_main">Servidor Principal</span><span class="s-val ok" data-i18n="online">Online</span></div>
+            <div class="s-item"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="s-dot ok"></span><span class="s-name">CPU</span><span class="s-val ok" style="margin-left:auto">38%</span></div><div class="prog-wrap"><div class="prog ok" style="width:0" data-w="38"></div></div></div></div>
+            <div class="s-item"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="s-dot warn"></span><span class="s-name">RAM</span><span class="s-val warn" style="margin-left:auto">72%</span></div><div class="prog-wrap"><div class="prog warn" style="width:0" data-w="72"></div></div></div></div>
+            <div class="s-item"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="s-dot ok"></span><span class="s-name" data-i18n="storage">Armazenamento</span><span class="s-val ok" style="margin-left:auto">54%</span></div><div class="prog-wrap"><div class="prog ok" style="width:0" data-w="54"></div></div></div></div>
+            <div class="s-item"><span class="s-dot ok"></span><span class="s-name" data-i18n="database">Banco de Dados</span><span class="s-val ok" data-i18n="operational">Operacional</span></div>
+            <div class="s-item"><span class="s-dot warn"></span><span class="s-name" data-i18n="network">Rede Interna</span><span class="s-val warn" data-i18n="slow">Lentidão</span></div>
+          </div>
+          <div class="act-panel">
+            <h3 data-i18n="recent_activity">Atividade Recente</h3><p data-i18n="today_actions">Ações realizadas hoje</p>
+            <div class="act-item"><span class="act-dot" style="background:#C8A96B"></span><div class="act-txt"><strong>João Mendes</strong> <span data-i18n="act1">abriu chamado #4821</span></div><span class="act-time">09:14</span></div>
+            <div class="act-item"><span class="act-dot" style="background:#2D9E6B"></span><div class="act-txt"><strong data-i18n="system">Sistema</strong> <span data-i18n="act2">concluiu backup automático</span></div><span class="act-time">08:50</span></div>
+            <div class="act-item"><span class="act-dot" style="background:#005691"></span><div class="act-txt"><strong>Carla Souza</strong> <span data-i18n="act3">iniciou atualização Linha 7</span></div><span class="act-time">08:32</span></div>
+            <div class="act-item"><span class="act-dot" style="background:#E53E3E"></span><div class="act-txt"><span data-i18n="alert">Alerta:</span> <strong>RAM <span data-i18n="high_usage">alta</span></strong> <span data-i18n="act4">no Servidor B</span></div><span class="act-time">07:58</span></div>
+            <div class="act-item"><span class="act-dot" style="background:#2D9E6B"></span><div class="act-txt"><strong>Fernanda Costa</strong> <span data-i18n="act5">resolveu chamado #4810</span></div><span class="act-time">07:21</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEWS PLACEHOLDER -->
+    <div class="view" id="view-maquinas"><div class="placeholder"><i class="fa-solid fa-gears"></i><h3 data-i18n="nav_machines">Máquinas</h3><p data-i18n="ph_machines">Inventário, status operacional e histórico de manutenções.</p></div></div>
+    <div class="view" id="view-usuarios"><div class="placeholder"><i class="fa-solid fa-users"></i><h3 data-i18n="nav_users">Usuários</h3><p data-i18n="ph_users">Cadastro, permissões e controle de acesso dos colaboradores.</p></div></div>
+    <div class="view" id="view-chamados"><div class="panel"><div class="panel-hd"><div><h3 data-i18n="nav_tickets">Chamados Pendentes</h3><p>18 <span data-i18n="pending">pendentes</span></p></div><button class="btn-sm" data-i18n="new_ticket">+ Novo chamado</button></div><div class="tbl-wrap"><table><thead><tr><th>ID</th><th data-i18n="th_desc">Descrição</th><th data-i18n="th_priority">Prioridade</th><th data-i18n="th_responsible">Responsável</th><th>Status</th><th data-i18n="th_date">Data</th></tr></thead><tbody><tr><td class="td-id">#4821</td><td data-i18n="t1_desc">Falha no sensor da Máq. L-03</td><td><span class="prio-dot alta"></span><span data-i18n="high">Alta</span></td><td>João Mendes</td><td><span class="badge critico"><i class="fa-solid fa-circle-exclamation"></i><span data-i18n="critical">Crítico</span></span></td><td>25/05/2026</td></tr><tr><td class="td-id">#4816</td><td data-i18n="t3_desc">Solicitação de acesso — RH</td><td><span class="prio-dot baixa"></span><span data-i18n="low">Baixa</span></td><td>Ana Lima</td><td><span class="badge pendente"><i class="fa-solid fa-clock"></i><span data-i18n="pending">Pendente</span></span></td><td>24/05/2026</td></tr></tbody></table></div></div></div>
+    <div class="view" id="view-perfil"><div class="placeholder"><i class="fa-solid fa-circle-user"></i><h3 data-i18n="nav_profile">Meu Perfil</h3><p data-i18n="ph_profile">Informações pessoais, senha e preferências do sistema.</p></div></div>
+  </main>
+</div>
+<script src="/js/dashbord.adm.js"></script>
+</body>
+</html>

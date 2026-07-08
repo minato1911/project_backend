@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BAT Brasil — Novo Chamado</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="/css/op.Novo-chamado.css"/>
+<script src="/js/op-settings.js"></script>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i id="tico" class="fa-solid fa-check-circle"></i><span id="tmsg"></span></div>
+
+<!-- LIBRAS -->
+<div class="libras-wrap">
+  <div class="lib-panel" id="lib-panel">
+    <div class="lib-hd"><span><i class="fa-solid fa-hands"></i> Libras</span><button class="lib-cls" onclick="document.getElementById('lib-panel').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="lib-av"><i class="fa-solid fa-hands"></i></div>
+    <div class="lib-bd"><p id="lib-desc">Formulário de abertura de chamado técnico BAT Brasil. Preencha todos os campos e envie sua solicitação.</p><button class="lib-btn" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button></div>
+  </div>
+  <button class="lib-fab" onclick="document.getElementById('lib-panel').classList.toggle('open')"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-ov" id="sucess-ov">
+  <div class="success-card">
+    <div class="success-ico">
+      <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="22"/><polyline class="check-path" points="14,26 22,34 38,18"/></svg>
+    </div>
+    <h2 class="success-h" id="s-title">Chamado Enviado!</h2>
+    <p class="success-p" id="s-sub">Seu chamado foi registrado e já está disponível para os técnicos.</p>
+    <div class="success-num"><i class="fa-solid fa-ticket"></i><span id="s-num">#4826</span></div>
+    <div class="success-meta">
+      <div class="sm-item"><i class="fa-regular fa-clock"></i><span id="s-lbl-time">Aberto em: </span><strong id="s-time"></strong></div>
+      <div class="sm-item"><i class="fa-solid fa-triangle-exclamation"></i><span id="s-lbl-prio">Prioridade: </span><strong id="s-prio"></strong></div>
+    </div>
+    <div class="success-steps">
+      <div class="ss-step done"><div class="ss-dot"><i class="fa-solid fa-check"></i></div><div class="ss-lbl" id="ss1">Registrado</div></div>
+      <div class="ss-step pen"><div class="ss-dot"><i class="fa-solid fa-hourglass-half"></i></div><div class="ss-lbl" id="ss2">Aguardando</div></div>
+      <div class="ss-step pen"><div class="ss-dot"><i class="fa-solid fa-truck-moving"></i></div><div class="ss-lbl" id="ss3">A caminho</div></div>
+      <div class="ss-step pen"><div class="ss-dot"><i class="fa-solid fa-wrench"></i></div><div class="ss-lbl" id="ss4">Atendendo</div></div>
+      <div class="ss-step pen"><div class="ss-dot"><i class="fa-solid fa-flag-checkered"></i></div><div class="ss-lbl" id="ss5">Concluído</div></div>
+    </div>
+    <div class="success-btns">
+      <button class="btn outline" onclick="newTicket()" id="s-btn-new"><i class="fa-solid fa-plus"></i> <span id="s-btn-new-t">Novo Chamado</span></button>
+      <button class="btn primary" onclick="goTickets()" id="s-btn-go"><i class="fa-solid fa-ticket"></i> <span id="s-btn-go-t">Meus Chamados</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div>
+    <div class="sb-bt">
+      <strong>BAT Brasil</strong>
+      <span id="sb-panel-lbl">Painel do Operador</span>
+    </div>
+  </div>
+
+  <div class="sb-user">
+    <div class="sb-av" id="sb-av">JP</div>
+    <div class="sb-ui">
+      <strong id="sb-name">João Pedro Silva</strong>
+      <span id="sb-role">Operador de Produção</span>
+      <div class="on-pill">
+        <span></span>
+        <span id="sb-online">Online</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-sec" id="sb-sec1">Principal</div>
+
+    <button class="ni" onclick="openDashboard()">
+      <i class="fa-solid fa-gauge-high"></i>
+      <span id="nav-dash">Dashboard</span>
+    </button>
+
+    <button class="ni active" onclick="openNewTicket()">
+      <i class="fa-solid fa-plus-circle"></i>
+      <span id="nav-new">Novo Chamado</span>
+    </button>
+
+    <div class="sb-sec" id="sb-sec2">Chamados</div>
+
+    <button class="ni" onclick="openMyTickets()">
+      <i class="fa-solid fa-ticket"></i>
+      <span id="nav-mine">Meus Chamados</span>
+    </button>
+
+    <button class="ni" onclick="openHistory()">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <span id="nav-hist">Histórico</span>
+    </button>
+
+    <div class="sb-sec" id="sb-sec3">Conta</div>
+
+    <button class="ni" onclick="openProfile()">
+      <i class="fa-solid fa-circle-user"></i>
+      <span id="nav-prof">Meu Perfil</span>
+    </button>
+
+    <button class="ni" onclick="openSettings()">
+      <i class="fa-solid fa-sliders"></i>
+      <span id="nav-cfg">Configurações</span>
+    </button>
+    
+    <div class="sb-sec"></div>
+   <button class="ni"
+        onclick="logout()"
+        style="color:rgba(229,62,62,.7)">
+    <i class="fa-solid fa-arrow-right-from-bracket"
+       style="color:rgba(229,62,62,.7)"
+       aria-hidden="true"></i>
+    <span data-i18n="nav_logout">Sair</span>
+</button>
+  </nav>
+</aside>
+<div class="overlay" id="overlay" onclick="closeSB()"></div>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <header class="hdr">
+    <button class="hbr" onclick="toggleSB()"><i class="fa-solid fa-bars"></i></button>
+    <div class="ht"><h1 id="hdr-t">Novo Chamado</h1><p id="hdr-s">BAT Brasil · Registrar Solicitação Técnica</p></div>
+    <div class="ha">
+      <button class="hb" onclick="toggleTheme()"><i id="theme-ico" class="fa-solid fa-moon"></i></button>
+      <button class="hb"><i class="fa-solid fa-bell"></i></button>
+      <div class="lw">
+        <button class="lang-btn" onclick="toggleLM()" id="lang-btn"><i class="fa-solid fa-globe"></i><span id="lang-lbl">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></button>
+        <div class="lm" id="lm">
+          <div class="lo active" onclick="setLang('pt')">🇧🇷 Português</div>
+          <div class="lo" onclick="setLang('en')">🇺🇸 English</div>
+          <div class="lo" onclick="setLang('es')">🇪🇸 Español</div>
+          <div class="lo" onclick="setLang('de')">🇩🇪 Deutsch</div>
+          <div class="lo" onclick="setLang('ru')">🇷🇺 Русский</div>
+        </div>
+      </div>
+      <div class="hdr-user">
+        <div class="hdr-av" id="hdr-av">JP</div>
+        <div class="hdr-ui"><strong id="hdr-name">João Pedro Silva</strong><span id="hdr-online">Online</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="bc"><i class="fa-solid fa-house"></i> Home <i class="fa-solid fa-chevron-right"></i><span id="bc-new">Novo Chamado</span></div>
+
+    <!-- PAGE TOP -->
+    <div class="pg-top">
+      <div><h2 id="page-h2">Novo Chamado</h2><p id="page-desc">Preencha os campos para registrar sua solicitação técnica.</p></div>
+      <div class="ticket-badge">
+        <div class="tb-ico"><i class="fa-solid fa-ticket"></i></div>
+        <div><div class="tb-num" id="tb-num">#4826</div><div class="tb-date" id="tb-date"></div></div>
+      </div>
+    </div>
+
+    <!-- STEP BAR -->
+    <div class="step-bar">
+      <div class="step"><div class="step-c active" id="sc1">1</div><div class="step-lbl"><span id="sl1">Etapa 1</span><strong id="st1">Identificação</strong></div></div>
+      <div class="step-line"><div class="fill" id="ln1"></div></div>
+      <div class="step"><div class="step-c pending" id="sc2">2</div><div class="step-lbl"><span id="sl2">Etapa 2</span><strong id="st2">Problema</strong></div></div>
+      <div class="step-line"><div class="fill" id="ln2"></div></div>
+      <div class="step"><div class="step-c pending" id="sc3">3</div><div class="step-lbl"><span id="sl3">Etapa 3</span><strong id="st3">Revisão</strong></div></div>
+    </div>
+
+    <form id="form" novalidate>
+    <div class="form-grid">
+      <div class="form-col">
+
+        <!-- SECTION 1 -->
+        <div class="section" style="animation-delay:.05s">
+          <div class="sec-hd"><div class="sec-ico blue"><i class="fa-solid fa-id-card"></i></div><div class="sec-hd-t"><h3 id="s1h">Identificação do Operador</h3><p id="s1p">Dados do solicitante</p></div></div>
+          <div class="sec-body">
+            <div class="row2">
+              <div class="fg"><label id="l-name">Nome do Operador <span class="req">*</span></label><div class="fi has-ico" id="fi-name"><i class="fa-solid fa-user ico"></i><input type="text" id="f-name" placeholder="Seu nome completo" oninput="vf('fi-name','f-name');sv()"/><i class="fa-solid fa-check tick"></i></div><div class="err-txt" id="e-name"><i class="fa-solid fa-circle-exclamation"></i><span id="e-name-t">Campo obrigatório.</span></div></div>
+              <div class="fg"><label id="l-reg">Matrícula <span class="req">*</span></label><div class="fi has-ico" id="fi-reg"><i class="fa-solid fa-hashtag ico"></i><input type="text" id="f-reg" placeholder="Ex.: BAT-OP-0128" oninput="vf('fi-reg','f-reg');sv()"/><i class="fa-solid fa-check tick"></i></div><div class="err-txt" id="e-reg"><i class="fa-solid fa-circle-exclamation"></i><span id="e-reg-t">Campo obrigatório.</span></div></div>
+            </div>
+            <div class="row2">
+              <div class="fg"><label id="l-sector">Setor <span class="req">*</span></label><div class="fi has-ico" id="fi-sector"><i class="fa-solid fa-building ico"></i><select id="f-sector" onchange="vf('fi-sector','f-sector');sv()"><option value="" id="o-sector">Selecione o setor...</option><option>Produção A</option><option>Produção B</option><option>Produção C</option><option>Embalagem</option><option>Logística</option><option>Manutenção</option><option>Tecnologia</option><option>Qualidade</option><option>Administrativo</option></select></div><div class="err-txt" id="e-sector"><i class="fa-solid fa-circle-exclamation"></i><span id="e-sector-t">Selecione uma opção.</span></div></div>
+              <div class="fg"><label id="l-line">Linha de Produção</label><div class="fi has-ico"><i class="fa-solid fa-diagram-project ico"></i><select id="f-line" onchange="sv()"><option value="" id="o-line">Selecione a linha...</option><option>Linha 1</option><option>Linha 2</option><option>Linha 3</option><option>Linha 4</option><option>Linha 5</option><option>Linha 6</option><option>Linha 7</option><option>Linha 8</option><option id="o-noline">Não aplicável</option></select></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div class="section" style="animation-delay:.1s">
+          <div class="sec-hd"><div class="sec-ico gold"><i class="fa-solid fa-gears"></i></div><div class="sec-hd-t"><h3 id="s2h">Equipamento e Localização</h3><p id="s2p">Identificação da máquina ou sistema</p></div></div>
+          <div class="sec-body">
+            <div class="row2">
+              <div class="fg"><label id="l-machine">Máquina / Equipamento <span class="req">*</span></label><div class="fi has-ico" id="fi-machine"><i class="fa-solid fa-industry ico"></i><input type="text" id="f-machine" placeholder="Ex.: Máquina L-03, Esteira ET-05..." oninput="vf('fi-machine','f-machine');sv()"/><i class="fa-solid fa-check tick"></i></div><div class="err-txt" id="e-machine"><i class="fa-solid fa-circle-exclamation"></i><span id="e-machine-t">Campo obrigatório.</span></div><div class="hint" id="h-machine">Nome, modelo ou código do equipamento.</div></div>
+              <div class="fg"><label id="l-location">Localização Física</label><div class="fi has-ico"><i class="fa-solid fa-map-marker-alt ico"></i><input type="text" id="f-location" placeholder="Ex.: Galpão B, Piso 2..."/></div></div>
+            </div>
+            <!-- CATEGORY -->
+            <div class="fg" style="margin-top:4px">
+              <label id="l-cat">Categoria <span class="req">*</span></label>
+              <div class="cat-grid" id="cat-grid">
+                <label class="cat-card" id="cc-hardware" onclick="selCat('hardware',this)"><input type="radio" name="cat" value="hardware"><span class="cat-em">🔧</span><span class="cat-nm" id="cn-hardware">Hardware</span></label>
+                <label class="cat-card" id="cc-software" onclick="selCat('software',this)"><input type="radio" name="cat" value="software"><span class="cat-em">💻</span><span class="cat-nm" id="cn-software">Software</span></label>
+                <label class="cat-card" id="cc-rede" onclick="selCat('rede',this)"><input type="radio" name="cat" value="rede"><span class="cat-em">🌐</span><span class="cat-nm" id="cn-rede">Rede</span></label>
+                <label class="cat-card" id="cc-impressora" onclick="selCat('impressora',this)"><input type="radio" name="cat" value="impressora"><span class="cat-em">🖨️</span><span class="cat-nm" id="cn-impressora">Impressora</span></label>
+                <label class="cat-card" id="cc-sistema" onclick="selCat('sistema',this)"><input type="radio" name="cat" value="sistema"><span class="cat-em">⚙️</span><span class="cat-nm" id="cn-sistema">Sistema</span></label>
+                <label class="cat-card" id="cc-energia" onclick="selCat('energia',this)"><input type="radio" name="cat" value="energia"><span class="cat-em">⚡</span><span class="cat-nm" id="cn-energia">Energia</span></label>
+                <label class="cat-card" id="cc-mecanica" onclick="selCat('mecanica',this)"><input type="radio" name="cat" value="mecanica"><span class="cat-em">🔩</span><span class="cat-nm" id="cn-mecanica">Mecânica</span></label>
+                <label class="cat-card" id="cc-eletrica" onclick="selCat('eletrica',this)"><input type="radio" name="cat" value="eletrica"><span class="cat-em">🔌</span><span class="cat-nm" id="cn-eletrica">Elétrica</span></label>
+                <label class="cat-card" id="cc-outros" onclick="selCat('outros',this)"><input type="radio" name="cat" value="outros"><span class="cat-em">📋</span><span class="cat-nm" id="cn-outros">Outros</span></label>
+              </div>
+              <div class="err-txt" id="e-cat"><i class="fa-solid fa-circle-exclamation"></i><span id="e-cat-t">Selecione uma categoria.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div class="section" style="animation-delay:.15s">
+          <div class="sec-hd"><div class="sec-ico red"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="sec-hd-t"><h3 id="s3h">Prioridade e Descrição</h3><p id="s3p">Detalhe o problema encontrado</p></div></div>
+          <div class="sec-body">
+            <div class="fg" style="margin-bottom:20px">
+              <label id="l-prio">Prioridade <span class="req">*</span></label>
+              <div class="prio-grid">
+                <label class="prio-card alta" id="pc-alta" onclick="selPrio('alta',this)"><input type="radio" name="prio" value="alta"><span class="prio-em">🔴</span><span class="prio-nm" id="pn-high">Alta</span><span class="prio-ds" id="pd-high">Parada de produção ou risco imediato</span></label>
+                <label class="prio-card media" id="pc-media" onclick="selPrio('media',this)"><input type="radio" name="prio" value="media"><span class="prio-em">🟡</span><span class="prio-nm" id="pn-med">Média</span><span class="prio-ds" id="pd-med">Afeta a eficiência, mas sem parada total</span></label>
+                <label class="prio-card baixa" id="pc-baixa" onclick="selPrio('baixa',this)"><input type="radio" name="prio" value="baixa"><span class="prio-em">🔵</span><span class="prio-nm" id="pn-low">Baixa</span><span class="prio-ds" id="pd-low">Problema menor, sem impacto imediato</span></label>
+              </div>
+              <div class="err-txt" id="e-prio"><i class="fa-solid fa-circle-exclamation"></i><span id="e-prio-t">Selecione a prioridade.</span></div>
+            </div>
+            <div class="fg">
+              <label id="l-desc">Descrição Detalhada <span class="req">*</span></label>
+              <div class="fi" id="fi-desc">
+                <textarea id="f-desc" rows="5" placeholder="Descreva o problema com detalhes: o que aconteceu, quando começou, frequência, sintomas observados..." oninput="vf('fi-desc','f-desc',20);countChars();sv()"></textarea>
+              </div>
+              <div class="char-bar">
+                <div class="err-txt" id="e-desc"><i class="fa-solid fa-circle-exclamation"></i><span id="e-desc-t">Mínimo 20 caracteres.</span></div>
+                <span class="char-cnt" id="char-cnt">0 / 500</span>
+              </div>
+              <div class="hint" id="h-desc">Mínimo 20 caracteres. Seja específico para agilizar o atendimento.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: UPLOAD -->
+        <div class="section" style="animation-delay:.2s">
+          <div class="sec-hd"><div class="sec-ico purple"><i class="fa-solid fa-paperclip"></i></div><div class="sec-hd-t"><h3 id="s4h">Anexos e Evidências</h3><p id="s4p">Fotos ou documentos para auxiliar no diagnóstico</p></div></div>
+          <div class="sec-body">
+            <div class="upload-zone" id="upload-zone" ondragover="dragOv(event)" ondragleave="dragLv(event)" ondrop="dropFiles(event)">
+              <input type="file" id="file-inp" accept="image/*,application/pdf" multiple onchange="addFiles(this.files)"/>
+              <div class="upload-zone-ico"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+              <div class="upload-zone-t" id="up-t">Arraste e solte os arquivos aqui</div>
+              <div class="upload-zone-s"><span id="up-or">ou</span> <b id="up-click">clique para selecionar</b></div>
+              <div class="upload-zone-types" id="up-types">PNG, JPG, PDF — máximo 5 arquivos de 10MB cada</div>
+            </div>
+            <div id="prev-area" style="display:none">
+              <div class="prev-grid" id="prev-grid"></div>
+              <div class="file-badge"><i class="fa-solid fa-check-circle"></i><span id="file-cnt-t">0 arquivo(s)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="submit-bar">
+          <div class="submit-row">
+            <div class="submit-info"><strong id="sub-ready">Pronto para enviar?</strong><p id="sub-info">Verifique os dados acima antes de enviar.</p></div>
+            <div class="submit-btns">
+              <button type="button" class="btn outline" onclick="resetForm()"><i class="fa-solid fa-rotate-left bti"></i><span class="btt" id="btn-clear-t">Limpar</span></button>
+              <button type="button" class="btn primary" id="btn-submit" onclick="submitForm()"><div class="sp"></div><i class="fa-solid fa-paper-plane bti"></i><span class="btt" id="btn-sub-t">Enviar Chamado</span></button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /form-col -->
+
+      <!-- SIDE COL -->
+      <aside class="side-col">
+
+        <!-- PREVIEW -->
+        <div class="spanel" style="animation-delay:.25s">
+          <div class="sp-hd"><i class="fa-solid fa-ticket"></i><strong id="sp-preview-t">Prévia do Chamado</strong></div>
+          <div class="sp-body">
+            <div class="af-row"><span class="af-l" id="af-l-num">Número</span><span class="af-v num" id="pv-num">#4826</span></div>
+            <div class="af-row"><span class="af-l" id="af-l-dt">Data / Hora</span><span class="af-v ok" id="pv-dt">—</span></div>
+            <div class="af-row"><span class="af-l" id="af-l-op">Operador</span><span class="af-v" id="pv-op">—</span></div>
+            <div class="af-row"><span class="af-l" id="af-l-sec">Setor</span><span class="af-v" id="pv-sec">—</span></div>
+            <div class="af-row"><span class="af-l" id="af-l-mach">Máquina</span><span class="af-v" id="pv-mach">—</span></div>
+            <div class="af-row"><span class="af-l" id="af-l-cat">Categoria</span><span class="af-v" id="pv-cat">—</span></div>
+            <div class="af-row"><span class="af-l" id="af-l-prio">Prioridade</span><span class="af-v" id="pv-prio">—</span></div>
+          </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <div class="spanel" style="animation-delay:.3s">
+          <div class="sp-hd"><i class="fa-solid fa-list-check"></i><strong id="sp-cl-t">Verificação</strong></div>
+          <div class="sp-body">
+            <div class="cl-list">
+              <div class="cl-item" id="cl-name"><i class="fa-regular fa-circle"></i><span id="cl-name-t">Nome do operador</span></div>
+              <div class="cl-item" id="cl-reg"><i class="fa-regular fa-circle"></i><span id="cl-reg-t">Matrícula</span></div>
+              <div class="cl-item" id="cl-sector"><i class="fa-regular fa-circle"></i><span id="cl-sector-t">Setor</span></div>
+              <div class="cl-item" id="cl-machine"><i class="fa-regular fa-circle"></i><span id="cl-machine-t">Equipamento</span></div>
+              <div class="cl-item" id="cl-cat"><i class="fa-regular fa-circle"></i><span id="cl-cat-t">Categoria</span></div>
+              <div class="cl-item" id="cl-prio"><i class="fa-regular fa-circle"></i><span id="cl-prio-t">Prioridade</span></div>
+              <div class="cl-item" id="cl-desc"><i class="fa-regular fa-circle"></i><span id="cl-desc-t">Descrição detalhada</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIPS -->
+        <div class="spanel" style="animation-delay:.35s">
+          <div class="sp-hd"><i class="fa-solid fa-lightbulb"></i><strong id="sp-tips-t">Dicas</strong></div>
+          <div class="sp-body">
+            <div class="tip-list">
+              <div class="tip-item"><div class="tip-ico b"><i class="fa-solid fa-magnifying-glass"></i></div><div class="tip-t"><strong id="tip1-t">Seja específico</strong><span id="tip1-d">Informe o modelo e o código do equipamento.</span></div></div>
+              <div class="tip-item"><div class="tip-ico g"><i class="fa-solid fa-camera"></i></div><div class="tip-t"><strong id="tip2-t">Use fotos</strong><span id="tip2-d">Imagens aceleram muito o diagnóstico técnico.</span></div></div>
+              <div class="tip-item"><div class="tip-ico ok"><i class="fa-solid fa-clock"></i></div><div class="tip-t"><strong id="tip3-t">Indique quando começou</strong><span id="tip3-d">Mencione quando o problema foi identificado.</span></div></div>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+    </form>
+  </main>
+</div>
+<script src="/js/op.Novo-chamado.js"></script>
+</body>
+</html>
