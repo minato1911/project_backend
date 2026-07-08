@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BAT Brasil — Histórico de Atendimentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="/css/tec.historico.css">
+<script src="/js/tec.historicoAtend.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main" id="skip-link">Pular para o conteúdo principal</a>
+<div class="toast" id="toast"><i id="tico" class="fa-solid fa-check-circle"></i><span id="tmsg"></span></div>
+
+<div class="libras-wrap">
+  <div class="lib-panel" id="lib-panel">
+    <div class="lib-hd"><span><i class="fa-solid fa-hands"></i> <span id="lib-t">Libras</span></span><button class="lib-cls" onclick="document.getElementById('lib-panel').classList.remove('open')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="lib-av"><i class="fa-solid fa-hands"></i></div>
+    <div class="lib-bd"><p id="lib-d">Histórico de Atendimentos BAT Brasil. Consulte todos os chamados finalizados pelo técnico.</p><button class="lib-btn" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button></div>
+  </div>
+  <button class="lfab" onclick="document.getElementById('lib-panel').classList.toggle('open')" aria-label="Ativar Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- MODAL DETALHES -->
+<div class="mbg" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-num">
+  <div class="modal">
+    <div class="m-hd">
+      <div style="flex:1"><div class="m-num" id="m-num">#0000</div><div class="m-equip" id="m-equip"></div><div class="m-badges" id="m-badges"></div></div>
+      <button class="mcls" onclick="closeModal()" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="m-tabs">
+      <div class="m-tab active" onclick="switchTab('hist')"><i class="fa-solid fa-clock-rotate-left"></i><span id="tab-hist">Histórico</span></div>
+      <div class="m-tab" onclick="switchTab('obs')"><i class="fa-solid fa-notes-medical"></i><span id="tab-obs">Observações</span></div>
+      <div class="m-tab" onclick="switchTab('img')"><i class="fa-solid fa-images"></i><span id="tab-img">Fotos</span></div>
+      <div class="m-tab" onclick="switchTab('parts')"><i class="fa-solid fa-gears"></i><span id="tab-parts">Peças</span></div>
+    </div>
+    <div class="m-body">
+      <div class="tabp active" id="tabp-hist">
+        <div class="dg" id="m-dg"></div>
+        <div class="ddesc" id="m-desc"></div>
+        <div class="timer-row" id="m-timers"></div>
+        <div style="margin-top:18px"><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-bottom:12px" id="m-tl-lbl">Linha do Tempo</div><div class="mtl" id="m-timeline"></div></div>
+      </div>
+      <div class="tabp" id="tabp-obs"><div id="m-obs"></div></div>
+      <div class="tabp" id="tabp-img"><div id="m-imgs"></div></div>
+      <div class="tabp" id="tabp-parts"><div id="m-parts"></div></div>
+    </div>
+  </div>
+</div>
+
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu principal">
+  <div class="sb-brand"><div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div><div class="sb-bt"><strong>BAT Brasil</strong><span id="sb-panel">Painel do Técnico</span></div></div>
+  <div class="sb-user"><div class="sb-av" id="sb-av">CM</div><div class="sb-ui"><strong id="sb-name">Carlos Mendes</strong><span id="sb-role">Técnico de Manutenção</span><div class="on-pill"><span class="dot"></span><span id="sb-on">Online</span></div></div></div>
+  <nav class="sb-nav">
+    <div class="sb-sec" id="sb-s1">Principal</div>
+    <button class="ni" onclick="window.location.href='/tecnico/dashboard'"><i class="fa-solid fa-gauge-high"></i><span id="n-dash">Dashboard</span></button>
+    <button class="ni" onclick="window.location.href='/tecnico/chamados-disponiveis'"><i class="fa-solid fa-inbox"></i><span id="n-avail">Chamados Disponíveis</span></button>
+    <button class="ni" onclick="window.location.href='/tecnico/chamados-disponiveis'"><i class="fa-solid fa-screwdriver-wrench"></i><span id="n-current">Meu Chamado Atual</span></button>
+    <div class="sb-sec" id="sb-s2">Registros</div>
+    <button class="ni active" aria-current="page"><i class="fa-solid fa-clock-rotate-left"></i><span id="n-hist">Histórico de Atendimentos</span></button>
+    <div class="sb-sec" id="sb-s3">Conta</div>
+    <button class="ni" onclick="window.location.href='/tecnico/perfil'"><i class="fa-solid fa-circle-user"></i><span id="n-prof">Meu Perfil</span></button>
+    <button class="ni" onclick="window.location.href='/tecnico/configuracoes'"><i class="fa-solid fa-sliders"></i><span id="n-cfg">Configurações</span></button>
+    <div class="sb-sec"></div>
+    <button class="ni" style="color:rgba(229,62,62,.7)"><i class="fa-solid fa-arrow-right-from-bracket" style="color:rgba(229,62,62,.7)"></i><span id="n-out">Sair</span></button>
+  </nav>
+</aside>
+<div class="overlay" id="overlay" onclick="closeSB()"></div>
+
+<div class="main-wrap">
+  <header class="hdr" role="banner">
+    <button class="hbr" onclick="toggleSB()" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="ht"><h1 id="hdr-t">Histórico de Atendimentos</h1><p id="hdr-s">BAT Brasil · Chamados Finalizados</p></div>
+    <div class="ha">
+      <button class="hb" onclick="toggleTheme()" aria-label="Alternar tema"><i id="theme-ico" class="fa-solid fa-moon"></i></button>
+      <div class="lw">
+        <button class="lang-btn" onclick="toggleLM()" id="lang-btn" aria-haspopup="true"><i class="fa-solid fa-globe"></i><span id="lang-lbl">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></button>
+        <div class="lm" id="lm" role="menu">
+          <div class="lo active" onclick="setLang('pt')" role="menuitem">🇧🇷 Português</div>
+          <div class="lo" onclick="setLang('en')" role="menuitem">🇺🇸 English</div>
+          <div class="lo" onclick="setLang('es')" role="menuitem">🇪🇸 Español</div>
+          <div class="lo" onclick="setLang('de')" role="menuitem">🇩🇪 Deutsch</div>
+          <div class="lo" onclick="setLang('ru')" role="menuitem">🇷🇺 Русский</div>
+        </div>
+      </div>
+      <div class="hdr-user"><div class="hdr-av" id="hdr-av">CM</div><div class="hdr-ui"><strong id="hdr-name">Carlos Mendes</strong><span id="hdr-on">Online</span></div></div>
+    </div>
+  </header>
+
+  <main class="content" id="main" role="main">
+    <div class="bc"><i class="fa-solid fa-house"></i> Home <i class="fa-solid fa-chevron-right"></i><span id="bc-label">Histórico de Atendimentos</span></div>
+    <div class="page-top">
+      <div><h2 id="page-h2">Histórico de Atendimentos</h2><p id="page-sub">Consulte todos os chamados finalizados e exporte relatórios</p></div>
+      <div class="export-btns">
+        <button class="btn pdf" onclick="exportPDF()"><i class="fa-solid fa-file-pdf"></i><span id="btn-pdf">Exportar PDF</span></button>
+        <button class="btn excel" onclick="exportExcel()"><i class="fa-solid fa-file-excel"></i><span id="btn-excel">Exportar Excel</span></button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="sg">
+      <div class="sc c0"><div class="sc-ico"><i class="fa-solid fa-clipboard-check"></i></div><div class="sc-val" id="st-total">0</div><div class="sc-lbl" id="st-total-l">Total de Atendimentos</div></div>
+      <div class="sc c1"><div class="sc-ico"><i class="fa-solid fa-stopwatch"></i></div><div class="sc-val" id="st-avg-svc">0min</div><div class="sc-lbl" id="st-avg-svc-l">Tempo Médio de Atendimento</div></div>
+      <div class="sc c2"><div class="sc-ico"><i class="fa-solid fa-truck-moving"></i></div><div class="sc-val" id="st-avg-trv">0min</div><div class="sc-lbl" id="st-avg-trv-l">Tempo Médio de Deslocamento</div></div>
+      <div class="sc c3"><div class="sc-ico"><i class="fa-solid fa-circle-check"></i></div><div class="sc-val" id="st-ontime">0</div><div class="sc-lbl" id="st-ontime-l">Resolvidos no Prazo</div></div>
+      <div class="sc c4"><div class="sc-ico"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="sc-val" id="st-late">0</div><div class="sc-lbl" id="st-late-l">Chamados Atrasados</div></div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-card">
+      <div class="chart-hd"><h3 id="chart-title">Atendimentos por Setor</h3><p id="chart-sub">Distribuição dos chamados finalizados</p></div>
+      <div class="chart-body"><div class="sector-bars" id="sector-bars"></div></div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="tr1">
+        <div class="srch"><i class="fa-solid fa-magnifying-glass"></i><input id="srch" placeholder="Pesquisa avançada: número, operador, equipamento, problema..." oninput="render()" aria-label="Pesquisar"/></div>
+        <select class="fsl" id="f-tech" onchange="render()" aria-label="Filtrar técnico"><option value="" id="o-all-tech">Todos os Técnicos</option></select>
+        <select class="fsl" id="f-sec" onchange="render()" aria-label="Filtrar setor"><option value="" id="o-all-sec">Todos Setores</option><option>Produção A</option><option>Produção B</option><option>Produção C</option><option>Embalagem</option><option>Logística</option><option>Manutenção</option><option>Tecnologia</option></select>
+        <select class="fsl" id="f-prio" onchange="render()" aria-label="Filtrar prioridade"><option value="" id="o-all-p">Todas Prioridades</option><option value="alta" id="o-high">Alta</option><option value="media" id="o-med">Média</option><option value="baixa" id="o-low">Baixa</option></select>
+        <div class="date-pair"><input type="date" id="f-d1" onchange="render()" aria-label="Data inicial"/><span>–</span><input type="date" id="f-d2" onchange="render()" aria-label="Data final"/></div>
+        <div class="tl-btns"><button class="btn ghost sm" onclick="clearFilters()"><i class="fa-solid fa-filter-circle-xmark"></i><span id="btn-clr">Limpar</span></button></div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="panel">
+      <div class="phd"><div class="phd-l"><h3 id="panel-title">Atendimentos Finalizados</h3><p id="panel-sub"></p></div>
+        <div class="phd-r"><span style="font-size:12px;color:var(--mu)" id="sort-lbl">Ordenar:</span>
+          <select class="fsl" id="f-sort" onchange="render()" style="min-width:130px"><option value="end-desc" id="o-srt-new">Encerramento ↓</option><option value="end-asc" id="o-srt-old">Encerramento ↑</option><option value="svc-desc" id="o-srt-svc">Maior atendimento</option><option value="prio" id="o-srt-p">Prioridade</option></select>
+        </div>
+      </div>
+      <div class="tw">
+        <table aria-label="Histórico de atendimentos">
+          <thead><tr>
+            <th onclick="srt('id')" id="th-id">Número <i class="fa-solid fa-sort si"></i></th>
+            <th onclick="srt('operator')" id="th-op">Operador <i class="fa-solid fa-sort si"></i></th>
+            <th onclick="srt('sector')" id="th-sec">Setor <i class="fa-solid fa-sort si"></i></th>
+            <th id="th-equip">Equipamento</th>
+            <th id="th-prob">Problema</th>
+            <th onclick="srt('prio')" id="th-prio">Prio. <i class="fa-solid fa-sort si"></i></th>
+            <th onclick="srt('open')" id="th-open">Abertura <i class="fa-solid fa-sort si"></i></th>
+            <th onclick="srt('end')" id="th-end">Encerramento <i class="fa-solid fa-sort si"></i></th>
+            <th id="th-trv">Deslocamento</th>
+            <th onclick="srt('svc')" id="th-svc">Atendimento <i class="fa-solid fa-sort si"></i></th>
+            <th id="th-tech">Técnico</th>
+            <th id="th-status">Status Final</th>
+            <th id="th-act">Ações</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="pag"><div class="pg-inf" id="pg-inf"></div><div class="pg-btns" id="pg-btns"></div></div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

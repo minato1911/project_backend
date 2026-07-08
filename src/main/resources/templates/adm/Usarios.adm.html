@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAT Brasil — Usuários</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="/css/usuario.adm.css"/>
+  <script src="/js/bat-settings.js"></script>
+</head>
+<body>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ══ MODAL: ADICIONAR / EDITAR USUÁRIO ══ -->
+<div class="modal-bg" id="modal-user">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-hd-icon"><i class="fa-solid fa-user-pen"></i></div>
+      <div class="modal-hd-txt">
+        <h3 id="modal-title" data-i18n="modal_add">Novo Usuário</h3>
+        <p id="modal-sub" data-i18n="modal_sub">Preencha os dados do colaborador</p>
+      </div>
+      <button class="modal-cls" onclick="closeModal('modal-user')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <!-- Preview avatar -->
+      <div class="avatar-preview">
+        <div class="av-preview-circle" id="av-preview" style="background:#005691">JD</div>
+        <div class="av-preview-info">
+          <strong id="av-name-preview">João da Silva</strong>
+          <p data-i18n="av_hint">O avatar é gerado automaticamente a partir das iniciais do nome.</p>
+        </div>
+      </div>
+      <div class="form-section" data-i18n="section_personal">Informações Pessoais</div>
+      <div class="form-grid">
+        <div class="form-grp">
+          <label data-i18n="col_name">Nome Completo</label>
+          <input type="text" id="f-name" data-i18n-ph="ph_name" placeholder="João da Silva" oninput="updateAvatarPreview()"/>
+        </div>
+        <div class="form-grp">
+          <label data-i18n="col_email">E-mail</label>
+          <input type="email" id="f-email" placeholder="joao.silva@bat.com"/>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-grp">
+          <label data-i18n="col_role">Cargo</label>
+          <input type="text" id="f-role" data-i18n-ph="ph_role" placeholder="Ex.: Analista Sênior"/>
+        </div>
+        <div class="form-grp">
+          <label data-i18n="col_dept">Departamento</label>
+          <select id="f-dept">
+            <option>Operações</option><option>Tecnologia</option><option>RH</option>
+            <option>Financeiro</option><option>Logística</option><option>Compliance</option>
+            <option>Marketing</option><option>Jurídico</option><option>Produção</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-section" data-i18n="section_access">Acesso ao Sistema</div>
+      <div class="form-grid">
+        <div class="form-grp">
+          <label data-i18n="col_status">Status</label>
+          <select id="f-status">
+            <option value="ativo"     data-i18n="status_active">Ativo</option>
+            <option value="inativo"   data-i18n="status_inactive">Inativo</option>
+            <option value="bloqueado" data-i18n="status_blocked">Bloqueado</option>
+          </select>
+        </div>
+        <div class="form-grp">
+          <label data-i18n="col_profile">Perfil</label>
+          <select id="f-profile">
+            <option data-i18n="profile_admin">Administrador</option>
+            <option data-i18n="profile_manager">Gerente</option>
+            <option data-i18n="profile_analyst">Analista</option>
+            <option data-i18n="profile_operator">Operador</option>
+            <option data-i18n="profile_viewer">Visualizador</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-cancel" onclick="closeModal('modal-user')" data-i18n="btn_cancel">Cancelar</button>
+      <button class="btn-save" onclick="saveUser()">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span data-i18n="btn_save">Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: RESETAR SENHA ══ -->
+<div class="modal-bg" id="modal-reset">
+  <div class="reset-modal">
+    <div class="reset-body">
+      <div class="reset-icon"><i class="fa-solid fa-key"></i></div>
+      <h3 id="reset-title" data-i18n="reset_title">Redefinir Senha</h3>
+      <p id="reset-desc" data-i18n="reset_desc">Uma nova senha temporária foi gerada para o usuário. Compartilhe com segurança.</p>
+      <div class="new-pass-box">
+        <span id="new-pass">BAT@2026!</span>
+        <button class="copy-btn" onclick="copyPass()" title="Copiar"><i class="fa-regular fa-copy"></i></button>
+      </div>
+      <p style="font-size:11px;color:var(--text-muted)" data-i18n="reset_note">O usuário deverá alterar a senha no próximo acesso.</p>
+    </div>
+    <div style="padding:0 24px 24px;display:flex;gap:10px">
+      <button class="btn-confirm-cancel" onclick="closeModal('modal-reset')" data-i18n="btn_close">Fechar</button>
+      <button class="btn-save" style="flex:1;justify-content:center" onclick="closeModal('modal-reset')">
+        <i class="fa-solid fa-paper-plane"></i>
+        <span data-i18n="btn_send_email">Enviar por E-mail</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CONFIRMAR EXCLUSÃO ══ -->
+<div class="modal-bg" id="modal-confirm">
+  <div class="confirm-modal">
+    <div class="confirm-body">
+      <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 data-i18n="confirm_del_title">Excluir Usuário</h3>
+      <p id="confirm-del-msg" data-i18n="confirm_del_msg">Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.</p>
+    </div>
+    <div class="confirm-ft">
+      <button class="btn-confirm-cancel" onclick="closeModal('modal-confirm')" data-i18n="btn_cancel">Cancelar</button>
+      <button class="btn-confirm-del" id="btn-do-del" data-i18n="btn_delete">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"><i id="toast-icon" class="fa-solid fa-check-circle"></i><span id="toast-msg"></span></div>
+
+<!-- ══ LIBRAS ══ -->
+<div class="libras-wrap">
+  <div class="libras-panel" id="libras-panel">
+    <div class="libras-hd">
+      <span><i class="fa-solid fa-hands"></i> <span data-i18n="libras_title">Libras</span></span>
+      <button class="libras-cls" onclick="toggleLibras()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="libras-av"><i class="fa-solid fa-hands"></i><p data-i18n="libras_hint">Intérprete ativo</p></div>
+    <div class="libras-bd">
+      <p data-i18n="libras_desc">Esta é a página de Gerenciamento de Usuários do sistema BAT Brasil. Aqui você pode visualizar, cadastrar, editar e remover usuários do sistema.</p>
+      <button class="libras-mb" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button>
+    </div>
+  </div>
+  <button class="libras-fab" onclick="toggleLibras()" title="Acessibilidade em Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div>
+    <div class="sb-brand-txt"><strong>BAT Brasil</strong><span data-i18n="admin_panel">Painel Adm.</span></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec" data-i18n="nav_main">Principal</div>
+    <a class="nav-item" href="#"><i class="fa-solid fa-gauge-high"></i><span data-i18n="nav_dashboard">Dashboard</span></a>
+    <div class="sb-sec" data-i18n="nav_management">Gerenciamento</div>
+    <a class="nav-item" href="#"><i class="fa-solid fa-gears"></i><span data-i18n="nav_machines">Máquinas</span><span class="nav-badge">247</span></a>
+    <a class="nav-item active"><i class="fa-solid fa-users"></i><span data-i18n="nav_users">Usuários</span><span class="nav-badge" id="sb-count">12</span></a>
+    <a class="nav-item" href="#"><i class="fa-solid fa-ticket"></i><span data-i18n="nav_tickets">Chamados</span><span class="nav-badge">18</span></a>
+    <div class="sb-sec" data-i18n="nav_account">Conta</div>
+    <a class="nav-item" href="#"><i class="fa-solid fa-circle-user"></i><span data-i18n="nav_profile">Meu Perfil</span></a>
+    <a class="nav-item" href="#"><i class="fa-solid fa-sliders"></i><span data-i18n="nav_settings">Configurações</span></a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-avatar-sm"><i class="fa-solid fa-user"></i></div>
+    <div class="sb-user"><strong data-i18n="user_name">Admin BAT</strong><span data-i18n="user_role">Administrador</span></div>
+    <button class="sb-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div class="header-title">
+      <h1 data-i18n="page_title">Gerenciamento de Usuários</h1>
+      <p data-i18n="page_sub">BAT Brasil · Controle de Acesso</p>
+    </div>
+    <div class="toolbar">
+      <button class="tb-btn" onclick="toggleTheme()">
+        <i id="theme-icon" class="fa-solid fa-moon"></i>
+        <span id="theme-label" data-i18n="theme_dark">Escuro</span>
+      </button>
+      <div class="lang-wrap">
+        <button class="tb-btn" onclick="toggleLangMenu()">
+          <i class="fa-solid fa-globe"></i>
+          <span id="lang-label">PT</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:9px"></i>
+        </button>
+        <div class="lang-menu" id="lang-menu">
+          <div class="lang-opt active" onclick="setLang('pt-BR')">🇧🇷 Português (BR)</div>
+          <div class="lang-opt" onclick="setLang('en')">🇺🇸 English</div>
+          <div class="lang-opt" onclick="setLang('es')">🇪🇸 Español</div>
+          <div class="lang-opt" onclick="setLang('de')">🇩🇪 Deutsch</div>
+          <div class="lang-opt" onclick="setLang('ru')">🇷🇺 Русский</div>
+          <div class="lang-opt" onclick="setLang('zh')">🇨🇳 中文</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="h-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <button class="h-btn"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></button>
+      <div class="h-user">
+        <div class="h-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="h-user-info">
+          <strong data-i18n="user_name">Admin BAT</strong>
+          <span data-i18n="user_role">Administrador</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <div class="breadcrumb">
+      <i class="fa-solid fa-house"></i> Home
+      <i class="fa-solid fa-chevron-right"></i>
+      <span data-i18n="nav_users">Usuários</span>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-hd">
+      <div class="page-hd-left">
+        <h2 data-i18n="page_title">Gerenciamento de Usuários</h2>
+        <p data-i18n="page_desc">Gerencie colaboradores, permissões e acessos do sistema BAT Brasil</p>
+      </div>
+      <button class="btn-primary" onclick="openAddModal()">
+        <i class="fa-solid fa-user-plus"></i>
+        <span data-i18n="btn_add">Novo Usuário</span>
+      </button>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="s-card total">
+        <div class="bg-c"></div>
+        <div class="sc-top">
+          <div class="sc-icon"><i class="fa-solid fa-users"></i></div>
+          <div class="online-pill"><span class="pulse-dot"></span><span id="online-count">0</span> <span data-i18n="online_now">online</span></div>
+        </div>
+        <div class="sc-val" id="cnt-total">0</div>
+        <div class="sc-lbl" data-i18n="stat_total">Total de Usuários</div>
+        <div class="sc-sub" data-i18n="stat_total_sub">Colaboradores cadastrados no sistema</div>
+      </div>
+      <div class="s-card active">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-circle-check"></i></div></div>
+        <div class="sc-val" id="cnt-active">0</div>
+        <div class="sc-lbl" data-i18n="stat_active">Usuários Ativos</div>
+        <div class="sc-sub" data-i18n="stat_active_sub">Com acesso liberado ao sistema</div>
+      </div>
+      <div class="s-card inact">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-user-clock"></i></div></div>
+        <div class="sc-val" id="cnt-inact">0</div>
+        <div class="sc-lbl" data-i18n="stat_inactive">Usuários Inativos</div>
+        <div class="sc-sub" data-i18n="stat_inactive_sub">Acesso temporariamente suspenso</div>
+      </div>
+      <div class="s-card block">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-user-lock"></i></div></div>
+        <div class="sc-val" id="cnt-block">0</div>
+        <div class="sc-lbl" data-i18n="stat_blocked">Usuários Bloqueados</div>
+        <div class="sc-sub" data-i18n="stat_blocked_sub">Aguardando revisão do administrador</div>
+      </div>
+    </div>
+
+    <!-- SEARCH & FILTER BAR -->
+    <div class="toolbar-bar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="search-input" data-i18n-ph="search_ph" placeholder="Buscar por nome, e-mail ou departamento..." oninput="renderView()"/>
+      </div>
+      <select class="filter-sel" id="filter-status" onchange="renderView()">
+        <option value="" data-i18n="filter_all">Todos os status</option>
+        <option value="ativo"     data-i18n="status_active">Ativo</option>
+        <option value="inativo"   data-i18n="status_inactive">Inativo</option>
+        <option value="bloqueado" data-i18n="status_blocked">Bloqueado</option>
+      </select>
+      <select class="filter-sel" id="filter-dept" onchange="renderView()">
+        <option value="" data-i18n="filter_all_depts">Todos os departamentos</option>
+        <option>Operações</option><option>Tecnologia</option><option>RH</option>
+        <option>Financeiro</option><option>Logística</option><option>Compliance</option>
+        <option>Marketing</option><option>Jurídico</option><option>Produção</option>
+      </select>
+      <div class="view-toggle">
+        <button class="view-btn active" id="btn-card-view" onclick="setView('cards')" title="Cards"><i class="fa-solid fa-grip"></i></button>
+        <button class="view-btn" id="btn-table-view" onclick="setView('table')" title="Tabela"><i class="fa-solid fa-list"></i></button>
+      </div>
+    </div>
+
+    <!-- CARDS VIEW -->
+    <div class="cards-view active" id="cards-view"></div>
+
+    <!-- TABLE VIEW -->
+    <div class="table-view" id="table-view">
+      <div class="panel">
+        <div class="panel-hd">
+          <div>
+            <h3 data-i18n="table_title">Lista de Usuários</h3>
+            <p id="tbl-count-info"></p>
+          </div>
+          <button class="btn-primary" style="font-size:11px;padding:7px 13px" onclick="openAddModal()">
+            <i class="fa-solid fa-user-plus"></i><span data-i18n="btn_add">Novo Usuário</span>
+          </button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="col_user">Usuário</th>
+                <th data-i18n="col_role">Cargo</th>
+                <th data-i18n="col_dept">Departamento</th>
+                <th data-i18n="col_status">Status</th>
+                <th data-i18n="col_profile">Perfil</th>
+                <th data-i18n="col_last_access">Último Acesso</th>
+                <th data-i18n="col_actions">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <div class="pag-info" id="pag-info"></div>
+          <div class="pag-btns" id="pag-btns"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div><!-- /main-wrap -->
+<script src="/js/usuario.adm.js"></script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAT Brasil — Máquinas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="/css/maquinas.adm.css">
+  <script src="/js/bat-settings.js"></script>
+ 
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- MODAL ADICIONAR/EDITAR -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3 id="modal-title" data-i18n="modal_add">Adicionar Máquina</h3>
+      <button class="modal-cls" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row2">
+        <div class="form-grp"><label data-i18n="col_name">Nome</label><input id="f-name" type="text" data-i18n-ph="ph_name" placeholder="Ex.: Máquina L-03"/></div>
+        <div class="form-grp"><label data-i18n="col_sector">Setor</label>
+          <select id="f-sector">
+            <option>Produção A</option><option>Produção B</option><option>Embalagem</option><option>Logística</option><option>Manutenção</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row2">
+        <div class="form-grp"><label data-i18n="col_status">Status</label>
+          <select id="f-status">
+            <option value="online" data-i18n="status_online">Online</option>
+            <option value="manutencao" data-i18n="status_maint">Em manutenção</option>
+            <option value="offline" data-i18n="status_offline">Offline</option>
+          </select>
+        </div>
+        <div class="form-grp"><label data-i18n="col_last_maint">Última Manutenção</label><input id="f-date" type="date"/></div>
+      </div>
+      <div class="form-row2">
+        <div class="form-grp"><label data-i18n="col_model">Modelo</label><input id="f-model" type="text" data-i18n-ph="ph_model" placeholder="Ex.: MK-2000"/></div>
+        <div class="form-grp"><label data-i18n="col_serial">Nº de Série</label><input id="f-serial" type="text" placeholder="SN-00000"/></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-cancel" onclick="closeModal()" data-i18n="btn_cancel">Cancelar</button>
+      <button class="btn-save" onclick="saveMachine()" data-i18n="btn_save">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fa-solid fa-check-circle"></i><span id="toast-msg"></span></div>
+
+<!-- LIBRAS -->
+<div class="libras-wrap">
+  <div class="libras-panel" id="libras-panel">
+    <div class="libras-hd">
+      <span><i class="fa-solid fa-hands"></i> <span data-i18n="libras_title">Libras</span></span>
+      <button class="libras-cls" onclick="toggleLibras()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="libras-av"><i class="fa-solid fa-hands"></i><p data-i18n="libras_hint">Intérprete ativo</p></div>
+    <div class="libras-bd">
+      <p data-i18n="libras_desc">Esta é a página de Gerenciamento de Máquinas do sistema BAT Brasil. Aqui você pode visualizar, adicionar, editar e remover máquinas do sistema.</p>
+      <button class="libras-mb" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button>
+    </div>
+  </div>
+  <button class="libras-fab" onclick="toggleLibras()" title="Acessibilidade em Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div>
+    <div class="sb-brand-txt"><strong>BAT Brasil</strong><span data-i18n="admin_panel">Painel Adm.</span></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec" data-i18n="nav_main">Principal</div>
+    <a class="nav-item" href="#"><i class="fa-solid fa-gauge-high"></i><span data-i18n="nav_dashboard">Dashboard</span></a>
+    <div class="sb-sec" data-i18n="nav_management">Gerenciamento</div>
+    <a class="nav-item active"><i class="fa-solid fa-gears"></i><span data-i18n="nav_machines">Máquinas</span><span class="nav-badge" id="sb-count">12</span></a>
+    <a class="nav-item" href="#"><i class="fa-solid fa-users"></i><span data-i18n="nav_users">Usuários</span></a>
+    <a class="nav-item" href="#"><i class="fa-solid fa-ticket"></i><span data-i18n="nav_tickets">Chamados</span><span class="nav-badge">18</span></a>
+    <div class="sb-sec" data-i18n="nav_account">Conta</div>
+    <a class="nav-item" href="#"><i class="fa-solid fa-circle-user"></i><span data-i18n="nav_profile">Meu Perfil</span></a>
+    <a class="nav-item" href="#"><i class="fa-solid fa-sliders"></i><span data-i18n="nav_settings">Configurações</span></a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+    <div class="sb-user"><strong data-i18n="user_name">Admin BAT</strong><span data-i18n="user_role">Administrador</span></div>
+    <button class="sb-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <header class="header">
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div class="header-title">
+      <h1 data-i18n="page_title">Gerenciamento de Máquinas</h1>
+      <p data-i18n="page_sub">BAT Brasil · Sistema Administrativo</p>
+    </div>
+    <div class="toolbar">
+      <button class="tb-btn" onclick="toggleTheme()"><i id="theme-icon" class="fa-solid fa-moon"></i><span id="theme-label" data-i18n="theme_dark">Escuro</span></button>
+      <div class="lang-wrap">
+        <button class="tb-btn" onclick="toggleLangMenu()"><i class="fa-solid fa-globe"></i><span id="lang-label">PT</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></button>
+        <div class="lang-menu" id="lang-menu">
+          <div class="lang-opt active" onclick="setLang('pt-BR')">🇧🇷 Português (BR)</div>
+          <div class="lang-opt" onclick="setLang('en')">🇺🇸 English</div>
+          <div class="lang-opt" onclick="setLang('es')">🇪🇸 Español</div>
+          <div class="lang-opt" onclick="setLang('de')">🇩🇪 Deutsch</div>
+          <div class="lang-opt" onclick="setLang('ru')">🇷🇺 Русский</div>
+          <div class="lang-opt" onclick="setLang('zh')">🇨🇳 中文</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="h-btn"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></button>
+      <div class="h-user">
+        <div class="h-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="h-user-info"><strong data-i18n="user_name">Admin BAT</strong><span data-i18n="user_role">Administrador</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="breadcrumb"><i class="fa-solid fa-house"></i> Home <i class="fa-solid fa-chevron-right"></i><span data-i18n="nav_machines">Máquinas</span></div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-hd">
+      <div class="page-hd-left">
+        <h2 data-i18n="page_title">Gerenciamento de Máquinas</h2>
+        <p data-i18n="page_desc">Monitore e gerencie todas as máquinas da planta industrial BAT Brasil</p>
+      </div>
+      <button class="btn-primary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i><span data-i18n="btn_add">Adicionar Máquina</span></button>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="s-card success">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-circle-check"></i></div></div>
+        <div class="sc-val" id="cnt-online">0</div>
+        <div class="sc-lbl" data-i18n="stat_active">Máquinas Ativas</div>
+        <div class="sc-sub" data-i18n="stat_active_sub"><strong>93,5%</strong> da frota operacional</div>
+      </div>
+      <div class="s-card danger">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-circle-xmark"></i></div></div>
+        <div class="sc-val" id="cnt-offline">0</div>
+        <div class="sc-lbl" data-i18n="stat_offline">Máquinas Offline</div>
+        <div class="sc-sub" data-i18n="stat_offline_sub">Aguardando verificação técnica</div>
+      </div>
+      <div class="s-card warning">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-wrench"></i></div></div>
+        <div class="sc-val" id="cnt-maint">0</div>
+        <div class="sc-lbl" data-i18n="stat_maint">Manutenções Pendentes</div>
+        <div class="sc-sub" data-i18n="stat_maint_sub">Programadas para esta semana</div>
+      </div>
+    </div>
+
+    <!-- SEARCH + FILTER -->
+    <div class="toolbar-bar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="search-input" data-i18n-ph="search_ph" placeholder="Buscar máquina por nome, setor ou ID..." oninput="renderTable()"/>
+      </div>
+      <select class="filter-sel" id="filter-status" onchange="renderTable()">
+        <option value="" data-i18n="filter_all">Todos os status</option>
+        <option value="online" data-i18n="status_online">Online</option>
+        <option value="manutencao" data-i18n="status_maint">Em manutenção</option>
+        <option value="offline" data-i18n="status_offline">Offline</option>
+      </select>
+      <select class="filter-sel" id="filter-sector" onchange="renderTable()">
+        <option value="" data-i18n="filter_all_sectors">Todos os setores</option>
+        <option>Produção A</option><option>Produção B</option><option>Embalagem</option><option>Logística</option><option>Manutenção</option>
+      </select>
+    </div>
+
+    <!-- TABLE -->
+    <div class="panel">
+      <div class="panel-hd">
+        <div><h3 data-i18n="table_title">Inventário de Máquinas</h3><p id="table-count-info"></p></div>
+        <button class="btn-primary" style="font-size:11px;padding:7px 13px" onclick="openAddModal()"><i class="fa-solid fa-plus"></i><span data-i18n="btn_add">Adicionar</span></button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="col_id">ID</th>
+              <th data-i18n="col_name">Nome</th>
+              <th data-i18n="col_model">Modelo</th>
+              <th data-i18n="col_sector">Setor</th>
+              <th data-i18n="col_status">Status</th>
+              <th data-i18n="col_last_maint">Última Manutenção</th>
+              <th data-i18n="col_actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <div class="pag-info" id="pag-info"></div>
+        <div class="pag-btns" id="pag-btns"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/js/maquinas.adm.js"></script>
+
+</body>
+</html>

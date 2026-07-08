@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BAT Brasil — Chamados Pendentes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+ <link rel="stylesheet" href="/css/chamador.adm.css"/>
+ <script src="/js/bat-settings.js"></script>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ══ MODAL: NOVO CHAMADO ══ -->
+<div class="modal-bg" id="modal-new">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-hd-ico"><i class="fa-solid fa-ticket"></i></div>
+      <div class="modal-hd-txt">
+        <h3 id="form-title" data-i18n="modal_new">Novo Chamado</h3>
+        <p data-i18n="modal_new_sub">Preencha os dados da solicitação técnica</p>
+      </div>
+      <button class="modal-cls" onclick="closeModal('modal-new')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-sec" data-i18n="sec_requester">Dados do Solicitante</div>
+      <div class="form-grid">
+        <div class="form-grp">
+          <label data-i18n="col_requester">Nome do Solicitante</label>
+          <input type="text" id="f-name" data-i18n-ph="ph_name" placeholder="Ex.: João da Silva"/>
+        </div>
+        <div class="form-grp">
+          <label data-i18n="col_sector">Setor</label>
+          <select id="f-sector">
+            <option>Produção A</option><option>Produção B</option><option>Embalagem</option>
+            <option>Logística</option><option>Tecnologia</option><option>RH</option>
+            <option>Financeiro</option><option>Manutenção</option><option>Compliance</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-sec" data-i18n="sec_problem">Detalhes do Problema</div>
+      <div class="form-grid">
+        <div class="form-grp">
+          <label data-i18n="col_category">Categoria</label>
+          <select id="f-category">
+            <option data-i18n="cat_hw">Hardware</option>
+            <option data-i18n="cat_sw">Software</option>
+            <option data-i18n="cat_net">Rede</option>
+            <option data-i18n="cat_print">Impressora</option>
+            <option data-i18n="cat_sys">Sistema Interno</option>
+            <option data-i18n="cat_other">Outros</option>
+          </select>
+        </div>
+        <div class="form-grp">
+          <label data-i18n="col_priority">Prioridade</label>
+          <select id="f-priority">
+            <option value="alta"  data-i18n="prio_high">Alta</option>
+            <option value="media" data-i18n="prio_medium" selected>Média</option>
+            <option value="baixa" data-i18n="prio_low">Baixa</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid full">
+        <div class="form-grp">
+          <label data-i18n="col_subject">Assunto</label>
+          <input type="text" id="f-subject" data-i18n-ph="ph_subject" placeholder="Resumo do problema..."/>
+        </div>
+      </div>
+      <div class="form-grid full">
+        <div class="form-grp">
+          <label data-i18n="col_description">Descrição do Problema</label>
+          <textarea id="f-desc" data-i18n-ph="ph_desc" placeholder="Descreva o problema detalhadamente..."></textarea>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-grp">
+          <label data-i18n="col_date">Data de Abertura</label>
+          <input type="text" id="f-date" class="date-readonly" readonly/>
+        </div>
+        <div class="form-grp">
+          <label data-i18n="col_attach">Anexo / Evidência</label>
+          <div class="upload-box" onclick="fakeUpload()">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p data-i18n="upload_hint">Clique para selecionar arquivo</p>
+            <span data-i18n="upload_types">PNG, JPG, PDF — máx. 10MB</span>
+            <div class="upload-name" id="upload-name"><i class="fa-solid fa-paperclip"></i> <span id="upload-fname"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-cancel" onclick="closeModal('modal-new')" data-i18n="btn_cancel">Cancelar</button>
+      <button class="btn-save" onclick="registerTicket()">
+        <i class="fa-solid fa-paper-plane"></i>
+        <span data-i18n="btn_register">Registrar Chamado</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: VISUALIZAR ══ -->
+<div class="modal-bg" id="modal-view">
+  <div class="view-modal">
+    <div class="view-hd">
+      <h3 id="view-id">Chamado #4821</h3>
+      <button onclick="closeModal('modal-view')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="view-body" id="view-body"></div>
+    <div class="modal-ft">
+      <button class="btn-save" style="background:var(--blue-mid)" onclick="closeModal('modal-view')">
+        <i class="fa-solid fa-check"></i><span data-i18n="btn_close">Fechar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CONFIRMAR AÇÃO ══ -->
+<div class="modal-bg" id="modal-confirm">
+  <div class="confirm-modal">
+    <div class="confirm-body">
+      <div class="confirm-ico" id="confirm-ico"><i id="confirm-icon-i" class="fa-solid fa-check-circle"></i></div>
+      <h3 id="confirm-title" data-i18n="confirm_finish_title">Finalizar Chamado</h3>
+      <p id="confirm-msg" data-i18n="confirm_finish_msg">Confirma a finalização deste chamado?</p>
+    </div>
+    <div class="confirm-ft">
+      <button class="btn-cc" onclick="closeModal('modal-confirm')" data-i18n="btn_cancel">Cancelar</button>
+      <button class="btn-cd ok" id="btn-confirm-action" data-i18n="btn_confirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i id="toast-ico" class="fa-solid fa-check-circle"></i><span id="toast-msg"></span></div>
+
+<!-- ══ LIBRAS ══ -->
+<div class="libras-wrap">
+  <div class="libras-panel" id="libras-panel">
+    <div class="libras-hd">
+      <span><i class="fa-solid fa-hands"></i> <span data-i18n="libras_title">Libras</span></span>
+      <button class="libras-cls" onclick="toggleLibras()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="libras-av"><i class="fa-solid fa-hands"></i><p data-i18n="libras_hint">Intérprete ativo</p></div>
+    <div class="libras-bd">
+      <p data-i18n="libras_desc">Esta é a página de Chamados Pendentes da BAT Brasil. Aqui você registra, acompanha e resolve chamados técnicos internos.</p>
+      <button class="libras-mb" onclick="window.open('https://www.vlibras.gov.br/','_blank')"><i class="fa-solid fa-external-link"></i> VLibras</button>
+    </div>
+  </div>
+  <button class="libras-fab" onclick="toggleLibras()" title="Acessibilidade em Libras"><i class="fa-solid fa-hands"></i></button>
+</div>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="fa-solid fa-layer-group"></i></div>
+    <div class="sb-brand-txt"><strong>BAT Brasil</strong><span data-i18n="admin_panel">Painel Adm.</span></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec" data-i18n="nav_main">Principal</div>
+    <a class="nav-item" href="/adm/dashboard"><i class="fa-solid fa-gauge-high"></i><span data-i18n="nav_dashboard">Dashboard</span></a>
+    <div class="sb-sec" data-i18n="nav_management">Gerenciamento</div>
+    <a class="nav-item" href="/adm/maquinas"><i class="fa-solid fa-gears"></i><span data-i18n="nav_machines">Máquinas</span><span class="nav-badge">247</span></a>
+    <a class="nav-item" href="/adm/usuarios"><i class="fa-solid fa-users"></i><span data-i18n="nav_users">Usuários</span></a>
+    <a class="nav-item active"><i class="fa-solid fa-ticket"></i><span data-i18n="nav_tickets">Chamados</span><span class="nav-badge" id="sb-count">18</span></a>
+    <div class="sb-sec" data-i18n="nav_account">Conta</div>
+    <a class="nav-item" href="/adm/perfil"><i class="fa-solid fa-circle-user"></i><span data-i18n="nav_profile">Meu Perfil</span></a>
+    <a class="nav-item" href="/adm/configuracoes"><i class="fa-solid fa-sliders"></i><span data-i18n="nav_settings">Configurações</span></a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-av"><i class="fa-solid fa-user"></i></div>
+    <div class="sb-user"><strong data-i18n="user_name">Admin BAT</strong><span data-i18n="user_role">Administrador</span></div>
+    <button class="sb-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-wrap">
+  <header class="header">
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div class="header-title">
+      <h1 data-i18n="page_title">Chamados Pendentes</h1>
+      <p data-i18n="page_sub">BAT Brasil · Suporte Técnico Interno</p>
+    </div>
+    <div class="toolbar">
+      <button class="tb-btn" onclick="toggleTheme()">
+        <i id="theme-icon" class="fa-solid fa-moon"></i>
+        <span id="theme-label" data-i18n="theme_dark">Escuro</span>
+      </button>
+      <div class="lang-wrap">
+        <button class="tb-btn" onclick="toggleLangMenu()">
+          <i class="fa-solid fa-globe"></i>
+          <span id="lang-label">PT</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:9px"></i>
+        </button>
+        <div class="lang-menu" id="lang-menu">
+          <div class="lang-opt active" onclick="setLang('pt-BR')">🇧🇷 Português (BR)</div>
+          <div class="lang-opt" onclick="setLang('en')">🇺🇸 English</div>
+          <div class="lang-opt" onclick="setLang('es')">🇪🇸 Español</div>
+          <div class="lang-opt" onclick="setLang('de')">🇩🇪 Deutsch</div>
+          <div class="lang-opt" onclick="setLang('ru')">🇷🇺 Русский</div>
+          <div class="lang-opt" onclick="setLang('zh')">🇨🇳 中文</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="h-btn"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></button>
+      <div class="h-user">
+        <div class="h-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="h-user-info">
+          <strong data-i18n="user_name">Admin BAT</strong>
+          <span data-i18n="user_role">Administrador</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="breadcrumb">
+      <i class="fa-solid fa-house"></i> Home
+      <i class="fa-solid fa-chevron-right"></i>
+      <span data-i18n="nav_tickets">Chamados</span>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-hd">
+      <div class="page-hd-left">
+        <h2 data-i18n="page_title">Chamados Pendentes</h2>
+        <p data-i18n="page_desc">Acompanhe, registre e resolva chamados técnicos internos da BAT Brasil</p>
+      </div>
+      <button class="btn-primary" onclick="openNewModal()">
+        <i class="fa-solid fa-plus"></i>
+        <span data-i18n="btn_new">Novo Chamado</span>
+      </button>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="s-card warn">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-folder-open"></i></div></div>
+        <div class="sc-val" id="cnt-open">0</div>
+        <div class="sc-lbl" data-i18n="stat_open">Chamados Abertos</div>
+        <div class="sc-sub" data-i18n="stat_open_sub">Aguardando atendimento</div>
+      </div>
+      <div class="s-card danger">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-fire"></i></div></div>
+        <div class="sc-val" id="cnt-urgent">0</div>
+        <div class="sc-lbl" data-i18n="stat_urgent">Chamados Urgentes</div>
+        <div class="sc-sub" data-i18n="stat_urgent_sub">Prioridade alta — ação imediata</div>
+      </div>
+      <div class="s-card blue">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-spinner"></i></div></div>
+        <div class="sc-val" id="cnt-progress">0</div>
+        <div class="sc-lbl" data-i18n="stat_progress">Em Andamento</div>
+        <div class="sc-sub" data-i18n="stat_progress_sub">Em atendimento pela equipe</div>
+      </div>
+      <div class="s-card ok">
+        <div class="bg-c"></div>
+        <div class="sc-top"><div class="sc-icon"><i class="fa-solid fa-circle-check"></i></div></div>
+        <div class="sc-val" id="cnt-done">0</div>
+        <div class="sc-lbl" data-i18n="stat_done">Resolvidos Hoje</div>
+        <div class="sc-sub" data-i18n="stat_done_sub">Concluídos nas últimas 24h</div>
+      </div>
+    </div>
+
+    <!-- GRID: TABELA + TIMELINE -->
+    <div class="main-grid">
+
+      <!-- TABELA -->
+      <div>
+        <div class="toolbar-bar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="search-input" data-i18n-ph="search_ph" placeholder="Buscar por chamado, usuário ou setor..." oninput="renderTable()"/>
+          </div>
+          <select class="filter-sel" id="filter-prio" onchange="renderTable()">
+            <option value="" data-i18n="filter_all_prio">Todas as prioridades</option>
+            <option value="alta"  data-i18n="prio_high">Alta</option>
+            <option value="media" data-i18n="prio_medium">Média</option>
+            <option value="baixa" data-i18n="prio_low">Baixa</option>
+          </select>
+          <select class="filter-sel" id="filter-status" onchange="renderTable()">
+            <option value="" data-i18n="filter_all_status">Todos os status</option>
+            <option value="aberto"    data-i18n="status_open">Aberto</option>
+            <option value="andamento" data-i18n="status_progress">Em andamento</option>
+            <option value="resolvido" data-i18n="status_resolved">Resolvido</option>
+          </select>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hd">
+            <div>
+              <h3 data-i18n="table_title">Lista de Chamados</h3>
+              <p id="tbl-info"></p>
+            </div>
+            <button class="btn-primary" style="font-size:11px;padding:7px 13px" onclick="openNewModal()">
+              <i class="fa-solid fa-plus"></i><span data-i18n="btn_new">Novo</span>
+            </button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="col_id">Nº</th>
+                  <th data-i18n="col_subject">Assunto</th>
+                  <th data-i18n="col_requester">Solicitante</th>
+                  <th data-i18n="col_sector">Setor</th>
+                  <th data-i18n="col_priority">Prioridade</th>
+                  <th>Status</th>
+                  <th data-i18n="col_date">Data</th>
+                  <th data-i18n="col_actions">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="table-body"></tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="pag-info" id="pag-info"></div>
+            <div class="pag-btns" id="pag-btns"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="timeline-panel">
+        <div class="tl-hd">
+          <h3 data-i18n="tl_title">Atividade Recente</h3>
+          <p data-i18n="tl_sub">Últimas ações no sistema</p>
+        </div>
+        <div class="tl-body" id="tl-body"></div>
+      </div>
+
+    </div><!-- /main-grid -->
+  </main>
+</div>
+
+<script src="/js/chamados.adm.js"></script>
+</body>
+</html>
