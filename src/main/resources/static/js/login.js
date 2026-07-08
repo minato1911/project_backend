@@ -251,25 +251,6 @@ function togglePwd() {
         'fa-solid fa-eye-slash';
 }
 
-/* Login */
-function fazerLogin() {
-    const usuario = document.getElementById('usuario').value;
-    const senha = document.getElementById('senha').value;
-
-    // Administrador
-    if (usuario === 'admin@bat' && senha === '123456') {
-        window.location.href = '/adm/dashboard';
-    }
-    // Operador
-    else if (usuario === 'operador@bat' && senha === '123456') {
-        window.location.href = '/operador/dashboard';
-    }
-    // Login inválido
-    else {
-        alert('Usuário ou senha inválidos!');
-    }
-}
-
 async function doLogin() {
     const em = document.getElementById('email').value.trim();
     const pw = document.getElementById('senha').value;

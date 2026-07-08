@@ -81,6 +81,9 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (path.startsWith("/api/usuarios") || path.startsWith("/api/maquinas")) {
             return user.hasRole("ADMIN");
         }
+        if (path.startsWith("/api/chamados")) {
+            return user.hasRole("ADMIN") || user.hasRole("OPERADOR") || user.hasRole("TECNICO");
+        }
         return true;
     }
 }
