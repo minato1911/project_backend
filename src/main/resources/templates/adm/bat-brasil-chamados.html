@@ -228,10 +228,13 @@
         <h2 data-i18n="page_title">Chamados Pendentes</h2>
         <p data-i18n="page_desc">Acompanhe, registre e resolva chamados técnicos internos da BAT Brasil</p>
       </div>
-      <button class="btn-primary" onclick="openNewModal()">
-        <i class="fa-solid fa-plus"></i>
-        <span data-i18n="btn_new">Novo Chamado</span>
-      </button>
+      <div class="page-hd-right">
+        <div class="live-chip"><i class="fa-solid fa-clock"></i><span id="live-clock">--:--</span></div>
+        <button class="btn-primary" onclick="openNewModal()">
+          <i class="fa-solid fa-plus"></i>
+          <span data-i18n="btn_new">Novo Chamado</span>
+        </button>
+      </div>
     </div>
 
     <!-- STAT CARDS -->
@@ -264,6 +267,17 @@
         <div class="sc-lbl" data-i18n="stat_done">Resolvidos Hoje</div>
         <div class="sc-sub" data-i18n="stat_done_sub">Concluídos nas últimas 24h</div>
       </div>
+    </div>
+
+    <div class="board-panel">
+      <div class="board-panel-hd">
+        <div>
+          <h3>Visão rápida por status</h3>
+          <p>Fluxo operacional das solicitações mais recentes</p>
+        </div>
+        <div class="board-pill"><i class="fa-solid fa-arrows-spin"></i> Atualização em tempo real</div>
+      </div>
+      <div class="kanban-board" id="kanban-board"></div>
     </div>
 
     <!-- GRID: TABELA + TIMELINE -->

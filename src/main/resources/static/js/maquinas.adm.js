@@ -169,7 +169,7 @@ function updateThemeUI(t){const i=document.getElementById('theme-icon');const l=
 
 /* ═══ LANG ═══ */
 function initLang(){const s=localStorage.getItem('bat-lang')||'pt-BR';currentLang=s;document.getElementById('lang-label').textContent=LANG_CODES[s]||'PT';applyTranslations();}
-function setLang(code){currentLang=code;localStorage.setItem('bat-lang',code);document.getElementById('lang-label').textContent=LANG_CODES[code]||code;document.querySelectorAll('.lang-opt').forEach((el,i)=>{const codes=['pt-BR','en','es','de','ru','zh'];el.classList.toggle('active',codes[i]===code);});closeLangMenu();applyTranslations();renderTable();updateThemeUI(document.documentElement.getAttribute('data-theme'));}
+function setLang(code){currentLang=code;localStorage.setItem('bat-lang',code);document.getElementById('lang-label').textContent=LANG_CODES[code]||code;document.querySelectorAll('.lang-opt').forEach((el,i)=>{const codes=['pt-BR','en','es','de','ru','zh'];el.classList.toggle('active',codes[i]===code);});closeLangMenu();applyTranslations();renderHighlights();renderTable();updateThemeUI(document.documentElement.getAttribute('data-theme'));}
 function applyTranslations(){const d=TR[currentLang]||TR['pt-BR'];document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(d[k]!==undefined)el.textContent=d[k];});document.querySelectorAll('[data-i18n-ph]').forEach(el=>{const k=el.getAttribute('data-i18n-ph');if(d[k])el.placeholder=d[k];});}
 function toggleLangMenu(){document.getElementById('lang-menu').classList.toggle('open');}
 function closeLangMenu(){document.getElementById('lang-menu').classList.remove('open');}
@@ -181,6 +181,13 @@ function closeSidebar(){document.getElementById('sidebar').classList.remove('ope
 
 /* ═══ LIBRAS ═══ */
 function toggleLibras(){document.getElementById('libras-panel').classList.toggle('open');}
+
+function startLiveClock(){
+  const el=document.getElementById('live-clock');
+  if(!el) return;
+  const tick=()=>{ const now=new Date(); el.textContent=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); };
+  tick(); setInterval(tick,1000);
+}
 
 /* ═══ STATS ═══ */
 function updateStats(){
@@ -216,6 +223,19 @@ function getFiltered(){
     const matchSe=!se||m.sector===se;
     return matchQ&&matchSt&&matchSe;
   });
+}
+
+function renderHighlights(){
+  const board=document.getElementById('highlights-grid');
+  if(!board) return;
+  const d=TR[currentLang]||TR['pt-BR'];
+  const online=machines.filter(m=>m.status==='online').length;
+  const maint=machines.filter(m=>m.status==='manutencao').length;
+  const offline=machines.filter(m=>m.status==='offline').length;
+  board.innerHTML=`
+    <div class="highlight-card"><strong>${online} em operação</strong><span>${d.status_online} · ${d.stat_active_sub}</span></div>
+    <div class="highlight-card"><strong>${maint} em manutenção</strong><span>${d.status_maint} · ${d.stat_maint_sub}</span></div>
+    <div class="highlight-card"><strong>${offline} fora de linha</strong><span>${d.status_offline} · ${d.stat_offline_sub}</span></div>`;
 }
 
 function renderTable(){
@@ -289,15 +309,17 @@ function saveMachine(){
   if(!name){document.getElementById('f-name').focus();return;}
   const raw=document.getElementById('f-date').value;
   const fdate=raw?raw.split('-').reverse().join('/'):'—';
+  const serial=document.getElementById('f-serial').value.trim()||'SN-00000';
   const m={
     id:editIdx>=0?machines[editIdx].id:`M-${String(machines.length+1).padStart(3,'0')}`,
     name,model:document.getElementById('f-model').value||'—',
     sector:document.getElementById('f-sector').value,
     status:document.getElementById('f-status').value,
     last_maint:fdate,
+    serial,
   };
   if(editIdx>=0)machines[editIdx]=m;else machines.push(m);
-  closeModal();updateStats();renderTable();
+  closeModal();updateStats();renderHighlights();renderTable();
   showToast((TR[currentLang]||TR['pt-BR']).toast_saved,false);
 }
 
@@ -305,7 +327,7 @@ function deleteMachine(idx){
   const d=TR[currentLang]||TR['pt-BR'];
   if(!confirm(d.confirm_del))return;
   machines.splice(idx,1);
-  updateStats();renderTable();
+  updateStats();renderHighlights();renderTable();
   showToast(d.toast_deleted,true);
 }
 
@@ -323,4 +345,4 @@ function showToast(msg,isErr){
 }
 
 /* ═══ INIT ═══ */
-initTheme();initLang();updateStats();renderTable();
+initTheme();initLang();startLiveClock();updateStats();renderHighlights();renderTable();

@@ -135,7 +135,10 @@
         <h2 data-i18n="page_title">Gerenciamento de Máquinas</h2>
         <p data-i18n="page_desc">Monitore e gerencie todas as máquinas da planta industrial BAT Brasil</p>
       </div>
-      <button class="btn-primary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i><span data-i18n="btn_add">Adicionar Máquina</span></button>
+      <div class="page-hd-right">
+        <div class="live-chip"><i class="fa-solid fa-clock"></i><span id="live-clock">--:--</span></div>
+        <button class="btn-primary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i><span data-i18n="btn_add">Adicionar Máquina</span></button>
+      </div>
     </div>
 
     <!-- STAT CARDS -->
@@ -162,6 +165,8 @@
         <div class="sc-sub" data-i18n="stat_maint_sub">Programadas para esta semana</div>
       </div>
     </div>
+
+    <div class="highlights-grid" id="highlights-grid"></div>
 
     <!-- SEARCH + FILTER -->
     <div class="toolbar-bar">

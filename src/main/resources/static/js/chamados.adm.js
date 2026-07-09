@@ -414,6 +414,30 @@ function renderTimeline(){
     </div>`).join('');
 }
 
+function startLiveClock(){
+  const el=document.getElementById('live-clock');
+  if(!el) return;
+  const tick=()=>{ const now=new Date(); el.textContent=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); };
+  tick(); setInterval(tick,1000);
+}
+
+function renderKanban(){
+  const board=document.getElementById('kanban-board');
+  if(!board) return;
+  const groups=[
+    {key:'aberto',title:'Abertos',icon:'fa-folder-open'},
+    {key:'andamento',title:'Em andamento',icon:'fa-spinner'},
+    {key:'resolvido',title:'Resolvidos',icon:'fa-check-circle'}
+  ];
+  board.innerHTML=groups.map(group=>{
+    const items=tickets.filter(t=>t.status===group.key).slice(0,4);
+    return `<div class="kanban-col">
+      <h4><i class="fa-solid ${group.icon}" style="margin-right:6px"></i>${group.title}<span class="count"> · ${items.length}</span></h4>
+      ${items.length?items.map(item=>`<div class="kanban-card"><strong>${item.subject}</strong><span>${item.requester} · ${item.sector}</span><div class="meta">${item.priority.toUpperCase()}</div></div>`).join(''):'<div class="kanban-card"><strong>Nenhum chamado</strong><span>Não há itens nessa etapa.</span></div>'}
+    </div>`;
+  }).join('');
+}
+
 /* ══ NOVO CHAMADO ══ */
 function openNewModal(){
   const now=new Date(); const d=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
@@ -541,7 +565,7 @@ function showToast(msg,type='suc'){
 }
 
 /* ══ RENDER ALL ══ */
-function renderAll(){ updateStats(); renderTable(); renderTimeline(); }
+function renderAll(){ updateStats(); renderTable(); renderTimeline(); renderKanban(); }
 
 /* ══ INIT ══ */
-initTheme(); initLang(); renderAll();
+initTheme(); initLang(); startLiveClock(); renderAll();

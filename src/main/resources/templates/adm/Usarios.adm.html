@@ -36,56 +36,52 @@
       </div>
       <div class="form-section" data-i18n="section_personal">Informações Pessoais</div>
       <div class="form-grid">
-        <div class="form-grp">
+        <div class="form-grp" style="grid-column:1/-1">
           <label data-i18n="col_name">Nome Completo</label>
           <input type="text" id="f-name" data-i18n-ph="ph_name" placeholder="João da Silva" oninput="updateAvatarPreview()"/>
-        </div>
-        <div class="form-grp">
-          <label data-i18n="col_email">E-mail</label>
-          <input type="email" id="f-email" placeholder="joao.silva@bat.com"/>
         </div>
       </div>
       <div class="form-grid">
         <div class="form-grp">
-          <label data-i18n="col_role">Cargo</label>
-          <input type="text" id="f-role" data-i18n-ph="ph_role" placeholder="Ex.: Analista Sênior"/>
+          <label data-i18n="col_email">E-mail</label>
+          <input type="email" id="f-email" placeholder="usuario@empresa.com"/>
         </div>
         <div class="form-grp">
-          <label data-i18n="col_dept">Departamento</label>
-          <select id="f-dept">
-            <option>Operações</option><option>Tecnologia</option><option>RH</option>
-            <option>Financeiro</option><option>Logística</option><option>Compliance</option>
-            <option>Marketing</option><option>Jurídico</option><option>Produção</option>
+          <label>Função do Sistema</label>
+          <select id="f-profile">
+            <option value="OPERADOR">Operador</option>
+            <option value="TECNICO">Técnico</option>
           </select>
         </div>
       </div>
       <div class="form-section" data-i18n="section_access">Acesso ao Sistema</div>
       <div class="form-grid">
         <div class="form-grp">
-          <label data-i18n="col_status">Status</label>
-          <select id="f-status">
-            <option value="ativo"     data-i18n="status_active">Ativo</option>
-            <option value="inativo"   data-i18n="status_inactive">Inativo</option>
-            <option value="bloqueado" data-i18n="status_blocked">Bloqueado</option>
-          </select>
+          <label>Senha</label>
+          <div class="input-wrap" style="position:relative;display:flex;align-items:center;">
+            <input type="password" id="f-senha" placeholder="Mínimo 8 caracteres" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;"/>
+            <button class="eye-btn" onclick="togglePwdField('f-senha','eye-pass-icon')" style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:var(--text);" aria-label="Mostrar senha" type="button">
+              <i id="eye-pass-icon" class="fa-solid fa-eye"></i>
+            </button>
+          </div>
         </div>
         <div class="form-grp">
-          <label data-i18n="col_profile">Perfil</label>
-          <select id="f-profile">
-            <option data-i18n="profile_admin">Administrador</option>
-            <option data-i18n="profile_manager">Gerente</option>
-            <option data-i18n="profile_analyst">Analista</option>
-            <option data-i18n="profile_operator">Operador</option>
-            <option data-i18n="profile_viewer">Visualizador</option>
-          </select>
+          <label>Confirmar Senha</label>
+          <div class="input-wrap" style="position:relative;display:flex;align-items:center;">
+            <input type="password" id="f-confirm-senha" placeholder="Confirme a senha" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--input-bg);color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;"/>
+            <button class="eye-btn" onclick="togglePwdField('f-confirm-senha','eye-confirm-icon')" style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:var(--text);" aria-label="Mostrar senha" type="button">
+              <i id="eye-confirm-icon" class="fa-solid fa-eye"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
     <div class="modal-ft">
       <button class="btn-cancel" onclick="closeModal('modal-user')" data-i18n="btn_cancel">Cancelar</button>
-      <button class="btn-save" onclick="saveUser()">
-        <i class="fa-solid fa-floppy-disk"></i>
-        <span data-i18n="btn_save">Salvar</span>
+      <button class="btn-save" id="btn-save-user" onclick="saveUser()" style="display:flex;align-items:center;gap:8px;">
+        <div class="spinner" id="save-spinner" style="display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top:2px solid #fff;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <i id="save-icon" class="fa-solid fa-floppy-disk"></i>
+        <span id="save-text" data-i18n="btn_save">Salvar</span>
       </button>
     </div>
   </div>

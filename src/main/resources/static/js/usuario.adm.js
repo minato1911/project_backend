@@ -514,10 +514,9 @@ function openAddModal(){
   document.getElementById('modal-sub').textContent   = d.modal_sub;
   document.getElementById('f-name').value   = '';
   document.getElementById('f-email').value  = '';
-  document.getElementById('f-role').value   = '';
-  document.getElementById('f-dept').value   = 'Operações';
-  document.getElementById('f-status').value = 'ativo';
-  document.getElementById('f-profile').value= 'Analista';
+  document.getElementById('f-senha').value  = '';
+  document.getElementById('f-confirm-senha').value = '';
+  document.getElementById('f-profile').value= 'OPERADOR';
   updateAvatarPreview();
   document.getElementById('modal-user').classList.add('open');
 }
@@ -552,23 +551,75 @@ function updateAvatarPreview(){
 
 function saveUser(){
   const name = document.getElementById('f-name').value.trim();
-  if(!name){ document.getElementById('f-name').classList.add('err'); return; }
-  document.getElementById('f-name').classList.remove('err');
-  const u = {
-    id: editIdx>=0 ? users[editIdx].id : `U-${String(users.length+1).padStart(3,'0')}`,
-    name,
-    email:  document.getElementById('f-email').value.trim()  || `${name.split(' ')[0].toLowerCase()}@bat.com`,
-    role:   document.getElementById('f-role').value.trim()   || '—',
-    dept:   document.getElementById('f-dept').value,
-    status: document.getElementById('f-status').value,
-    profile:document.getElementById('f-profile').value,
-    last_access: editIdx>=0 ? users[editIdx].last_access : 'Agora',
-    online: editIdx>=0 ? users[editIdx].online : false,
+  const email = document.getElementById('f-email').value.trim();
+  const profile = document.getElementById('f-profile').value;
+  const senha = document.getElementById('f-senha')?.value.trim() || '';
+  const confirmSenha = document.getElementById('f-confirm-senha')?.value.trim() || '';
+  
+  // Validação
+  if(!name){ showToast('Nome é obrigatório', 'err'); return; }
+  if(!email){ showToast('E-mail é obrigatório', 'err'); return; }
+  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){ showToast('E-mail inválido', 'err'); return; }
+  if(senha && confirmSenha && senha !== confirmSenha){ showToast('As senhas não coincidem', 'err'); return; }
+  if(senha && senha.length < 8){ showToast('Senha deve ter no mínimo 8 caracteres', 'err'); return; }
+  if(!senha && !confirmSenha){ showToast('Senha é obrigatória', 'err'); return; }
+  
+  // Preparar dados
+  const payload = {
+    nome: name,
+    email: email,
+    perfil: profile === 'OPERADOR' ? 'OPERADOR' : 'TECNICO',
+    senha: senha,
+    telefone: ''
   };
-  if(editIdx>=0) users[editIdx] = u; else users.push(u);
-  closeModal('modal-user');
-  updateStats(); renderView();
-  showToast((TR[currentLang]||TR['pt-BR']).toast_saved, 'suc');
+  
+  // Desabilitar botão
+  const btn = document.getElementById('btn-save-user');
+  const spinner = document.getElementById('save-spinner');
+  const saveText = document.getElementById('save-text');
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  saveText.textContent = 'Salvando...';
+  
+  // Requisição
+  fetch('/api/usuarios', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.ok ? r.json() : Promise.reject(r))
+  .then(data => {
+    closeModal('modal-user');
+    showToast((TR[currentLang]||TR['pt-BR']).toast_saved, 'suc');
+    // Atualizar lista (recarregar do servidor)
+    setTimeout(() => location.reload(), 800);
+  })
+  .catch(err => {
+    let msg = 'Erro ao salvar usuário';
+    if(err.status === 409) msg = 'E-mail já cadastrado';
+    if(err.status === 400) msg = 'Dados inválidos';
+    showToast(msg, 'err');
+  })
+  .finally(() => {
+    btn.disabled = false;
+    spinner.style.display = 'none';
+    saveText.textContent = (TR[currentLang]||TR['pt-BR']).btn_save;
+  });
+}
+
+function togglePwdField(fieldId, iconId){
+  const field = document.getElementById(fieldId);
+  const icon = document.getElementById(iconId);
+  if(!field || !icon) return;
+  if(field.type === 'password'){
+    field.type = 'text';
+    icon.className = 'fa-solid fa-eye-slash';
+  } else {
+    field.type = 'password';
+    icon.className = 'fa-solid fa-eye';
+  }
 }
 
 /* RESET PASSWORD */
