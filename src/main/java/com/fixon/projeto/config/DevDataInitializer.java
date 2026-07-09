@@ -34,15 +34,33 @@ public class DevDataInitializer {
             String senha = encoder.encode("senha123");
 
             if (administradores.count() == 0) {
-                administradores.save(new Administrador(null, "Administrador", "admin@bat.com", senha, null, true, null));
+                Administrador admin = new Administrador();
+                admin.setNome("Administrador");
+                admin.setEmail("admin@bat.com");
+                admin.setSenha(senha);
+                admin.setNomeUsuario("admin");
+                administradores.save(admin);
             }
 
             if (operadores.count() == 0) {
-                operadores.save(new Operador(null, "Carlos Operador", "operador@bat.com", senha, "(34) 99999-0001", null, true, null));
+                Operador operador = new Operador();
+                operador.setNome("Carlos Operador");
+                operador.setEmail("operador@bat.com");
+                operador.setSenha(senha);
+                operador.setNomeUsuario("operador");
+                operador.setTelefone("(34) 99999-0001");
+                operadores.save(operador);
             }
 
             if (tecnicos.count() == 0) {
-                tecnicos.save(new Tecnico(null, "Joao Tecnico", "tecnico@bat.com", senha, "Mecanica", "(34) 98888-0001", null, true, null));
+                Tecnico tecnico = new Tecnico();
+                tecnico.setNome("Joao Tecnico");
+                tecnico.setEmail("tecnico@bat.com");
+                tecnico.setSenha(senha);
+                tecnico.setNomeUsuario("tecnico");
+                tecnico.setEspecialidade("Mecanica");
+                tecnico.setTelefone("(34) 98888-0001");
+                tecnicos.save(tecnico);
             }
 
             if (setores.count() == 0) {

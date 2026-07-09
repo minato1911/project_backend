@@ -34,6 +34,9 @@ public class Tecnico {
 
     private String senha;
 
+    @Column(unique = true, length = 80)
+    private String nomeUsuario;
+
     private String especialidade;
 
     private String telefone;

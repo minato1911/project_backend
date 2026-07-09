@@ -371,19 +371,33 @@ function submitForm(){
   }
   const btn = document.getElementById('btn-submit');
   btn.classList.add('loading');
-  setTimeout(()=>{
+  setTimeout(async ()=>{
     btn.classList.remove('loading');
-    const ticket = buildTicket();
+    const ticket = await buildTicket();
     saveTicket(ticket);
     showSuccess(ticket);
   }, 1600);
 }
 
-function buildTicket(){
+function fileToAttachment(file){
+  return new Promise(function(resolve){
+    if(!file){ resolve({name:'',type:'',data:null}); return; }
+    if(file.type && file.type.indexOf('image/')===0){
+      const reader = new FileReader();
+      reader.onload = function(){ resolve({name:file.name,type:file.type,data:reader.result}); };
+      reader.onerror = function(){ resolve({name:file.name,type:file.type,data:null}); };
+      reader.readAsDataURL(file);
+    } else {
+      resolve({name:file.name,type:file.type,data:null});
+    }
+  });
+}
+async function buildTicket(){
   const now = new Date();
   const ds = String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
   const catEl = document.querySelector('input[name=cat]:checked');
   const prioEl = document.querySelector('input[name=prio]:checked');
+  const attachments = await Promise.all(files.map(fileToAttachment));
   return {
     id:'#'+ticketNum,
     operator: document.getElementById('f-name').value.trim(),
@@ -395,7 +409,7 @@ function buildTicket(){
     category: catEl?catEl.value:'',
     priority: prioEl?prioEl.value:'media',
     problem: document.getElementById('f-desc').value.trim(),
-    files: files.map(f=>f.name),
+    files: attachments,
     status: 'disponivel',
     tech: null,
     date: ds,

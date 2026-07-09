@@ -8,4 +8,6 @@ import com.fixon.projeto.model.Administrador;
 
 public interface AdministradorRepository extends JpaRepository<Administrador, Long> {
     Optional<Administrador> findByEmail(String email);
+
+    Optional<Administrador> findByNomeUsuarioIgnoreCase(String nomeUsuario);
 }

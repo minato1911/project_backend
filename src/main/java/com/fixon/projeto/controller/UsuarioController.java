@@ -42,6 +42,11 @@ public class UsuarioController {
         return usuarioService.listarTecnicos().stream().map(UsuarioResponse::from).toList();
     }
 
+    @GetMapping
+    public List<UsuarioResponse> listarTodos() {
+        return usuarioService.listarUsuarios();
+    }
+
     @PostMapping
     public UsuarioResponse criar(@Valid @RequestBody UsuarioRequest request) {
         Object usuario = usuarioService.criar(request);

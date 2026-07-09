@@ -36,37 +36,53 @@ public class AuthService {
         if (request == null) {
             throw new IllegalArgumentException("Informe email e senha.");
         }
-        String email = normalize(request.email());
+        String identificador = normalize(request.email());
         String senha = request.senha() == null ? "" : request.senha();
 
-        if (email.isBlank() || senha.isBlank()) {
+        if (identificador.isBlank() || senha.isBlank()) {
             throw new IllegalArgumentException("Informe email e senha.");
         }
 
         // Bloqueia por excesso de tentativas ANTES de gastar tempo validando a senha.
-        loginAttemptService.verificarBloqueio(email);
+        loginAttemptService.verificarBloqueio(identificador);
 
-        LoginResponse resposta = administradores.findByEmail(email)
+        LoginResponse resposta = buscarPorEmailOuNomeUsuario(identificador, senha);
+
+        if (resposta == null) {
+            loginAttemptService.registrarFalha(identificador);
+            throw new IllegalArgumentException("Email ou senha invalidos.");
+        }
+
+        loginAttemptService.registrarSucesso(identificador);
+        return resposta;
+    }
+
+    private LoginResponse buscarPorEmailOuNomeUsuario(String identificador, String senha) {
+        return administradores.findByEmail(identificador)
                 .filter(admin -> Boolean.TRUE.equals(admin.getAtivo()))
                 .filter(admin -> senhaConfere(senha, admin.getSenha()))
                 .map(this::adminResponse)
-                .or(() -> operadores.findByEmail(email)
+                .or(() -> administradores.findByNomeUsuarioIgnoreCase(identificador)
+                        .filter(admin -> Boolean.TRUE.equals(admin.getAtivo()))
+                        .filter(admin -> senhaConfere(senha, admin.getSenha()))
+                        .map(this::adminResponse))
+                .or(() -> operadores.findByEmail(identificador)
                         .filter(operador -> Boolean.TRUE.equals(operador.getAtivo()))
                         .filter(operador -> senhaConfere(senha, operador.getSenha()))
                         .map(this::operadorResponse))
-                .or(() -> tecnicos.findByEmail(email)
+                .or(() -> operadores.findByNomeUsuarioIgnoreCase(identificador)
+                        .filter(operador -> Boolean.TRUE.equals(operador.getAtivo()))
+                        .filter(operador -> senhaConfere(senha, operador.getSenha()))
+                        .map(this::operadorResponse))
+                .or(() -> tecnicos.findByEmail(identificador)
+                        .filter(tecnico -> Boolean.TRUE.equals(tecnico.getAtivo()))
+                        .filter(tecnico -> senhaConfere(senha, tecnico.getSenha()))
+                        .map(this::tecnicoResponse))
+                .or(() -> tecnicos.findByNomeUsuarioIgnoreCase(identificador)
                         .filter(tecnico -> Boolean.TRUE.equals(tecnico.getAtivo()))
                         .filter(tecnico -> senhaConfere(senha, tecnico.getSenha()))
                         .map(this::tecnicoResponse))
                 .orElse(null);
-
-        if (resposta == null) {
-            loginAttemptService.registrarFalha(email);
-            throw new IllegalArgumentException("Email ou senha invalidos.");
-        }
-
-        loginAttemptService.registrarSucesso(email);
-        return resposta;
     }
 
     private LoginResponse adminResponse(Administrador admin) {

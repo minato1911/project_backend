@@ -236,20 +236,44 @@ const AVATAR_COLORS = [
   '#D35400','#27AE60','#2C3E50','#7D3C98','#1A5276'
 ];
 
-let users = [
-  {id:'U-001',name:'Ana Carolina Lima',role:'Diretora de Operações',dept:'Operações',email:'ana.lima@bat.com',status:'ativo',profile:'Administrador',last_access:'Hoje, 09:32',online:true},
-  {id:'U-002',name:'Ricardo Alves Mendes',role:'Gerente de TI',dept:'Tecnologia',email:'r.mendes@bat.com',status:'ativo',profile:'Gerente',last_access:'Hoje, 08:15',online:true},
-  {id:'U-003',name:'Fernanda Costa Silva',role:'Analista de RH',dept:'RH',email:'f.costa@bat.com',status:'ativo',profile:'Analista',last_access:'Ontem, 17:45',online:false},
-  {id:'U-004',name:'João Pedro Cardoso',role:'Controller Financeiro',dept:'Financeiro',email:'jp.cardoso@bat.com',status:'ativo',profile:'Gerente',last_access:'Hoje, 10:01',online:true},
-  {id:'U-005',name:'Mariana Souza Ferreira',role:'Coordenadora de Logística',dept:'Logística',email:'m.ferreira@bat.com',status:'inativo',profile:'Operador',last_access:'15/05/2026',online:false},
-  {id:'U-006',name:'Carlos Eduardo Rocha',role:'Analista de Compliance',dept:'Compliance',email:'c.rocha@bat.com',status:'ativo',profile:'Analista',last_access:'Hoje, 07:55',online:true},
-  {id:'U-007',name:'Patrícia Nunes Barros',role:'Gerente de Marketing',dept:'Marketing',email:'p.barros@bat.com',status:'bloqueado',profile:'Gerente',last_access:'10/04/2026',online:false},
-  {id:'U-008',name:'Thiago Oliveira Santos',role:'Advogado Sênior',dept:'Jurídico',email:'t.santos@bat.com',status:'ativo',profile:'Analista',last_access:'Ontem, 14:22',online:false},
-  {id:'U-009',name:'Luisa Martins Pinto',role:'Supervisora de Produção',dept:'Produção',email:'l.pinto@bat.com',status:'ativo',profile:'Operador',last_access:'Hoje, 06:40',online:true},
-  {id:'U-010',name:'Bruno Henrique Castro',role:'Analista de Sistemas',dept:'Tecnologia',email:'b.castro@bat.com',status:'inativo',profile:'Operador',last_access:'02/05/2026',online:false},
-  {id:'U-011',name:'Camila Rodrigues Melo',role:'Especialista Financeiro',dept:'Financeiro',email:'c.melo@bat.com',status:'ativo',profile:'Analista',last_access:'Hoje, 11:18',online:true},
-  {id:'U-012',name:'Diego Farias Lopes',role:'Operador de Produção',dept:'Produção',email:'d.lopes@bat.com',status:'bloqueado',profile:'Operador',last_access:'28/03/2026',online:false},
-];
+let users = [];
+
+function mapUser(u){
+  const roleLabel = u.perfil === 'ADMIN' ? 'Administrador' : u.perfil === 'TECNICO' ? 'Técnico' : 'Operador';
+  const dept = u.especialidade || u.telefone || '-';
+  return {
+    id: `U-${String(u.id).padStart(3,'0')}`,
+    name: u.nome || '—',
+    username: u.nomeUsuario || '-',
+    role: roleLabel,
+    dept: dept,
+    email: u.email || '—',
+    status: u.ativo ? 'ativo' : 'inativo',
+    profile: roleLabel,
+    last_access: formatDate(u.criadoEm),
+    online: Boolean(u.ativo)
+  };
+}
+
+function formatDate(value){
+  if(!value) return '—';
+  const d = new Date(value);
+  if(Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+async function loadUsers(){
+  try{
+    const resp = await fetch('/api/usuarios');
+    if(!resp.ok) throw new Error('Falha ao carregar');
+    const data = await resp.json();
+    users = data.map(mapUser);
+    updateStats();
+    renderView();
+  } catch(err){
+    showToast('Falha ao carregar usuários', 'err');
+  }
+}
 
 const LANG_CODES={'pt-BR':'PT','en':'EN','es':'ES','de':'DE','ru':'RU','zh':'中文'};
 let currentLang = 'pt-BR';
@@ -514,6 +538,7 @@ function openAddModal(){
   document.getElementById('modal-sub').textContent   = d.modal_sub;
   document.getElementById('f-name').value   = '';
   document.getElementById('f-email').value  = '';
+  document.getElementById('f-username').value = '';
   document.getElementById('f-senha').value  = '';
   document.getElementById('f-confirm-senha').value = '';
   document.getElementById('f-profile').value= 'OPERADOR';
@@ -552,6 +577,7 @@ function updateAvatarPreview(){
 function saveUser(){
   const name = document.getElementById('f-name').value.trim();
   const email = document.getElementById('f-email').value.trim();
+  const username = document.getElementById('f-username')?.value.trim() || '';
   const profile = document.getElementById('f-profile').value;
   const senha = document.getElementById('f-senha')?.value.trim() || '';
   const confirmSenha = document.getElementById('f-confirm-senha')?.value.trim() || '';
@@ -559,7 +585,7 @@ function saveUser(){
   // Validação
   if(!name){ showToast('Nome é obrigatório', 'err'); return; }
   if(!email){ showToast('E-mail é obrigatório', 'err'); return; }
-  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){ showToast('E-mail inválido', 'err'); return; }
+  if(!email.includes('@')){ showToast('E-mail inválido', 'err'); return; }
   if(senha && confirmSenha && senha !== confirmSenha){ showToast('As senhas não coincidem', 'err'); return; }
   if(senha && senha.length < 8){ showToast('Senha deve ter no mínimo 8 caracteres', 'err'); return; }
   if(!senha && !confirmSenha){ showToast('Senha é obrigatória', 'err'); return; }
@@ -568,6 +594,7 @@ function saveUser(){
   const payload = {
     nome: name,
     email: email,
+    nomeUsuario: username,
     perfil: profile === 'OPERADOR' ? 'OPERADOR' : 'TECNICO',
     senha: senha,
     telefone: ''
@@ -593,8 +620,10 @@ function saveUser(){
   .then(data => {
     closeModal('modal-user');
     showToast((TR[currentLang]||TR['pt-BR']).toast_saved, 'suc');
-    // Atualizar lista (recarregar do servidor)
-    setTimeout(() => location.reload(), 800);
+    users.unshift(mapUser(data));
+    currentPage = 1;
+    updateStats();
+    renderView();
   })
   .catch(err => {
     let msg = 'Erro ao salvar usuário';
@@ -660,4 +689,4 @@ function showToast(msg, type='suc'){
 }
 
 /* ══ INIT ══ */
-initTheme(); initLang(); updateStats(); renderView();
+initTheme(); initLang(); loadUsers();

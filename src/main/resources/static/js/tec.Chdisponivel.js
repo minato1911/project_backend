@@ -191,10 +191,28 @@ function initUser(){
 /* ============ DATA ============ */
 var tickets=[], sortCol='date', sortDir='desc', page=1, PER=10, modalId=null;
 var TECH_NAME='Carlos Mendes';
-function getCurrentTicketId(){ return localStorage.getItem('bat-tech-current')||null; }
+var currentTimerId=null, currentTimerStart=null;
+function getTechName(){ return localStorage.getItem('bat-tech-name')||TECH_NAME||'Carlos Mendes'; }
+function getCurrentStorageKey(){ return 'bat-tech-current:' + encodeURIComponent(getTechName()); }
+function getCurrentTicketId(){ return localStorage.getItem(getCurrentStorageKey())||null; }
 function hasCurrent(){ return !!getCurrentTicketId(); }
+function clearCurrentTicket(){ localStorage.removeItem(getCurrentStorageKey()); }
+function normalizeFileEntry(entry){ if(!entry) return null; if(typeof entry==='string') return {name:entry,type:'',data:null}; return {name:entry.name||entry.fileName||'Arquivo',type:entry.type||'',data:entry.data||entry.url||null}; }
+function normalizeFiles(files){ return (files||[]).map(normalizeFileEntry).filter(Boolean); }
 
 function parseDate(ds){ if(!ds) return new Date(0); var p=ds.split(' '),dp=p[0].split('/'); return new Date(dp[2]+'-'+dp[1]+'-'+dp[0]+(p[1]?'T'+p[1]:'')); }
+function formatElapsed(ms){ var total=Math.max(0,Math.floor(ms/1000)); var h=Math.floor(total/3600); var m=Math.floor((total%3600)/60); var s=total%60; return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+function getTicketStartTime(t){ if(t.history && t.history.length){ for(var i=t.history.length-1;i>=0;i--){ if(t.history[i].st==='1'||t.history[i].st==='at'){ var dt=parseDate(t.history[i].time); if(dt && !isNaN(dt.getTime())) return dt; }} } return new Date(); }
+function updateCurrentTimer(){ var el=document.getElementById('m-timer'); if(!el) return; var start=currentTimerStart||new Date(); el.textContent=formatElapsed(Date.now()-start.getTime()); }
+function startCurrentTimer(t){ stopCurrentTimer(); currentTimerStart=getTicketStartTime(t); updateCurrentTimer(); currentTimerId=setInterval(updateCurrentTimer,1000); var panel=document.getElementById('m-timer-panel'); if(panel) panel.style.display='flex'; }
+function stopCurrentTimer(){ if(currentTimerId){ clearInterval(currentTimerId); currentTimerId=null; } var panel=document.getElementById('m-timer-panel'); if(panel) panel.style.display='none'; }
+function setCurrentButtonState(isCurrent, status){ ['m-defer-btn','m-cancel-btn','m-finish-btn'].forEach(function(id){ var btn=document.getElementById(id); if(!btn) return; if(isCurrent && status==='inservice'){ btn.style.display='inline-flex'; btn.disabled=false; } else if(isCurrent){ btn.style.display='inline-flex'; btn.disabled=true; } else { btn.style.display='none'; } }); }
+function getNowString(){ var now=new Date(); return String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'); }
+function saveTechTicket(t){ var tech=JSON.parse(localStorage.getItem('bat-tech-tickets')||'[]'); var i=tech.findIndex(function(x){return x.id===t.id;}); var rec={id:t.id,tech:t.tech||getTechName(),status:t.status,history:t.history,dateEnd:t.dateEnd||null,files:t.files||[]}; if(i>=0) tech[i]=Object.assign({},tech[i],rec); else tech.push(rec); localStorage.setItem('bat-tech-tickets',JSON.stringify(tech)); }
+function finalizeCurrentTicket(){ var curId=getCurrentTicketId(); if(!curId) return; var t=tickets.find(function(x){return x.id===curId;}); if(!t) return; if(!confirm('Deseja finalizar este chamado?')) return; var nowStr=getNowString(); t.status='4'; t.dateEnd=nowStr; t.history=t.history||[]; t.history.push({st:'4',time:nowStr}); t.tech=getTechName(); saveTechTicket(t); clearCurrentTicket(); stopCurrentTimer(); closeModal(); render(); renderStats(); renderBanner(); showToast('Chamado finalizado!','suc'); }
+function cancelCurrentTicket(){ var curId=getCurrentTicketId(); if(!curId) return; var t=tickets.find(function(x){return x.id===curId;}); if(!t) return; if(!confirm('Deseja cancelar este chamado?')) return; var nowStr=getNowString(); t.status='0'; t.tech=null; t.history=t.history||[]; t.history.push({st:'0',time:nowStr}); saveTechTicket(t); clearCurrentTicket(); stopCurrentTimer(); closeModal(); render(); renderStats(); renderBanner(); showToast('Chamado cancelado!','info'); }
+function deferCurrentTicket(){ var curId=getCurrentTicketId(); if(!curId) return; var t=tickets.find(function(x){return x.id===curId;}); if(!t) return; if(!confirm('Deseja adiar este chamado?')) return; var nowStr=getNowString(); t.status='p'; t.history=t.history||[]; t.history.push({st:'p',time:nowStr}); saveTechTicket(t); clearCurrentTicket(); stopCurrentTimer(); render(); renderStats(); renderBanner(); showToast('Chamado adiado!','info'); }
+
 function timeAgo(ds){ var diff=Math.floor((Date.now()-parseDate(ds).getTime())/60000); if(diff<1) return T('now'); if(diff<60) return diff+' '+T('min_ago'); if(diff<1440) return Math.floor(diff/60)+' '+T('hour_ago'); return ds; }
 
 function loadData(){
@@ -209,7 +227,7 @@ function loadData(){
       sector:t.sector||'—', line:t.line||'', equip:t.equip||'—', location:t.location||'', category:t.category||'—',
       priority:t.priority||'media', problem:t.problem||'—', tech:t.tech||null,
       status:String(t.status!==undefined?t.status:'0'), date:t.date||'—', dateEnd:t.dateEnd||null,
-      files:t.files||[], history:t.history||[]
+      files:normalizeFiles(t.files), history:t.history||[]
     };
   });
 }
@@ -238,12 +256,14 @@ function prioBadge(p){
 function uiStatus(t){
   if(t.status==='4'||t.status==='finalizado') return 'finished';
   if(t.status==='0') return 'available';
+  if(t.status==='p') return 'postponed';
   return 'inservice';
 }
 function statusBadge(t){
   var s=uiStatus(t);
   if(s==='available') return '<span class="stb st-av"><span class="dp" style="background:var(--bm)"></span>'+T('st_available')+'</span>';
   if(s==='inservice') return '<span class="stb st-at"><span class="dp" style="background:var(--wn);animation:blink 1.3s ease infinite"></span>'+T('st_inservice')+'</span>';
+  if(s==='postponed') return '<span class="stb st-p"><span class="dp" style="background:var(--dn)"></span>'+T('st_postponed')+'</span>';
   return '<span class="stb st-dn"><i class="fa-solid fa-check" style="font-size:9px"></i>'+T('st_finished')+'</span>';
 }
 
@@ -366,26 +386,19 @@ function assumeTicket(id){
   var t=tickets.find(function(x){return x.id===id;});
   if(!t || uiStatus(t)!=='available') return;
   // 1. Vincular ao técnico + 2. status Em Atendimento
-  t.tech=TECH_NAME;
+  t.tech=getTechName();
   t.status='at';
   var now=new Date();
   var nowStr=String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
   t.history=t.history||[]; t.history.push({st:'1',time:nowStr});
   // 4. Salvar no localStorage (bat-tech-tickets) + marcar chamado atual
   saveTechTicket(t);
-  localStorage.setItem('bat-tech-current',id);
+  localStorage.setItem(getCurrentStorageKey(),id);
   // 3. Bloquear demais botões (re-render aplica lock)
   render(); renderStats(); renderBanner();
   closeModal();
   showToast(T('toast_assumed'),'suc');
   // 5. "Enviar" para Meu Chamado Atual — já persistido em bat-tech-current
-}
-function saveTechTicket(t){
-  var tech=JSON.parse(localStorage.getItem('bat-tech-tickets')||'[]');
-  var i=tech.findIndex(function(x){return x.id===t.id;});
-  var rec={id:t.id,tech:t.tech,status:t.status,history:t.history};
-  if(i>=0) tech[i]=Object.assign({},tech[i],rec); else tech.push(rec);
-  localStorage.setItem('bat-tech-tickets',JSON.stringify(tech));
 }
 function assumeFromModal(){ if(modalId) assumeTicket(modalId); }
 function goToCurrent(){
@@ -412,18 +425,26 @@ function openModal(id){
   ];
   document.getElementById('m-dg').innerHTML=pairs.map(function(p){return '<div class="di"><div class="dl">'+T(p[0])+'</div><div class="dv">'+p[1]+'</div></div>';}).join('');
   document.getElementById('m-desc').textContent=t.problem;
-  // images
+  var fileList=normalizeFiles(t.files||[]);
   var mi=document.getElementById('m-imgs');
-  if(t.files&&t.files.length){
+  if(fileList&&fileList.length){
     var colors=['#002B5B','#005691','#2D9E6B','#6B46C1','#E8A020','#C8A96B'];
-    mi.innerHTML='<div class="img-grid">'+t.files.map(function(f,fi){
+    mi.innerHTML='<div class="img-grid">'+fileList.map(function(f,fi){
       var c=colors[fi%colors.length];
-      var isImg=/\.(jpe?g|png|gif|webp)$/i.test(f);
-      var inner=isImg?'<div class="img-ph" style="background:linear-gradient(135deg,'+c+'22,'+c+'44)"><i class="fa-solid fa-image" style="font-size:26px;color:'+c+';opacity:.65"></i><span>'+f+'</span></div>':'<div class="img-ph"><i class="fa-solid fa-file-pdf" style="font-size:26px;color:var(--dn)"></i><span>'+f+'</span></div>';
-      return '<div class="img-card" title="'+f+'">'+inner+'</div>';
+      var isImg=!!(f.data && f.type && f.type.indexOf('image/')===0);
+      var inner=isImg?'<img src="'+f.data+'" alt="'+f.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px" />':'<div class="img-ph"><i class="fa-solid fa-file-lines" style="font-size:26px;color:'+c+'"></i><span>'+f.name+'</span></div>';
+      return '<div class="img-card" title="'+f.name+'">'+inner+'</div>';
     }).join('')+'</div>';
   } else {
     mi.innerHTML='<div class="no-img"><i class="fa-solid fa-image"></i>'+T('no_img')+'</div>';
+  }
+  // action buttons and timer state
+  var isCurrent=t.id===getCurrentTicketId();
+  setCurrentButtonState(isCurrent, uiStatus(t));
+  if(isCurrent && uiStatus(t)==='inservice'){
+    startCurrentTimer(t);
+  } else {
+    stopCurrentTimer();
   }
   // history
   var hCfg={'0':{i:'fa-plus',l:'h_open'},'1':{i:'fa-user-check',l:'h_assumed'},'at':{i:'fa-user-check',l:'h_assumed'}};

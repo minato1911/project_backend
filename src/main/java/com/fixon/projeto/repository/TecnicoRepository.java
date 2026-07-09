@@ -8,4 +8,6 @@ import com.fixon.projeto.model.Tecnico;
 
 public interface TecnicoRepository extends JpaRepository<Tecnico, Long> {
     Optional<Tecnico> findByEmail(String email);
+
+    Optional<Tecnico> findByNomeUsuarioIgnoreCase(String nomeUsuario);
 }

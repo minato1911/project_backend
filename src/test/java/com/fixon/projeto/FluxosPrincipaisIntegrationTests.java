@@ -2,6 +2,7 @@ package com.fixon.projeto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -21,8 +22,8 @@ class FluxosPrincipaisIntegrationTests {
     @LocalServerPort
     private int port;
 
-    private final HttpClient http = HttpClient.newHttpClient();
-    private String cookie;
+    private final CookieManager cookieManager = new CookieManager();
+    private final HttpClient http = HttpClient.newBuilder().cookieHandler(cookieManager).build();
 
     @Test
     void loginFuncionaParaTodosOsPerfisDeTeste() throws Exception {
@@ -33,14 +34,96 @@ class FluxosPrincipaisIntegrationTests {
 
     @Test
     void apiProtegidaExigeLogin() throws Exception {
-        cookie = null;
+        cookieManager.getCookieStore().removeAll();
         HttpResponse<String> response = get("/api/maquinas");
         assertThat(response.statusCode()).isIn(302, 401);
     }
 
     @Test
+    void cadastroComNomeUsuarioPermiteLoginPorUsuarioERedirecionaPeloPerfil() throws Exception {
+        cookieManager.getCookieStore().removeAll();
+        loginAndGetCookie("admin@bat.com");
+
+        String novoOperador = """
+                {
+                  "nome": "Maria Operadora",
+                  "email": "maria.operadora@bat.com",
+                  "nomeUsuario": "mariaop",
+                  "senha": "senha1234",
+                  "perfil": "OPERADOR"
+                }
+                """;
+
+        HttpResponse<String> operadorCriado = postJson("/api/usuarios", novoOperador);
+        assertOk(operadorCriado);
+        assertThat(operadorCriado.body()).contains("\"perfil\":\"OPERADOR\"");
+
+        String loginOperador = """
+                {
+                  "email": "mariaop",
+                  "senha": "senha1234"
+                }
+                """;
+
+        HttpResponse<String> loginResponse = postJson("/api/auth/login", loginOperador);
+        assertOk(loginResponse);
+        assertThat(loginResponse.body()).contains("\"perfil\":\"OPERADOR\"");
+        assertThat(loginResponse.body()).contains("\"redirectUrl\":\"/operador/dashboard\"");
+
+        cookieManager.getCookieStore().removeAll();
+        loginAndGetCookie("admin@bat.com");
+
+        String novoTecnico = """
+                {
+                  "nome": "Joao Tecnico",
+                  "email": "joao.tecnico@bat.com",
+                  "nomeUsuario": "joaotec",
+                  "senha": "senha1234",
+                  "perfil": "TECNICO"
+                }
+                """;
+
+        HttpResponse<String> tecnicoCriado = postJson("/api/usuarios", novoTecnico);
+        assertOk(tecnicoCriado);
+        assertThat(tecnicoCriado.body()).contains("\"perfil\":\"TECNICO\"");
+
+        String loginTecnico = """
+                {
+                  "email": "joaotec",
+                  "senha": "senha1234"
+                }
+                """;
+
+        HttpResponse<String> loginTecnicoResponse = postJson("/api/auth/login", loginTecnico);
+        assertOk(loginTecnicoResponse);
+        assertThat(loginTecnicoResponse.body()).contains("\"perfil\":\"TECNICO\"");
+        assertThat(loginTecnicoResponse.body()).contains("\"redirectUrl\":\"/tecnico/dashboard\"");
+    }
+
+    @Test
+    void cadastroComEmailDeDominioSimplesEhAceito() throws Exception {
+        cookieManager.getCookieStore().removeAll();
+        loginAndGetCookie("admin@bat.com");
+
+        String novoUsuario = """
+                {
+                  "nome": "Ana Interna",
+                  "email": "ana.interna@empresa",
+                  "nomeUsuario": "anainterna",
+                  "senha": "senha1234",
+                  "perfil": "OPERADOR"
+                }
+                """;
+
+        HttpResponse<String> response = postJson("/api/usuarios", novoUsuario);
+        assertOk(response);
+        assertThat(response.body()).contains("\"email\":\"ana.interna@empresa\"");
+    }
+
+    @Test
     void listagemDeUsuariosNaoExpoeSenha() throws Exception {
-        cookie = loginAndGetCookie("admin@bat.com");
+        cookieManager.getCookieStore().removeAll();
+        loginAndGetCookie("admin@bat.com");
         HttpResponse<String> response = get("/api/usuarios/operadores");
         assertOk(response);
         assertThat(response.body()).contains("\"perfil\":\"OPERADOR\"");
@@ -49,7 +132,8 @@ class FluxosPrincipaisIntegrationTests {
 
     @Test
     void fluxoPrincipalDeChamadoFuncionaAteFinalizar() throws Exception {
-        cookie = loginAndGetCookie("admin@bat.com");
+        cookieManager.getCookieStore().removeAll();
+        loginAndGetCookie("admin@bat.com");
 
         HttpResponse<String> maquinas = get("/api/maquinas");
         assertOk(maquinas);
@@ -97,7 +181,7 @@ class FluxosPrincipaisIntegrationTests {
         assertThat(response.body()).contains("\"redirectUrl\":\"" + redirectUrl + "\"");
     }
 
-    private String loginAndGetCookie(String email) throws Exception {
+    private void loginAndGetCookie(String email) throws Exception {
         String body = """
                 {
                   "email": "%s",
@@ -107,10 +191,6 @@ class FluxosPrincipaisIntegrationTests {
 
         HttpResponse<String> response = postJson("/api/auth/login", body);
         assertOk(response);
-        return response.headers()
-                .firstValue("Set-Cookie")
-                .map(value -> value.split(";", 2)[0])
-                .orElseThrow();
     }
 
     private void assertStatus(HttpResponse<String> response, String status) {
@@ -139,9 +219,7 @@ class FluxosPrincipaisIntegrationTests {
     }
 
     private void addCookie(HttpRequest.Builder builder) {
-        if (cookie != null) {
-            builder.header("Cookie", cookie);
-        }
+        // The CookieManager handles session cookies automatically for the test client.
     }
 
     private URI uri(String path) {

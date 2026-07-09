@@ -43,9 +43,14 @@
       <div id="m-imgs"></div>
       <div class="m-sec-t"><i class="fa-solid fa-clock-rotate-left"></i> <span id="m-sec-hist">Histórico do Chamado</span></div>
       <div class="mtl" id="m-hist"></div>
+      <div class="m-sec-t"><i class="fa-solid fa-stopwatch"></i> <span id="m-timer-label">Temporizador</span></div>
+      <div class="m-timer" id="m-timer-panel" style="display:none"><strong id="m-timer">00:00:00</strong><span id="m-timer-desc">Tempo de atendimento em andamento</span></div>
     </div>
     <div class="m-foot">
       <button class="btn ghost" onclick="closeModal()"><span id="m-close">Fechar</span></button>
+      <button class="btn secondary" id="m-defer-btn" style="display:none" onclick="deferCurrentTicket()"><i class="fa-solid fa-clock"></i><span id="m-defer">Adiar</span></button>
+      <button class="btn warn" id="m-cancel-btn" style="display:none" onclick="cancelCurrentTicket()"><i class="fa-solid fa-ban"></i><span id="m-cancel">Cancelar</span></button>
+      <button class="btn primary" id="m-finish-btn" style="display:none" onclick="finalizeCurrentTicket()"><i class="fa-solid fa-check"></i><span id="m-finish">Finalizar</span></button>
       <button class="btn assume" id="m-assume-btn" onclick="assumeFromModal()"><i class="fa-solid fa-hand-pointer"></i><span id="m-assume">Assumir Chamado</span></button>
     </div>
   </div>
@@ -65,7 +70,7 @@
     <button class="ni" onclick="window.location.href='/tecnico/perfil'"><i class="fa-solid fa-circle-user"></i><span id="n-prof">Meu Perfil</span></button>
     <button class="ni" onclick="window.location.href='/tecnico/configuracoes'"><i class="fa-solid fa-sliders"></i><span id="n-cfg">Configurações</span></button>
     <div class="sb-sec"></div>
-    <button class="ni" style="color:rgba(229,62,62,.7)"><i class="fa-solid fa-arrow-right-from-bracket" style="color:rgba(229,62,62,.7)"></i><span id="n-out">Sair</span></button>
+    <button class="ni sb-logout" style="color:rgba(229,62,62,.7)" onclick="window.location.href='/login'"><i class="fa-solid fa-arrow-right-from-bracket" style="color:rgba(229,62,62,.7)"></i><span id="n-out">Sair</span></button>
   </nav>
 </aside>
 <div class="overlay" id="overlay" onclick="closeSB()"></div>

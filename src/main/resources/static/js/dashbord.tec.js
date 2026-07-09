@@ -191,6 +191,7 @@ function initUser(){
 /* ============ DATA ============ */
 var allTickets=[], notifs=[], dismissedAlerts=[];
 var TECH_NAME='Carlos Mendes';
+function getTechName(){ return localStorage.getItem('bat-tech-name')||TECH_NAME||'Carlos Mendes'; }
 
 function parseDate(ds){ if(!ds) return new Date(0); var p=ds.split(' '),dp=p[0].split('/'); return new Date(dp[2]+'-'+dp[1]+'-'+dp[0]+(p[1]?'T'+p[1]:'')); }
 function toSec(s){ if(!s) return 0; var p=s.split(':'); return (+p[0])*3600+(+p[1])*60+(+(p[2]||0)); }
@@ -239,7 +240,7 @@ function makeSamples(){
 
 /* ============ STATS ============ */
 function getAvailable(){ return allTickets.filter(function(t){ return t.status==='0'; }); }
-function getCurrent(){ return allTickets.filter(function(t){ return (t.status==='1'||t.status==='2'||t.status==='3') && t.tech===TECH_NAME; }); }
+function getCurrent(){ var techName=getTechName(); return allTickets.filter(function(t){ return (t.status==='1'||t.status==='2'||t.status==='3') && t.tech===techName; }); }
 function getUrgent(){ return allTickets.filter(function(t){ return t.priority==='alta' && (t.status==='0'||t.status==='1'||t.status==='2'||t.status==='3'); }); }
 function getDoneToday(){
   var today=new Date(); today.setHours(0,0,0,0);

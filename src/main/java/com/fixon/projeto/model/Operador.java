@@ -34,6 +34,9 @@ public class Operador {
 
     private String senha;
 
+    @Column(unique = true, length = 80)
+    private String nomeUsuario;
+
     private String telefone;
 
     private String foto;

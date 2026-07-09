@@ -36,6 +36,9 @@ public class Administrador {
     @Column(nullable = false)
     private String senha;
 
+    @Column(unique = true, length = 80)
+    private String nomeUsuario;
+
     private String foto;
 
     private Boolean ativo = true;
