@@ -1,29 +1,41 @@
 version: '3.9'
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: projeto-app
+    container_name: fixon-app
+    restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8089:8080"
     environment:
-      PORT: 8080
+      SERVER_PORT: 8080
       DB_URL: jdbc:postgresql://db:5432/bat_helpdesk
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:16-alpine
-    container_name: projeto-db
+    container_name: fixon-db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: bat_helpdesk
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5438:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./src/main/db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bat_helpdesk"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   pgdata:
