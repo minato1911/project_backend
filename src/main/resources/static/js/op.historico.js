@@ -216,45 +216,37 @@ function toSec(s){ if(!s) return 0; var p=s.split(':'); return (+p[0])*3600+(+p[
 function fmtDur(sec){ var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60); return (h>0?h+'h ':'')+m+'min'; }
 function sumTimes(a,b){ var t=toSec(a)+toSec(b); return String(Math.floor(t/3600)).padStart(2,'0')+':'+String(Math.floor((t%3600)/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); }
 
-function loadData(){
-  var op=JSON.parse(localStorage.getItem('bat-op-tickets')||'[]');
-  var tech=JSON.parse(localStorage.getItem('bat-tech-tickets')||'[]');
-  var all=op.slice();
-  tech.forEach(function(tt){ var i=all.findIndex(function(x){return x.id===tt.id;}); if(i>=0) all[i]=Object.assign({},all[i],tt); else all.push(tt); });
-  // Only closed tickets (status 4/finalizado/resolvido/cancelled)
-  var closed = all.filter(function(t){ return t.status==='4'||t.status==='finalizado'||t.status==='resolvido'||t.status==='cancelled'||t.dateEnd; });
-  if(!closed.length) closed = makeSamples();
-  tickets = closed.map(function(t){
-    return {
-      id:t.id, operator:t.operator||'João Pedro Silva', matricula:t.matricula||'BAT-OP-0128',
-      sector:t.sector||'—', line:t.line||'', equip:t.equip||'—', category:t.category||'—',
-      priority:t.priority||'media', problem:t.problem||'—', tech:t.tech||'—',
-      dateOpen:t.date||'—', dateEnd:t.dateEnd||t.date||'—',
-      travelTime:t.travelTime||null, serviceTime:t.serviceTime||null,
-      finalStatus:t.finalStatus||(t.status==='cancelled'?'cancelled':'done'),
-      history:t.history||[], obs:t.obs||[]
-    };
-  });
-}
-
-function makeSamples(){
-  var now=new Date();
-  function f(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-  function ago(m){ return f(new Date(now-m*60000)); }
-  return [
-    {id:'#4821',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção A',line:'Linha 1',equip:'Máquina L-03',category:'Hardware',priority:'alta',problem:'Sensor de temperatura com leitura incorreta, gerando alarmes falsos na linha de produção.',tech:'Carlos Mendes',date:ago(1440),dateEnd:ago(960),travelTime:'00:15:00',serviceTime:'01:45:00',status:'4',history:[{st:'0',time:ago(1440)},{st:'1',time:ago(1425)},{st:'2',time:ago(1410)},{st:'3',time:ago(1405)},{st:'4',time:ago(960)}]},
-    {id:'#4820',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Embalagem',line:'Linha 2',equip:'Impressora IR-02',category:'Impressora',priority:'baixa',problem:'Impressora imprimindo rótulos com qualidade ruim. Cabeçote com sujeira acumulada.',tech:'Pedro Lima',date:ago(2880),dateEnd:ago(2700),travelTime:'00:10:00',serviceTime:'00:45:00',status:'4',history:[{st:'0',time:ago(2880)},{st:'1',time:ago(2800)},{st:'2',time:ago(2790)},{st:'3',time:ago(2785)},{st:'4',time:ago(2700)}]},
-    {id:'#4819',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção B',line:'Linha 7',equip:'Linha de Envase B7',category:'Elétrica',priority:'alta',problem:'Válvula solenóide travada em posição fechada. Produção parada há 40 minutos.',tech:'Carlos Mendes',date:ago(4320),dateEnd:ago(4050),travelTime:'00:12:00',serviceTime:'01:18:00',status:'4',history:[{st:'0',time:ago(4320)},{st:'1',time:ago(4308)},{st:'2',time:ago(4296)},{st:'3',time:ago(4290)},{st:'4',time:ago(4050)}]},
-    {id:'#4818',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Logística',line:'',equip:'Empilhadeira EL-02',category:'Mecânica',priority:'media',problem:'Bateria não carrega. Indicador de falha aceso no painel.',tech:'Ana Técnica',date:ago(5760),dateEnd:ago(5580),travelTime:'00:20:00',serviceTime:'02:00:00',status:'4',history:[{st:'0',time:ago(5760)},{st:'1',time:ago(5700)},{st:'2',time:ago(5680)},{st:'3',time:ago(5670)},{st:'4',time:ago(5580)}]},
-    {id:'#4817',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Tecnologia',line:'',equip:'Switch de Rede SW-04',category:'Rede',priority:'media',problem:'Perda intermitente de conexão na rede do setor administrativo.',tech:'Pedro Lima',date:ago(7200),dateEnd:ago(7080),travelTime:'00:08:00',serviceTime:'00:52:00',status:'4',history:[{st:'0',time:ago(7200)},{st:'1',time:ago(7150)},{st:'2',time:ago(7140)},{st:'3',time:ago(7135)},{st:'4',time:ago(7080)}]},
-    {id:'#4816',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Manutenção',line:'',equip:'Compressor Atlas C-08',category:'Mecânica',priority:'alta',problem:'Vazamento de óleo no compressor principal. Pressão instável.',tech:'Carlos Mendes',date:ago(10080),dateEnd:ago(9800),travelTime:'00:14:00',serviceTime:'02:46:00',status:'4',history:[{st:'0',time:ago(10080)},{st:'1',time:ago(10060)},{st:'2',time:ago(10040)},{st:'3',time:ago(10030)},{st:'4',time:ago(9800)}]},
-    {id:'#4815',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção A',line:'Linha 2',equip:'Robô Soldador RS-01',category:'Automação',priority:'alta',problem:'Robô de solda com erro de calibração no eixo Z. Soldas fora de posição.',tech:'Ana Técnica',date:ago(11520),dateEnd:ago(11280),travelTime:'00:16:00',serviceTime:'01:44:00',status:'4',history:[{st:'0',time:ago(11520)},{st:'1',time:ago(11500)},{st:'2',time:ago(11480)},{st:'3',time:ago(11470)},{st:'4',time:ago(11280)}]},
-    {id:'#4814',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Embalagem',line:'Linha 1',equip:'Seladora SL-03',category:'Mecânica',priority:'baixa',problem:'Seladora não atinge temperatura ideal de selagem.',tech:'Pedro Lima',date:ago(14400),dateEnd:ago(14280),travelTime:'00:09:00',serviceTime:'00:51:00',status:'4',history:[{st:'0',time:ago(14400)},{st:'1',time:ago(14350)},{st:'2',time:ago(14340)},{st:'3',time:ago(14335)},{st:'4',time:ago(14280)}]},
-    {id:'#4813',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção C',line:'Linha 4',equip:'Misturador MX-02',category:'Elétrica',priority:'media',problem:'Motor do misturador superaquecendo após 2h de operação.',tech:'Carlos Mendes',date:ago(17280),dateEnd:ago(17040),travelTime:'00:13:00',serviceTime:'01:47:00',status:'4',history:[{st:'0',time:ago(17280)},{st:'1',time:ago(17260)},{st:'2',time:ago(17240)},{st:'3',time:ago(17230)},{st:'4',time:ago(17040)}]},
-    {id:'#4812',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Tecnologia',line:'',equip:'Servidor SRV-01',category:'Hardware',priority:'baixa',problem:'Disco rígido com setores defeituosos. Substituição preventiva solicitada.',tech:'Pedro Lima',date:ago(20160),dateEnd:ago(20000),travelTime:'00:07:00',serviceTime:'01:13:00',status:'cancelled',finalStatus:'cancelled',history:[{st:'0',time:ago(20160)},{st:'1',time:ago(20100)},{st:'4',time:ago(20000)}]},
-    {id:'#4811',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Logística',line:'',equip:'Esteira Transportadora ET-09',category:'Mecânica',priority:'media',problem:'Rolamento da esteira com ruído excessivo e travamento ocasional.',tech:'Ana Técnica',date:ago(23040),dateEnd:ago(22800),travelTime:'00:18:00',serviceTime:'02:02:00',status:'4',history:[{st:'0',time:ago(23040)},{st:'1',time:ago(23020)},{st:'2',time:ago(23000)},{st:'3',time:ago(22990)},{st:'4',time:ago(22800)}]},
-    {id:'#4810',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção B',line:'Linha 5',equip:'Dosadora DS-04',category:'Automação',priority:'alta',problem:'Dosadora com imprecisão no volume. Variação de ±15% no enchimento.',tech:'Carlos Mendes',date:ago(25920),dateEnd:ago(25620),travelTime:'00:11:00',serviceTime:'02:49:00',status:'4',history:[{st:'0',time:ago(25920)},{st:'1',time:ago(25900)},{st:'2',time:ago(25880)},{st:'3',time:ago(25870)},{st:'4',time:ago(25620)}]}
-  ];
+async function loadData(){
+  try {
+    const resp = await API.listar(0);
+    const items = resp.content || resp || [];
+    const all = items.map(function(c){ return API.normalize(c); });
+    const resolved = all.filter(function(t){ return t.status === 'resolvido'; });
+    tickets = resolved.map(function(t){
+      return {
+        id: t.id || t.protocolo,
+        operator: t.operator || '—',
+        matricula: '—',
+        sector: t.sector || '—',
+        line: '',
+        equip: t.equip || '—',
+        category: t.category || '—',
+        priority: t.priority || 'media',
+        problem: t.problem || '—',
+        tech: t.tech || '—',
+        dateOpen: t.date || '—',
+        dateEnd: t.dateEnd || t.date || '—',
+        travelTime: t.travelTime || null,
+        serviceTime: t.serviceTime || null,
+        finalStatus: t.status === 'cancelled' ? 'cancelled' : 'done',
+        history: [],
+        obs: []
+      };
+    });
+  } catch(e) {
+    console.error('Erro ao carregar histórico:', e);
+    tickets = [];
+  }
 }
 
 /* ============================================================ BADGES */
@@ -464,13 +456,13 @@ function exportExcel(){
 }
 
 /* ============================================================ INIT */
-function init(){
+async function init(){
   initTheme();
   var lang=localStorage.getItem('bat-hist-lang')||'pt'; CL=lang;
   document.getElementById('lang-lbl').textContent=lang.toUpperCase();
   document.querySelectorAll('.lo').forEach(function(el,i){ el.classList.toggle('active',['pt','en','es','de','ru'][i]===lang); });
   if(localStorage.getItem('bat-op-hc')==='1') document.documentElement.setAttribute('data-hc','1');
-  loadData();
+  await loadData();
   initUser();
   applyTR();
   buildTechFilter();
