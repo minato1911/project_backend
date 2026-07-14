@@ -39,9 +39,9 @@
     <div class="sb-sec" data-i18n="nav_main">Principal</div>
     <a class="nav-item active" onclick="switchView('dashboard',this)"><i class="fa-solid fa-gauge-high"></i><span data-i18n="nav_dashboard">Dashboard</span></a>
     <div class="sb-sec" data-i18n="nav_management">Gerenciamento</div>
-    <a class="nav-item" onclick="switchView('maquinas',this)"><i class="fa-solid fa-gears"></i><span data-i18n="nav_machines">Máquinas</span><span class="nav-badge">247</span></a>
-    <a class="nav-item" onclick="switchView('usuarios',this)"><i class="fa-solid fa-users"></i><span data-i18n="nav_users">Usuários</span></a>
-    <a class="nav-item" onclick="switchView('chamados',this)"><i class="fa-solid fa-ticket"></i><span data-i18n="nav_tickets">Chamados</span><span class="nav-badge">18</span></a>
+    <a class="nav-item" onclick="switchView('maquinas',this)"><i class="fa-solid fa-gears"></i><span data-i18n="nav_machines">Máquinas</span><span class="nav-badge" id="sb-machines">0</span></a>
+    <a class="nav-item" onclick="switchView('usuarios',this)"><i class="fa-solid fa-users"></i><span data-i18n="nav_users">Usuários</span><span class="nav-badge" id="sb-users">0</span></a>
+    <a class="nav-item" onclick="switchView('chamados',this)"><i class="fa-solid fa-ticket"></i><span data-i18n="nav_tickets">Chamados</span><span class="nav-badge" id="sb-tickets">0</span></a>
     <div class="sb-sec" data-i18n="nav_account">Conta</div>
     <a class="nav-item" onclick="switchView('perfil',this)"><i class="fa-solid fa-circle-user"></i><span data-i18n="nav_profile">Meu Perfil</span></a>
     <a class="nav-item"><i class="fa-solid fa-sliders"></i><span data-i18n="nav_settings">Configurações</span></a>
@@ -93,24 +93,24 @@
       <p class="sec-title" data-i18n="overview">Visão Geral</p>
       <div class="cards-grid">
         <div class="m-card blue"><div class="bg-circle"></div>
-          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-gears"></i></div><span class="c-trend up"><i class="fa-solid fa-arrow-up"></i> +3,2%</span></div>
-          <div class="c-val" data-target="247">0</div><div class="c-lbl" data-i18n="total_machines">Total de Máquinas</div>
-          <div class="c-sub"><strong>231</strong> <span data-i18n="operational">operacionais</span> · <strong>16</strong> <span data-i18n="in_maintenance">em manutenção</span></div>
+          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-gears"></i></div><span class="c-trend up" id="trend-machines"><i class="fa-solid fa-minus"></i></span></div>
+          <div class="c-val" id="val-machines">0</div><div class="c-lbl" data-i18n="total_machines">Total de Máquinas</div>
+          <div class="c-sub"><strong id="sub-machines-online">0</strong> <span data-i18n="operational">operacionais</span> · <strong id="sub-machines-maint">0</strong> <span data-i18n="in_maintenance">em manutenção</span></div>
         </div>
         <div class="m-card gold"><div class="bg-circle"></div>
-          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-users"></i></div><span class="c-trend up"><i class="fa-solid fa-arrow-up"></i> +1,8%</span></div>
-          <div class="c-val" data-target="1842">0</div><div class="c-lbl" data-i18n="active_users">Usuários Ativos</div>
-          <div class="c-sub"><strong>1.782</strong> <span data-i18n="online_today">online hoje</span> · <strong>60</strong> <span data-i18n="new_users">novos</span></div>
+          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-users"></i></div><span class="c-trend up" id="trend-users"><i class="fa-solid fa-minus"></i></span></div>
+          <div class="c-val" id="val-users">0</div><div class="c-lbl" data-i18n="active_users">Usuários Ativos</div>
+          <div class="c-sub"><strong id="sub-users-admins">0</strong> <span>admins</span> · <strong id="sub-users-tecs">0</strong> <span>técnicos</span> · <strong id="sub-users-ops">0</strong> <span>operadores</span></div>
         </div>
         <div class="m-card danger"><div class="bg-circle"></div>
-          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-ticket"></i></div><span class="c-trend down"><i class="fa-solid fa-arrow-down"></i> -5,4%</span></div>
-          <div class="c-val" data-target="18">0</div><div class="c-lbl" data-i18n="pending_tickets">Chamados Pendentes</div>
-          <div class="c-sub"><strong>5</strong> <span data-i18n="critical">críticos</span> · <strong>13</strong> <span data-i18n="in_analysis">em análise</span></div>
+          <div class="card-top"><div class="c-icon"><i class="fa-solid fa-ticket"></i></div><span class="c-trend up" id="trend-tickets"><i class="fa-solid fa-minus"></i></span></div>
+          <div class="c-val" id="val-tickets">0</div><div class="c-lbl" data-i18n="pending_tickets">Chamados Pendentes</div>
+          <div class="c-sub"><strong id="sub-tickets-alta">0</strong> <span data-i18n="critical">críticos</span> · <strong id="sub-tickets-media">0</strong> <span data-i18n="in_analysis">em análise</span></div>
         </div>
         <div class="m-card success"><div class="bg-circle"></div>
           <div class="card-top"><div class="c-icon"><i class="fa-solid fa-server"></i></div><span class="c-trend stable" data-i18n="stable">Estável</span></div>
-          <div class="c-val">99,8%</div><div class="c-lbl" data-i18n="system_uptime">Uptime do Sistema</div>
-          <div class="c-sub"><span data-i18n="last_check">Última verificação:</span> <strong data-i18n="mins_ago">há 2 min</strong></div>
+          <div class="c-val" id="val-uptime">—</div><div class="c-lbl" data-i18n="system_uptime">Uptime do Sistema</div>
+          <div class="c-sub"><span data-i18n="last_check">Última verificação:</span> <strong id="sub-uptime">—</strong></div>
         </div>
       </div>
       <div class="bottom-grid">

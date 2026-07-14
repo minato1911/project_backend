@@ -145,6 +145,23 @@ public class UsuarioService {
         return valor == null ? "" : valor.trim().toLowerCase(Locale.ROOT);
     }
 
+    @Transactional
+    public void excluir(Long id) {
+        if (administradores.existsById(id)) {
+            administradores.deleteById(id);
+            return;
+        }
+        if (operadores.existsById(id)) {
+            operadores.deleteById(id);
+            return;
+        }
+        if (tecnicos.existsById(id)) {
+            tecnicos.deleteById(id);
+            return;
+        }
+        throw new IllegalArgumentException("Usuário não encontrado com id: " + id);
+    }
+
     private String normalize(String email) {
         return email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
     }

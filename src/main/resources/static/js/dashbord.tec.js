@@ -6,7 +6,7 @@ pt:{
   sb_s1:"Principal",sb_s2:"Registros",sb_s3:"Conta",
   n_dash:"Dashboard",n_avail:"Chamados Disponíveis",n_current:"Meu Chamado Atual",n_hist:"Histórico de Atendimentos",n_prof:"Meu Perfil",n_cfg:"Configurações",n_out:"Sair",
   hdr_t:"Dashboard Técnico",hdr_s:"BAT Brasil · Visão Geral dos Chamados",
-  page_h2:"Bem-vindo, Carlos",page_sub:"Aqui está a visão geral dos chamados técnicos de hoje",bc_label:"Dashboard",btn_refresh:"Atualizar",
+  page_h2:"Bem-vindo",page_sub:"Aqui está a visão geral dos chamados técnicos de hoje",bc_label:"Dashboard",btn_refresh:"Atualizar",
   notif_title:"Notificações",notif_clear:"Limpar",notif_empty:"Nenhuma notificação",
   lbl_avail:"Chamados Disponíveis",sub_avail:"Aguardando atribuição",
   lbl_current:"Chamado Atual",sub_current:"Em atendimento agora",
@@ -32,7 +32,7 @@ en:{
   sb_s1:"Main",sb_s2:"Records",sb_s3:"Account",
   n_dash:"Dashboard",n_avail:"Available Tickets",n_current:"My Current Ticket",n_hist:"Service History",n_prof:"My Profile",n_cfg:"Settings",n_out:"Sign Out",
   hdr_t:"Technician Dashboard",hdr_s:"BAT Brasil · Tickets Overview",
-  page_h2:"Welcome, Carlos",page_sub:"Here is the overview of today's technical tickets",bc_label:"Dashboard",btn_refresh:"Refresh",
+  page_h2:"Welcome",page_sub:"Here is the overview of today's technical tickets",bc_label:"Dashboard",btn_refresh:"Refresh",
   notif_title:"Notifications",notif_clear:"Clear",notif_empty:"No notifications",
   lbl_avail:"Available Tickets",sub_avail:"Awaiting assignment",
   lbl_current:"Current Ticket",sub_current:"In service now",
@@ -58,7 +58,7 @@ es:{
   sb_s1:"Principal",sb_s2:"Registros",sb_s3:"Cuenta",
   n_dash:"Dashboard",n_avail:"Tickets Disponibles",n_current:"Mi Ticket Actual",n_hist:"Historial de Atenciones",n_prof:"Mi Perfil",n_cfg:"Configuración",n_out:"Cerrar sesión",
   hdr_t:"Dashboard Técnico",hdr_s:"BAT Brasil · Visión General de Tickets",
-  page_h2:"Bienvenido, Carlos",page_sub:"Aquí está la visión general de los tickets técnicos de hoy",bc_label:"Dashboard",btn_refresh:"Actualizar",
+  page_h2:"Bienvenido",page_sub:"Aquí está la visión general de los tickets técnicos de hoy",bc_label:"Dashboard",btn_refresh:"Actualizar",
   notif_title:"Notificaciones",notif_clear:"Limpiar",notif_empty:"Sin notificaciones",
   lbl_avail:"Tickets Disponibles",sub_avail:"Esperando asignación",
   lbl_current:"Ticket Actual",sub_current:"En atención ahora",
@@ -84,7 +84,7 @@ de:{
   sb_s1:"Hauptmenü",sb_s2:"Aufzeichnungen",sb_s3:"Konto",
   n_dash:"Dashboard",n_avail:"Verfügbare Tickets",n_current:"Mein aktuelles Ticket",n_hist:"Service-Verlauf",n_prof:"Mein Profil",n_cfg:"Einstellungen",n_out:"Abmelden",
   hdr_t:"Techniker-Dashboard",hdr_s:"BAT Brasil · Ticket-Übersicht",
-  page_h2:"Willkommen, Carlos",page_sub:"Hier ist die Übersicht der heutigen technischen Tickets",bc_label:"Dashboard",btn_refresh:"Aktualisieren",
+  page_h2:"Willkommen",page_sub:"Hier ist die Übersicht der heutigen technischen Tickets",bc_label:"Dashboard",btn_refresh:"Aktualisieren",
   notif_title:"Benachrichtigungen",notif_clear:"Leeren",notif_empty:"Keine Benachrichtigungen",
   lbl_avail:"Verfügbare Tickets",sub_avail:"Warten auf Zuweisung",
   lbl_current:"Aktuelles Ticket",sub_current:"Jetzt in Bearbeitung",
@@ -110,7 +110,7 @@ ru:{
   sb_s1:"Главное",sb_s2:"Записи",sb_s3:"Аккаунт",
   n_dash:"Панель",n_avail:"Доступные заявки",n_current:"Моя текущая заявка",n_hist:"История обслуживания",n_prof:"Мой профиль",n_cfg:"Настройки",n_out:"Выйти",
   hdr_t:"Панель техника",hdr_s:"BAT Brasil · Обзор заявок",
-  page_h2:"Добро пожаловать, Карлос",page_sub:"Обзор сегодняшних технических заявок",bc_label:"Панель",btn_refresh:"Обновить",
+  page_h2:"Добро пожаловать",page_sub:"Обзор сегодняшних технических заявок",bc_label:"Панель",btn_refresh:"Обновить",
   notif_title:"Уведомления",notif_clear:"Очистить",notif_empty:"Нет уведомлений",
   lbl_avail:"Доступные заявки",sub_avail:"Ожидают назначения",
   lbl_current:"Текущая заявка",sub_current:"В работе сейчас",
@@ -180,19 +180,19 @@ function showToast(msg,type){ var t=document.getElementById('toast'),ic=document
 /* USER */
 function ini(n){ var p=n.trim().split(' '); return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():(p[0][0]||'C').toUpperCase(); }
 function initUser(){
-  var name=localStorage.getItem('bat-tech-name')||'Carlos Mendes', iv=ini(name);
+  var name=localStorage.getItem('bat-tech-name')||'Técnico', iv=ini(name);
   var photo=localStorage.getItem('bat-tech-photo');
   ['sb-av','hdr-av'].forEach(function(id){ var e=document.getElementById(id); if(!e)return; if(photo){e.innerHTML='<img src="'+photo+'" alt="Foto"/>';}else{e.textContent=iv;} });
   ['sb-name','hdr-name'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=name; });
-  var fn=name.split(' ')[0];
   var ph=document.getElementById('page-h2');
+  if(ph) ph.textContent = T('page_h2') + ', ' + name.split(' ')[0];
 }
 
 /* ============ DATA ============ */
 var allTickets=[], notifs=[], dismissedAlerts=[];
-var TECH_NAME='Carlos Mendes';
+var TECH_NAME='Técnico';
 let currentUser = null;
-function getTechName(){ return localStorage.getItem('bat-tech-name')||TECH_NAME||'Carlos Mendes'; }
+function getTechName(){ return localStorage.getItem('bat-tech-name')||TECH_NAME; }
 
 function parseDate(ds){ if(!ds) return new Date(0); var p=ds.split(' '),dp=p[0].split('/'); return new Date(dp[2]+'-'+dp[1]+'-'+dp[0]+(p[1]?'T'+p[1]:'')); }
 function toSec(s){ if(!s) return 0; var p=s.split(':'); return (+p[0])*3600+(+p[1])*60+(+(p[2]||0)); }

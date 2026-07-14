@@ -208,13 +208,98 @@ function switchView(id,el){
   if(window.innerWidth<=900)closeSidebar();
 }
 
-/* COUNTERS */
-document.querySelectorAll('[data-target]').forEach(el=>{
-  const target=parseInt(el.dataset.target,10);if(isNaN(target))return;
-  const dur=1100;const start=performance.now();
-  function step(now){const p=Math.min((now-start)/dur,1);const e=1-Math.pow(1-p,3);el.textContent=Math.round(e*target).toLocaleString('pt-BR');if(p<1)requestAnimationFrame(step);}
+/* DYNAMIC DATA LOADING */
+async function loadDashboardData() {
+  try {
+    const [maquinasData, usersData, chamadosData] = await Promise.all([
+      API.maquinas().catch(() => []),
+      API.usuarios().catch(() => []),
+      API.listar().catch(() => []),
+    ]);
+
+    const totalMaquinas = (maquinasData || []).length;
+    const maquinasOnline = (maquinasData || []).filter(m => m.status === 'ATIVA').length;
+    const maquinasMaint = (maquinasData || []).filter(m => m.status === 'MANUTENCAO').length;
+
+    const totalUsers = (usersData || []).length;
+    const admins = (usersData || []).filter(u => u.tipo === 'ADMIN' || u.tipo === 'ADMINISTRADOR').length;
+    const tecs = (usersData || []).filter(u => u.tipo === 'TECNICO').length;
+    const ops = (usersData || []).filter(u => u.tipo === 'OPERADOR').length;
+
+    const chamados = (chamadosData || []).map(c => API.normalize(c));
+    const chamadosPendentes = chamados.filter(c => c.status !== 'resolvido' && c.status !== 'cancelado');
+    const totalTickets = chamadosPendentes.length;
+    const ticketsAlta = chamadosPendentes.filter(c => c.priority === 'alta').length;
+    const ticketsMedia = chamadosPendentes.filter(c => c.priority === 'media').length;
+
+    animVal('val-machines', totalMaquinas);
+    animVal('val-users', totalUsers);
+    animVal('val-tickets', totalTickets);
+
+    document.getElementById('sub-machines-online').textContent = maquinasOnline;
+    document.getElementById('sub-machines-maint').textContent = maquinasMaint;
+    document.getElementById('sub-users-admins').textContent = admins;
+    document.getElementById('sub-users-tecs').textContent = tecs;
+    document.getElementById('sub-users-ops').textContent = ops;
+    document.getElementById('sub-tickets-alta').textContent = ticketsAlta;
+    document.getElementById('sub-tickets-media').textContent = ticketsMedia;
+
+    document.getElementById('sb-machines').textContent = totalMaquinas;
+    document.getElementById('sb-users').textContent = totalUsers;
+    document.getElementById('sb-tickets').textContent = totalTickets;
+
+    const now = new Date();
+    document.getElementById('sub-uptime').textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('val-uptime').textContent = 'Ativo';
+
+    window._dashChamados = chamados;
+    window._dashPendentes = chamadosPendentes;
+    renderDashTickets(chamadosPendentes.slice(0, 5));
+    renderDashActivity(chamados.slice(0, 5));
+  } catch(e) {
+    console.error('Erro ao carregar dados do dashboard:', e);
+  }
+}
+
+function animVal(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const from = parseInt(el.textContent) || 0;
+  if (from === target) { el.textContent = target; return; }
+  const dur = 700, start = performance.now();
+  function step(now) { const p = Math.min((now - start) / dur, 1), e = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(from + (target - from) * e); if (p < 1) requestAnimationFrame(step); }
   requestAnimationFrame(step);
-});
+}
+
+function renderDashTickets(tickets) {
+  const tbody = document.getElementById('dash-tickets-tbody');
+  if (!tickets.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">Nenhum chamado pendente</td></tr>'; return; }
+  tbody.innerHTML = tickets.map(t => {
+    const pLabel = t.priority === 'alta' ? 'Alta' : t.priority === 'media' ? 'Média' : 'Baixa';
+    const sLabel = t.status === 'aberto' ? 'Aberto' : t.status === 'andamento' ? 'Em andamento' : t.status === 'resolvido' ? 'Resolvido' : t.status;
+    return `<tr>
+      <td>#${t.protocolo || t.id}</td>
+      <td>${t.subject || t.desc || '—'}</td>
+      <td><span class="badge badge-${t.priority}">${pLabel}</span></td>
+      <td>${t.tech || '—'}</td>
+      <td><span class="badge badge-${t.status}">${sLabel}</span></td>
+      <td>${t.date || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderDashActivity(chamados) {
+  const el = document.getElementById('dash-activity-body');
+  if (!chamados.length) { el.innerHTML = '<div class="act-item"><div class="act-txt"><span>Nenhuma atividade recente.</span></div></div>'; return; }
+  el.innerHTML = chamados.map(c => {
+    const hoursAgo = c.dataAbertura ? Math.floor((Date.now() - new Date(c.dataAbertura).getTime()) / 3600000) : null;
+    const timeStr = hoursAgo == null ? '' : hoursAgo < 1 ? 'agora' : hoursAgo < 24 ? hoursAgo + 'h atrás' : Math.floor(hoursAgo / 24) + 'd atrás';
+    return `<div class="act-item"><div class="act-txt"><span>Chamado #${c.protocolo || c.id}</span> — ${c.status === 'aberto' ? 'Aberto' : c.status === 'andamento' ? 'Em andamento' : c.status === 'resolvido' ? 'Resolvido' : c.status} · ${timeStr}</div></div>`;
+  }).join('');
+}
+
+/* COUNTERS - removed old data-target animation */
+
 
 /* PROGRESS BARS */
 setTimeout(()=>{document.querySelectorAll('.prog[data-w]').forEach(b=>{b.style.width=b.dataset.w+'%';});},400);
@@ -325,6 +410,7 @@ function renderGauge(){
 
 initTheme();
 initLang();
+loadDashboardData();
 
 // Hook: repinta gráficos ao alternar tema
 (function(){

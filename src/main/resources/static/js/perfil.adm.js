@@ -319,17 +319,19 @@ function saveProfile(){
   },1600);
 }
 
-/* ══ FAKE UPLOAD AVATAR ══ */
-function fakeUploadAvatar(){
-  const d=TR[currentLang]||TR['pt-BR'];
-  const colors=['#005691','#6B46C1','#2D9E6B','#C0392B','#E8A020','#0072BC','#C8A96B'];
-  const col=colors[Math.floor(Math.random()*colors.length)];
-  const ma=document.getElementById('main-avatar');
-  const au=document.getElementById('av-up-circle');
-  if(ma) ma.style.background=col;
-  if(au) au.style.background=col;
-  showToast(d.toast_avatar,'info');
+/* ══ PERFIL DATA LOADING ══ */
+async function loadPerfilData() {
+  try {
+    const u = await API.session();
+    if (u && u.nome) {
+      const el = document.getElementById('main-avatar');
+      if (el) el.textContent = initials(u.nome);
+      const nm = document.getElementById('profile-name');
+      if (nm) nm.textContent = u.nome;
+    }
+  } catch(e) {}
 }
+function initials(n){ const p=n.trim().split(' '); return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0][0].toUpperCase(); }
 
 /* ══ THEME ══ */
 function initTheme(){ updateThemeUI(document.documentElement.getAttribute('data-theme')||'light'); }

@@ -144,20 +144,40 @@ const LANG_CODES={'pt-BR':'PT','en':'EN','es':'ES','de':'DE','ru':'RU','zh':'中
 let currentLang='pt-BR';
 
 /* ═══ DATA ═══ */
-let machines=[
-  {id:'M-001',name:'Cigarre Line Alpha',model:'MK-2000',sector:'Produção A',status:'online',last_maint:'12/04/2026'},
-  {id:'M-002',name:'Embaladora Sigma',model:'EP-500X',sector:'Embalagem',status:'online',last_maint:'28/03/2026'},
-  {id:'M-003',name:'Esteira Logística 01',model:'EL-100',sector:'Logística',status:'manutencao',last_maint:'05/05/2026'},
-  {id:'M-004',name:'Filtro Primário Beta',model:'FP-300',sector:'Produção B',status:'online',last_maint:'20/02/2026'},
-  {id:'M-005',name:'Prensa Hidráulica PH-7',model:'PH-750',sector:'Manutenção',status:'offline',last_maint:'10/01/2026'},
-  {id:'M-006',name:'Secador Industrial Delta',model:'SI-200',sector:'Produção A',status:'online',last_maint:'15/04/2026'},
-  {id:'M-007',name:'Encaixotadora Rápida',model:'ER-800',sector:'Embalagem',status:'online',last_maint:'02/05/2026'},
-  {id:'M-008',name:'Transportador Omega',model:'TO-400',sector:'Logística',status:'manutencao',last_maint:'18/04/2026'},
-  {id:'M-009',name:'Misturador Industrial',model:'MI-600',sector:'Produção B',status:'online',last_maint:'08/03/2026'},
-  {id:'M-010',name:'Compressor Atlas',model:'CA-150',sector:'Manutenção',status:'offline',last_maint:'22/12/2025'},
-  {id:'M-011',name:'Linha Blend Premium',model:'LB-900',sector:'Produção A',status:'online',last_maint:'30/04/2026'},
-  {id:'M-012',name:'Rotuladora Flex',model:'RF-350',sector:'Embalagem',status:'online',last_maint:'14/04/2026'},
-];
+let machines=[];
+const STATUS_MAP = { 'ATIVA': 'online', 'INATIVA': 'offline', 'MANUTENCAO': 'manutencao' };
+const STATUS_REV = { 'online': 'ATIVA', 'offline': 'INATIVA', 'manutencao': 'MANUTENCAO' };
+
+function mapFromApi(m) {
+  return {
+    id: 'M-' + String(m.id).padStart(3, '0'),
+    realId: m.id,
+    name: m.nome || '—',
+    model: m.codigo || '—',
+    sector: m.setor ? m.setor.nome : '—',
+    status: STATUS_MAP[m.status] || 'online',
+    last_maint: '—',
+  };
+}
+
+function mapToApi(m) {
+  return {
+    nome: m.name,
+    codigo: m.model !== '—' ? m.model : null,
+    setorId: null,
+    status: STATUS_REV[m.status] || 'ATIVA',
+  };
+}
+
+async function loadMachines() {
+  try {
+    const data = await API.maquinas();
+    machines = (data || []).map(mapFromApi);
+  } catch(e) {
+    console.error('Erro ao carregar máquinas:', e);
+    machines = [];
+  }
+}
 let editIdx=-1;
 let currentPage=1;
 const PER_PAGE=6;
@@ -304,31 +324,44 @@ function openEditModal(idx){
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
 
-function saveMachine(){
+async function saveMachine(){
   const name=document.getElementById('f-name').value.trim();
   if(!name){document.getElementById('f-name').focus();return;}
-  const raw=document.getElementById('f-date').value;
-  const fdate=raw?raw.split('-').reverse().join('/'):'—';
-  const serial=document.getElementById('f-serial').value.trim()||'SN-00000';
   const m={
-    id:editIdx>=0?machines[editIdx].id:`M-${String(machines.length+1).padStart(3,'0')}`,
-    name,model:document.getElementById('f-model').value||'—',
+    name,
+    model:document.getElementById('f-model').value||'—',
     sector:document.getElementById('f-sector').value,
     status:document.getElementById('f-status').value,
-    last_maint:fdate,
-    serial,
+    last_maint:'—',
   };
-  if(editIdx>=0)machines[editIdx]=m;else machines.push(m);
-  closeModal();updateStats();renderHighlights();renderTable();
-  showToast((TR[currentLang]||TR['pt-BR']).toast_saved,false);
+  try {
+    if(editIdx>=0 && machines[editIdx].realId){
+      showToast('Edição via API não disponível. Remova e recrie.', true);
+      return;
+    }
+    const payload = { nome: m.name, codigo: m.model !== '—' ? m.model : null, status: STATUS_REV[m.status] || 'ATIVA' };
+    const saved = await API.criarMaquina(payload);
+    closeModal();
+    await loadMachines();
+    updateStats(); renderHighlights(); renderTable();
+    showToast((TR[currentLang]||TR['pt-BR']).toast_saved, false);
+  } catch(e) {
+    showToast('Erro ao salvar: ' + e.message, true);
+  }
 }
 
-function deleteMachine(idx){
+async function deleteMachine(idx){
   const d=TR[currentLang]||TR['pt-BR'];
   if(!confirm(d.confirm_del))return;
-  machines.splice(idx,1);
-  updateStats();renderHighlights();renderTable();
-  showToast(d.toast_deleted,true);
+  const m = machines[idx];
+  try {
+    if(m.realId) await API.removerMaquina(m.realId);
+    machines.splice(idx,1);
+    updateStats();renderHighlights();renderTable();
+    showToast(d.toast_deleted,false);
+  } catch(e) {
+    showToast('Erro ao remover: ' + e.message, true);
+  }
 }
 
 function viewMachine(idx){
@@ -345,4 +378,5 @@ function showToast(msg,isErr){
 }
 
 /* ═══ INIT ═══ */
-initTheme();initLang();startLiveClock();updateStats();renderHighlights();renderTable();
+async function init(){ initTheme(); initLang(); startLiveClock(); await loadMachines(); updateStats(); renderHighlights(); renderTable(); }
+init();

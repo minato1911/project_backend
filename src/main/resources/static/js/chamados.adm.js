@@ -252,7 +252,7 @@ const TR = {
 };
 
 /* ══════════════════════════════════════════════
-   DADOS FICTÍCIOS
+   TIMELINE — carregada do servidor
 ══════════════════════════════════════════════ */
 const AV_COLORS = ['#005691','#002B5B','#2D9E6B','#6B46C1','#E8A020','#0072BC','#C0392B','#1ABC9C'];
 function initials(n){ const p=n.trim().split(' '); return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0][0].toUpperCase(); }
@@ -260,12 +260,7 @@ function avColor(n){ let h=0; for(let c of n) h=(h<<5)-h+c.charCodeAt(0); return
 
 let tickets = [];
 
-let timeline = [
-  {type:'finish', text:'Chamado <strong>#4814</strong> finalizado com sucesso', time:'Ontem, 15:45'},
-  {type:'new',    text:'Novo chamado <strong>#4813</strong> aberto — prioridade alta', time:'Ontem, 14:20'},
-  {type:'assume', text:'<strong>Admin</strong> assumiu o chamado <strong>#4811</strong>', time:'Ontem, 11:05'},
-  {type:'open',   text:'Chamado <strong>#4808</strong> reaberto por <strong>Camila Melo</strong>', time:'19/05, 16:30'},
-];
+let timeline = [];
 
 const LANG_CODES = {'pt-BR':'PT','en':'EN','es':'ES','de':'DE','ru':'RU','zh':'中文'};
 let currentLang = 'pt-BR';
@@ -596,12 +591,14 @@ function editTicket(idx){
   const mn=document.getElementById('modal-new'); if(mn) mn.classList.add('open');
 }
 
-/* ══ FAKE UPLOAD ══ */
-const fakeFiles=['relatorio_falha.pdf','screenshot_erro.png','log_sistema.txt','evidencia_camera.jpg'];
-function fakeUpload(){
-  const f=fakeFiles[Math.floor(Math.random()*fakeFiles.length)];
-  document.getElementById('upload-fname').textContent=f;
-  document.getElementById('upload-name').style.display='block';
+/* ══ FILE UPLOAD ══ */
+function handleUpload(input){
+  const f = input.files && input.files[0];
+  if (!f) return;
+  const el = document.getElementById('upload-fname');
+  if (el) el.textContent = f.name;
+  const nm = document.getElementById('upload-name');
+  if (nm) nm.style.display = 'block';
 }
 
 /* ══ TOAST ══ */

@@ -52,6 +52,12 @@ const API = {
   /* ── USERS ── */
   operadores() { return this.get('/usuarios/operadores'); },
   tecnicos() { return this.get('/usuarios/tecnicos'); },
+  usuarios() { return this.get('/usuarios'); },
+
+  /* ── MACHINES ── */
+  maquinas() { return this.get('/maquinas'); },
+  criarMaquina(data) { return this.post('/maquinas', data); },
+  removerMaquina(id) { return fetch(this.base + '/maquinas/' + id, { method: 'DELETE', credentials: 'same-origin' }).then(r => { if (!r.ok) throw new Error(r.status); }); },
 
   /* ── HELPERS ── */
 
