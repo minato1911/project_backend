@@ -69,7 +69,8 @@ public class UsuarioService {
             case "TECNICO", "TÉCNICO" -> criarTecnico(request, nomeUsuario);
             default -> criarOperador(request, nomeUsuario);
         };
-        log.info("Usuário criado: perfil={}, email={}, nomeUsuario={}", perfil, normalize(request.email()), nomeUsuario);
+        log.info("Usuário criado: perfil={}, email={}, nomeUsuario={}", perfil, normalize(request.email()),
+                nomeUsuario);
         return usuario;
     }
 
