@@ -291,8 +291,16 @@ function ini(n){
   var p = n.trim().split(' ');
   return p.length >= 2 ? (p[0][0] + p[p.length-1][0]).toUpperCase() : (p[0][0] || 'J').toUpperCase();
 }
-function initUser(){
-  var name = localStorage.getItem('bat-op-name') || 'João Pedro Silva';
+async function initUser(){
+  var name = localStorage.getItem('bat-op-name');
+  if(!name){
+    try {
+      var session = await API.session();
+      name = (session && session.nome) ? session.nome : '—';
+    } catch(e) {
+      name = '—';
+    }
+  }
   var iv = ini(name);
   ['sb-av','hdr-av'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=iv; });
   ['sb-name','hdr-name'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=name; });
@@ -321,24 +329,24 @@ function sumTimes(a, b){
          String(tot%60).padStart(2,'0');
 }
 
-function loadData(){
-  localStorage.removeItem('bat-op-tickets');
-  localStorage.removeItem('bat-tech-tickets');
-  fetch('/api/chamados?page=0&size=100').then(r=>r.json()).then(data=>{
-    var items = data.content || data || [];
-    tickets = items.map(c=>({ 
-      id:c.id,
-      equip:c.equip||c.equipment||'—',
-      setor:c.sector||'—',
-      prio:(c.priority||'baixa').toLowerCase(),
-      status:c.status||'0',
-      tech:c.technicianName||'—',
-      data:new Date(c.createdAt||new Date()).toLocaleDateString('pt-BR'),
-      notas:c.notes||'',
-      desc:c.subject||c.descricao||''
-    }));
-  }).catch(e=>{ console.warn('Erro ao carregar chamados:', e); tickets=[]; });
+async function loadData(){
+  try {
+    var apiResult = await API.listar(0);
+    if (apiResult && apiResult.content && apiResult.content.length) {
+      tickets = apiResult.content.map(function(ch){ return API.normalize(ch); });
+      return;
+    }
+  } catch(e) { /* fallback to localStorage */ }
+  var stored = JSON.parse(localStorage.getItem('bat-op-tickets') || '[]');
+  var tech = JSON.parse(localStorage.getItem('bat-tech-tickets') || '[]');
+  tech.forEach(function(tt){
+    var i = stored.findIndex(function(x){ return x.id===tt.id; });
+    if(i >= 0) stored[i] = Object.assign({}, stored[i], tt);
+  });
+  tickets = stored;
 }
+
+
 
 /* ============================================================
    BADGES — use single quotes for HTML attributes (FIXED)
@@ -708,7 +716,7 @@ function forceRefresh(){
 /* ============================================================
    INIT
 ============================================================ */
-function init(){
+async function init(){
   initTheme();
   var lang = localStorage.getItem('bat-mc-lang') || 'pt';
   CL = lang;
@@ -719,8 +727,8 @@ function init(){
   if(localStorage.getItem('bat-op-hc') === '1'){
     document.documentElement.setAttribute('data-hc', '1');
   }
-  loadData();
-  initUser();
+  await loadData();
+  await initUser();
   applyTR();
   updateStats();
   renderTable();

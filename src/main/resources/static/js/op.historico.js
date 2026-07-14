@@ -443,13 +443,13 @@ function exportExcel(){
 }
 
 /* ============================================================ INIT */
-function init(){
+async function init(){
   initTheme();
   var lang=localStorage.getItem('bat-hist-lang')||'pt'; CL=lang;
   document.getElementById('lang-lbl').textContent=lang.toUpperCase();
   document.querySelectorAll('.lo').forEach(function(el,i){ el.classList.toggle('active',['pt','en','es','de','ru'][i]===lang); });
   if(localStorage.getItem('bat-op-hc')==='1') document.documentElement.setAttribute('data-hc','1');
-  loadData();
+  await loadData();
   initUser();
   applyTR();
   buildTechFilter();

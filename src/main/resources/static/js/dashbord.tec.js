@@ -191,6 +191,7 @@ function initUser(){
 /* ============ DATA ============ */
 var allTickets=[], notifs=[], dismissedAlerts=[];
 var TECH_NAME='Carlos Mendes';
+let currentUser = null;
 function getTechName(){ return localStorage.getItem('bat-tech-name')||TECH_NAME||'Carlos Mendes'; }
 
 function parseDate(ds){ if(!ds) return new Date(0); var p=ds.split(' '),dp=p[0].split('/'); return new Date(dp[2]+'-'+dp[1]+'-'+dp[0]+(p[1]?'T'+p[1]:'')); }
@@ -215,12 +216,12 @@ function makeSamples(){
 }
 
 /* ============ STATS ============ */
-function getAvailable(){ return allTickets.filter(function(t){ return t.status==='0'; }); }
-function getCurrent(){ var techName=getTechName(); return allTickets.filter(function(t){ return (t.status==='1'||t.status==='2'||t.status==='3') && t.tech===techName; }); }
-function getUrgent(){ return allTickets.filter(function(t){ return t.priority==='alta' && (t.status==='0'||t.status==='1'||t.status==='2'||t.status==='3'); }); }
+function getAvailable(){ return allTickets.filter(function(t){ return t.status==='aberto'; }); }
+function getCurrent(){ var techName=getTechName(); return allTickets.filter(function(t){ return t.status==='andamento' && t.tech===techName; }); }
+function getUrgent(){ return allTickets.filter(function(t){ return t.priority==='alta' && t.status!=='resolvido' && t.status!=='cancelado'; }); }
 function getDoneToday(){
   var today=new Date(); today.setHours(0,0,0,0);
-  return allTickets.filter(function(t){ return t.status==='4' && t.dateEnd && parseDate(t.dateEnd)>=today; });
+  return allTickets.filter(function(t){ return t.status==='resolvido' && t.dateEnd && parseDate(t.dateEnd)>=today; });
 }
 function animV(el,tgt){ if(!el)return; var from=parseInt(el.textContent)||0,dur=700,st=performance.now(); function step(now){var p=Math.min((now-st)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.round(from+(tgt-from)*e);if(p<1)requestAnimationFrame(step);} requestAnimationFrame(step); }
 
@@ -240,7 +241,7 @@ function renderCards(){
 
 /* ============ DONUT: PRIORITY ============ */
 function renderDonut(){
-  var active=allTickets.filter(function(t){ return t.status!=='4'; });
+  var active=allTickets.filter(function(t){ return t.status!=='resolvido'; });
   var counts={alta:0,media:0,baixa:0};
   active.forEach(function(t){ if(counts[t.priority]!==undefined) counts[t.priority]++; });
   var total=counts.alta+counts.media+counts.baixa;
@@ -264,7 +265,7 @@ function renderDonut(){
 
 /* ============ BARS: SECTOR ============ */
 function renderSectorBars(){
-  var active=allTickets.filter(function(t){ return t.status!=='4'; });
+  var active=allTickets.filter(function(t){ return t.status!=='resolvido'; });
   var sectors={};
   active.forEach(function(t){ sectors[t.sector]=(sectors[t.sector]||0)+1; });
   var entries=Object.keys(sectors).map(function(k){return [k,sectors[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,6);
@@ -280,7 +281,7 @@ function renderSectorBars(){
 
 /* ============ GAUGE: AVG TIME ============ */
 function renderGauge(){
-  var done=allTickets.filter(function(t){ return t.status==='4' && t.serviceTime; });
+  var done=allTickets.filter(function(t){ return t.status==='resolvido' && t.serviceTime; });
   var secs=done.map(function(t){ return toSec(t.serviceTime); });
   var avg=secs.length?Math.round(secs.reduce(function(a,b){return a+b;},0)/secs.length):0;
   var fast=secs.length?Math.min.apply(null,secs):0;
@@ -313,7 +314,7 @@ function renderTimelines(){
     }).join('');
   }
   // finished = status 4 sorted by dateEnd desc top 6
-  var finished=allTickets.filter(function(t){return t.status==='4';}).sort(function(a,b){return parseDate(b.dateEnd)-parseDate(a.dateEnd);}).slice(0,6);
+  var finished=allTickets.filter(function(t){return t.status==='resolvido';}).sort(function(a,b){return parseDate(b.dateEnd)-parseDate(a.dateEnd);}).slice(0,6);
   var fEl=document.getElementById('tl-finished');
   if(!finished.length){ fEl.innerHTML='<div class="tl-empty"><i class="fa-solid fa-circle-check"></i><p>'+T('tl_empty')+'</p></div>'; }
   else {
@@ -327,8 +328,8 @@ function renderTimelines(){
 /* ============ ALERTS ============ */
 function renderAlerts(){
   var avail=getAvailable();
-  var urgent=getUrgent().filter(function(t){return t.status==='0';});
-  var exceeded=allTickets.filter(function(t){ return t.status==='3' && t.serviceTime && toSec(t.serviceTime)>2*3600; });
+  var urgent=getUrgent().filter(function(t){return t.status==='aberto';});
+  var exceeded=allTickets.filter(function(t){ return t.status==='andamento' && t.serviceTime && toSec(t.serviceTime)>2*3600; });
   var alerts=[];
   if(urgent.length && dismissedAlerts.indexOf('urgent')<0) alerts.push({type:'urgent',ico:'fa-triangle-exclamation',t:T('alert_urgent_t'),d:T('alert_urgent_d'),act:T('alert_attend')});
   if(avail.length && dismissedAlerts.indexOf('new')<0) alerts.push({type:'new',ico:'fa-bell',t:T('alert_new_t'),d:avail.length+' — '+T('alert_new_d'),act:T('alert_view')});
@@ -344,8 +345,8 @@ function dismissAlert(type){ dismissedAlerts.push(type); renderAlerts(); showToa
 function buildNotifs(){
   notifs=[];
   var avail=getAvailable();
-  var urgent=getUrgent().filter(function(t){return t.status==='0';});
-  var exceeded=allTickets.filter(function(t){ return t.status==='3' && t.serviceTime && toSec(t.serviceTime)>2*3600; });
+  var urgent=getUrgent().filter(function(t){return t.status==='aberto';});
+  var exceeded=allTickets.filter(function(t){ return t.status==='andamento' && t.serviceTime && toSec(t.serviceTime)>2*3600; });
   urgent.slice(0,2).forEach(function(t){ notifs.push({type:'urgent',ico:'fa-triangle-exclamation',title:T('notif_urgent'),text:t.id+' · '+t.sector,time:timeAgo(t.date)}); });
   avail.slice(0,3).forEach(function(t){ notifs.push({type:'new',ico:'fa-inbox',title:T('notif_new'),text:t.id+' · '+t.equip,time:timeAgo(t.date)}); });
   exceeded.slice(0,2).forEach(function(t){ notifs.push({type:'exceeded',ico:'fa-clock',title:T('notif_exceeded'),text:t.id+' · '+t.sector,time:timeAgo(t.date)}); });
@@ -365,7 +366,15 @@ function clearNotifs(){ notifs=[]; renderNotifs(); showToast(T('toast_notif_clea
 function renderAll(){
   renderCards(); renderDonut(); renderSectorBars(); renderGauge(); renderTimelines(); renderAlerts(); buildNotifs(); renderNotifs();
 }
-function refreshData(){ loadData(); renderAll(); showToast(T('toast_refreshed'),'suc'); }
+async function refreshData(){ await loadData(); renderAll(); showToast(T('toast_refreshed'),'suc'); }
+
+async function loadSession(){
+  try {
+    currentUser = await API.session();
+  } catch(e) {
+    console.error('Erro ao carregar sessao:', e);
+  }
+}
 
 /* ============ KEYBOARD NAV ============ */
 document.addEventListener('keydown',function(e){
@@ -378,7 +387,7 @@ document.addEventListener('keydown',function(e){
 });
 
 /* ============ INIT ============ */
-function init(){
+async function init(){
   initTheme();
   var lang=localStorage.getItem('bat-lang')||'pt'; CL=lang;
   document.getElementById('lang-lbl').textContent=lang.toUpperCase();
@@ -386,9 +395,9 @@ function init(){
   if(localStorage.getItem('bat-op-hc')==='1'){ document.documentElement.setAttribute('data-hc','1'); }
   applyTR();
   initUser();
-  loadData();
+  await loadSession();
+  await loadData();
   renderAll();
-  // auto refresh every 30s
-  setInterval(function(){ loadData(); renderAll(); },30000);
+  setInterval(async function(){ await loadData(); renderAll(); },30000);
 }
 document.addEventListener('DOMContentLoaded',init);

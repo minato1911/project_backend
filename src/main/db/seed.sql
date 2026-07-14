@@ -9,8 +9,7 @@
 -- Hash bcrypt de "senha123"
 -- $2b$10$DGsR/fgDCjKIl8Gym1LL1OvX7BlAU9PdG2M1.Bp62qQ03by6nqoK.
 
-INSERT INTO administradores (nome, email, senha, ativo) VALUES
-  ('Administrador', 'admin@bat.com',
+INSERT INTO administradores (nome, email, nome_usuario, senha, ativo) VALUES
+  ('Administrador', 'admin@bat.com', 'admin',
    '$2b$10$DGsR/fgDCjKIl8Gym1LL1OvX7BlAU9PdG2M1.Bp62qQ03by6nqoK.', TRUE);
-
 

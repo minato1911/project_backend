@@ -1,5 +1,6 @@
 package com.fixon.projeto.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,15 @@ public class AuthController {
         session.setAttribute(AuthInterceptor.SESSION_USER,
                 new AuthUser(response.id(), response.nome(), response.email(), response.perfil()));
         return response;
+    }
+
+    @GetMapping("/session")
+    public AuthUser session(HttpSession session) {
+        AuthUser user = (AuthUser) session.getAttribute(AuthInterceptor.SESSION_USER);
+        if (user == null) {
+            throw new RuntimeException("Não autenticado");
+        }
+        return user;
     }
 
     @PostMapping("/logout")

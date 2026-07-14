@@ -119,8 +119,8 @@
           <div class="tbl-wrap">
             <table>
               <thead><tr><th>ID</th><th data-i18n="th_desc">Descrição</th><th data-i18n="th_priority">Prioridade</th><th data-i18n="th_responsible">Responsável</th><th>Status</th><th data-i18n="th_date">Data</th></tr></thead>
-              <tbody>
-                <tr><td colspan="6" class="empty-state">Nenhum chamado registrado.</td></tr>
+              <tbody id="dash-tickets-tbody">
+                <tr><td colspan="6" class="empty-msg" data-i18n="no_data">Carregando dados do servidor...</td></tr>
               </tbody>
             </table>
           </div>
@@ -135,10 +135,10 @@
             <div class="s-item"><span class="s-dot ok"></span><span class="s-name" data-i18n="database">Banco de Dados</span><span class="s-val ok" data-i18n="operational">Operacional</span></div>
             <div class="s-item"><span class="s-dot warn"></span><span class="s-name" data-i18n="network">Rede Interna</span><span class="s-val warn" data-i18n="slow">Lentidão</span></div>
           </div>
-          <div class="act-panel">
-            <h3 data-i18n="recent_activity">Atividade Recente</h3><p data-i18n="today_actions">Ações realizadas hoje</p>
-            <div class="act-item"><span class="act-dot" style="background:#2D9E6B"></span><div class="act-txt"><strong>Sistema</strong> <span>Sem atividade recente.</span></div><span class="act-time">--</span></div>
-          </div>
+            <div class="act-panel">
+              <h3 data-i18n="recent_activity">Atividade Recente</h3><p data-i18n="today_actions">Ações realizadas hoje</p>
+              <div id="dash-activity-body"><div class="act-item"><div class="act-txt"><span data-i18n="no_activity">Nenhuma atividade recente.</span></div></div></div>
+            </div>
         </div>
       </div>
     </div>
@@ -146,10 +146,11 @@
     <!-- VIEWS PLACEHOLDER -->
     <div class="view" id="view-maquinas"><div class="placeholder"><i class="fa-solid fa-gears"></i><h3 data-i18n="nav_machines">Máquinas</h3><p data-i18n="ph_machines">Inventário, status operacional e histórico de manutenções.</p></div></div>
     <div class="view" id="view-usuarios"><div class="placeholder"><i class="fa-solid fa-users"></i><h3 data-i18n="nav_users">Usuários</h3><p data-i18n="ph_users">Cadastro, permissões e controle de acesso dos colaboradores.</p></div></div>
-    <div class="view" id="view-chamados"><div class="panel"><div class="panel-hd"><div><h3 data-i18n="nav_tickets">Chamados Pendentes</h3><p>0 <span data-i18n="pending">pendentes</span></p></div><button class="btn-sm" data-i18n="new_ticket">+ Novo chamado</button></div><div class="tbl-wrap"><table><thead><tr><th>ID</th><th data-i18n="th_desc">Descrição</th><th data-i18n="th_priority">Prioridade</th><th data-i18n="th_responsible">Responsável</th><th>Status</th><th data-i18n="th_date">Data</th></tr></thead><tbody><tr><td colspan="6" class="empty-state">Nenhum chamado registrado.</td></tr></tbody></table></div></div></div>
+    <div class="view" id="view-chamados"><div class="panel"><div class="panel-hd"><div><h3 data-i18n="nav_tickets">Chamados Pendentes</h3><p><span id="chamados-view-count">0</span> <span data-i18n="pending">pendentes</span></p></div><button class="btn-sm" data-i18n="new_ticket">+ Novo chamado</button></div><div class="tbl-wrap"><table><thead><tr><th>ID</th><th data-i18n="th_desc">Descrição</th><th data-i18n="th_priority">Prioridade</th><th data-i18n="th_responsible">Responsável</th><th>Status</th><th data-i18n="th_date">Data</th></tr></thead><tbody id="chamados-view-tbody"><tr><td colspan="6" class="empty-msg">Carregando do servidor...</td></tr></tbody></table></div></div></div>
     <div class="view" id="view-perfil"><div class="placeholder"><i class="fa-solid fa-circle-user"></i><h3 data-i18n="nav_profile">Meu Perfil</h3><p data-i18n="ph_profile">Informações pessoais, senha e preferências do sistema.</p></div></div>
   </main>
 </div>
+<script src="/js/api.js"></script>
 <script src="/js/dashbord.adm.js"></script>
 </body>
 </html>

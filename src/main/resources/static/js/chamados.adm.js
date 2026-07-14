@@ -304,9 +304,11 @@ function updateStats(){
   const prog  = tickets.filter(t=>t.status==='andamento').length;
   const done  = tickets.filter(t=>t.status==='resolvido').length;
   const urg   = tickets.filter(t=>t.priority==='alta' && t.status!=='resolvido').length;
-  animVal('cnt-open', open); animVal('cnt-urgent', urg);
-  animVal('cnt-progress', prog); animVal('cnt-done', done);
-  document.getElementById('sb-count').textContent = open+prog;
+  const elOpen=document.getElementById('cnt-open'); if(elOpen) animVal('cnt-open', open);
+  const elUrg=document.getElementById('cnt-urgent'); if(elUrg) animVal('cnt-urgent', urg);
+  const elProg=document.getElementById('cnt-progress'); if(elProg) animVal('cnt-progress', prog);
+  const elDone=document.getElementById('cnt-done'); if(elDone) animVal('cnt-done', done);
+  const elSb=document.getElementById('sb-count'); if(elSb) elSb.textContent = open+prog;
 }
 function animVal(id,target){ const el=document.getElementById(id); if(!el) return; const from=parseInt(el.textContent)||0; const dur=700; const start=performance.now(); function step(now){ const p=Math.min((now-start)/dur,1); const e=1-Math.pow(1-p,3); el.textContent=Math.round(from+(target-from)*e); if(p<1)requestAnimationFrame(step); } requestAnimationFrame(step); }
 
@@ -384,13 +386,14 @@ function renderTable(){
   const start=(currentPage-1)*PER_PAGE;
   const page=fi.slice(start,start+PER_PAGE);
   const tbody=document.getElementById('table-body');
-  tbody.innerHTML = page.map(t=>{
+  if(!tb) return;
+  tbody.innerHTML = page.map((t,pgIdx)=>{
     const ri=tickets.indexOf(t);
     const ini=initials(t.requester); const col=avColor(t.requester);
-    const canFinish = t.status!=='resolvido';
+    const displayId = typeof t.id === 'number' ? '#'+t.id : t.id;
     return `<tr>
-      <td class="td-id">${t.id}</td>
-      <td><div class="td-subject" title="${t.subject}">${t.subject}</div></td>
+      <td class="td-id">${displayId}</td>
+      <td><div class="td-subject" title="${t.subject||t.desc}">${t.subject||t.desc||'—'}</div></td>
       <td><div class="td-user"><div class="td-av" style="background:${col}">${ini}</div><span>${t.requester}</span></div></td>
       <td style="font-size:12px">${t.sector}</td>
       <td>${prioBadge(t.priority)}</td>
@@ -401,15 +404,15 @@ function renderTable(){
         <div class="act-btns">
           <button class="act-btn view"   onclick="viewTicket(${ri})"   title="${d.tip_view}"><i class="fa-solid fa-eye"></i> ${d.btn_view}</button>
           <button class="act-btn assume" onclick="assumeTicket(${ri})" title="${d.tip_assume}" ${t.status==='resolvido'?'disabled style="opacity:.4;cursor:not-allowed"':''}><i class="fa-solid fa-hand-pointer"></i> ${d.btn_assume}</button>
-          <button class="act-btn finish" onclick="finishTicket(${ri})" title="${d.tip_finish}" ${!canFinish?'disabled style="opacity:.4;cursor:not-allowed"':''}><i class="fa-solid fa-check"></i> ${d.btn_finish}</button>
+          <button class="act-btn finish" onclick="finishTicket(${ri})" title="${d.tip_finish}" ${t.status==='resolvido'?'disabled style="opacity:.4;cursor:not-allowed"':''}><i class="fa-solid fa-check"></i> ${d.btn_finish}</button>
           <button class="act-btn edit"   onclick="editTicket(${ri})"   title="${d.tip_edit}"><i class="fa-solid fa-pen"></i> ${d.btn_edit}</button>
         </div>
       </td>
     </tr>`;
   }).join('');
-  const info=`${d.showing} <strong>${Math.min(start+1,tot)}-${Math.min(start+PER_PAGE,tot)}</strong> ${d.of} <strong>${tot}</strong> ${d.records}`;
-  document.getElementById('pag-info').innerHTML = info;
-  document.getElementById('tbl-info').innerHTML = `${tot} ${d.records}`;
+  const info=start===0&&tot===0?`0 ${d.records}`:`${d.showing} <strong>${Math.min(start+1,tot)}-${Math.min(start+PER_PAGE,tot)}</strong> ${d.of} <strong>${tot}</strong> ${d.records}`;
+  const pagInfo=document.getElementById('pag-info'); if(pagInfo) pagInfo.innerHTML = info;
+  const tblInfo=document.getElementById('tbl-info'); if(tblInfo) tblInfo.innerHTML = `${tot} ${d.records}`;
   renderPagination(totalPages);
 }
 function renderPagination(total){
@@ -462,58 +465,72 @@ function renderKanban(){
 /* ══ NOVO CHAMADO ══ */
 function openNewModal(){
   const now=new Date(); const d=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
-  document.getElementById('f-date').value=d;
-  document.getElementById('f-name').value='';
-  document.getElementById('f-subject').value='';
-  document.getElementById('f-desc').value='';
-  document.getElementById('upload-name').style.display='none';
-  document.getElementById('modal-new').classList.add('open');
+  const elDate=document.getElementById('f-date'); if(elDate) elDate.value=d;
+  const elName=document.getElementById('f-name'); if(elName) elName.value='';
+  const elSubject=document.getElementById('f-subject'); if(elSubject) elSubject.value='';
+  const elDesc=document.getElementById('f-desc'); if(elDesc) elDesc.value='';
+  const elUpload=document.getElementById('upload-name'); if(elUpload) elUpload.style.display='none';
+  const modalNew=document.getElementById('modal-new'); if(modalNew) modalNew.classList.add('open');
+  const formTitle=document.getElementById('form-title');
+  if(formTitle){ const dTr=TR[currentLang]||TR['pt-BR']; formTitle.textContent=dTr.modal_new; }
+  const btnSave=document.querySelector('.btn-save'); if(btnSave){ const dTr=TR[currentLang]||TR['pt-BR']; const sp=btnSave.querySelector('span'); if(sp) sp.textContent=dTr.btn_register; btnSave.onclick=registerTicket; }
 }
-function registerTicket(){
+async function registerTicket(){
   const d=TR[currentLang]||TR['pt-BR'];
   const name    = document.getElementById('f-name').value.trim();
   const subject = document.getElementById('f-subject').value.trim();
   const desc    = document.getElementById('f-desc').value.trim();
   let valid=true;
-  ['f-name','f-subject','f-desc'].forEach(id=>{ document.getElementById(id).classList.remove('err'); });
-  if(!name)    { document.getElementById('f-name').classList.add('err');    valid=false; }
-  if(!subject) { document.getElementById('f-subject').classList.add('err'); valid=false; }
-  if(!desc)    { document.getElementById('f-desc').classList.add('err');    valid=false; }
+  ['f-name','f-subject','f-desc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('err'); });
+  if(!name)    { const el=document.getElementById('f-name'); if(el) el.classList.add('err');    valid=false; }
+  if(!subject) { const el=document.getElementById('f-subject'); if(el) el.classList.add('err'); valid=false; }
+  if(!desc)    { const el=document.getElementById('f-desc'); if(el) el.classList.add('err');    valid=false; }
   if(!valid) return;
-  const newId = '#' + (parseInt(tickets[0].id.replace('#',''))+1);
-  const now=new Date(); const dateStr=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
-  const t = {
-    id:newId, subject, requester:name,
-    sector: document.getElementById('f-sector').value,
-    category: document.getElementById('f-category').value,
-    desc, priority: document.getElementById('f-priority').value,
-    status:'aberto', date:dateStr
-  };
-  tickets.unshift(t);
-  timeline.unshift({type:'new', text:`Novo chamado <strong>${newId}</strong> aberto por <strong>${name}</strong>`, time:'Agora'});
-  closeModal('modal-new'); renderAll();
-  showToast(d.toast_registered,'suc');
+  try {
+    const sectorEl=document.getElementById('f-sector');
+    const categoriaEl=document.getElementById('f-category');
+    const prioridadeEl=document.getElementById('f-priority');
+    const payload = {
+      operadorId: currentUser ? currentUser.id : 1,
+      setor: sectorEl ? sectorEl.value : 'Geral',
+      maquina: subject,
+      categoria: categoriaEl ? categoriaEl.value : 'Outros',
+      prioridade: (prioridadeEl ? prioridadeEl.value : 'media').toUpperCase(),
+      descricao: desc
+    };
+    const created = await API.criar(payload);
+    tickets.unshift(API.normalize(created));
+    timeline.unshift({type:'new', text:`Novo chamado <strong>#${created.id}</strong> aberto por <strong>${name}</strong>`, time:'Agora'});
+    closeModal('modal-new'); renderAll();
+    showToast(d.toast_registered,'suc');
+  } catch(e) {
+    showToast('Erro ao criar chamado: ' + e.message, 'err');
+  }
 }
 
 /* ══ VISUALIZAR ══ */
 function viewTicket(idx){
   const t=tickets[idx]; const d=TR[currentLang]||TR['pt-BR'];
-  document.getElementById('view-id').textContent = t.id;
-  document.getElementById('view-body').innerHTML = `
-    <div class="view-row"><span class="view-lbl">${d.view_lbl_id}</span><span class="view-val">${t.id}</span></div>
+  if(!t) return;
+  const displayId = typeof t.id === 'number' ? '#'+t.id : t.id;
+  const elId=document.getElementById('view-id'); if(elId) elId.textContent = displayId;
+  const elBody=document.getElementById('view-body');
+  if(!elBody) return;
+  elBody.innerHTML = `
+    <div class="view-row"><span class="view-lbl">${d.view_lbl_id}</span><span class="view-val">${displayId}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_req}</span><span class="view-val">${t.requester}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_sector}</span><span class="view-val">${t.sector}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_cat}</span><span class="view-val">${t.category}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_prio}</span><span class="view-val">${prioBadge(t.priority)}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_status}</span><span class="view-val">${statusBadge(t.status)}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_date}</span><span class="view-val">${t.date}</span></div>
-    <div class="view-row" style="flex-direction:column;gap:8px"><span class="view-lbl">${d.view_lbl_desc}</span><div class="view-desc">${t.desc}</div></div>`;
-  document.getElementById('modal-view').classList.add('open');
+    <div class="view-row" style="flex-direction:column;gap:8px"><span class="view-lbl">${d.view_lbl_desc}</span><div class="view-desc">${t.desc||t.subject||'—'}</div></div>`;
+  const modalView=document.getElementById('modal-view'); if(modalView) modalView.classList.add('open');
 }
 
 /* ══ ASSUMIR ══ */
 function assumeTicket(idx){
-  if(tickets[idx].status==='resolvido') return;
+  if(!tickets[idx] || tickets[idx].status==='resolvido') return;
   actionIdx=idx;
   const d=TR[currentLang]||TR['pt-BR'];
   const ci=document.getElementById('confirm-ico'); ci.className='confirm-ico assume';
@@ -531,7 +548,7 @@ function assumeTicket(idx){
 
 /* ══ FINALIZAR ══ */
 function finishTicket(idx){
-  if(tickets[idx].status==='resolvido') return;
+  if(!tickets[idx] || tickets[idx].status==='resolvido') return;
   actionIdx=idx;
   const d=TR[currentLang]||TR['pt-BR'];
   const ci=document.getElementById('confirm-ico'); ci.className='confirm-ico finish';
@@ -550,29 +567,33 @@ function finishTicket(idx){
 
 /* ══ EDITAR ══ */
 function editTicket(idx){
-  const t=tickets[idx];
-  document.getElementById('f-name').value    = t.requester;
-  document.getElementById('f-subject').value = t.subject;
-  document.getElementById('f-desc').value    = t.desc;
-  document.getElementById('f-sector').value  = t.sector;
-  document.getElementById('f-priority').value= t.priority;
-  document.getElementById('f-date').value    = t.date;
-  document.getElementById('upload-name').style.display='none';
+  const t=tickets[idx]; if(!t) return;
+  const fName=document.getElementById('f-name'); if(fName) fName.value = t.requester;
+  const fSubj=document.getElementById('f-subject'); if(fSubj) fSubj.value = t.subject||t.desc||'';
+  const fDesc=document.getElementById('f-desc'); if(fDesc) fDesc.value = t.desc||'';
+  const fSec=document.getElementById('f-sector'); if(fSec) fSec.value = t.sector;
+  const fPri=document.getElementById('f-priority'); if(fPri) fPri.value = t.priority;
+  const fDate=document.getElementById('f-date'); if(fDate) fDate.value = t.date;
+  const upName=document.getElementById('upload-name'); if(upName) upName.style.display='none';
   const d=TR[currentLang]||TR['pt-BR'];
-  document.getElementById('form-title').textContent=d.tip_edit+' '+t.id;
-  document.querySelector('.btn-save span').textContent=d.btn_save||'Salvar';
-  document.querySelector('.btn-save').onclick=()=>{
-    tickets[idx].requester = document.getElementById('f-name').value.trim()||t.requester;
-    tickets[idx].subject   = document.getElementById('f-subject').value.trim()||t.subject;
-    tickets[idx].desc      = document.getElementById('f-desc').value.trim()||t.desc;
-    tickets[idx].priority  = document.getElementById('f-priority').value;
-    timeline.unshift({type:'edit',text:`Chamado <strong>${t.id}</strong> atualizado`,time:'Agora'});
-    closeModal('modal-new'); renderAll(); showToast(d.toast_saved,'info');
-    document.querySelector('.btn-save').onclick=registerTicket;
-    document.querySelector('.btn-save span').textContent=d.btn_register;
-    document.getElementById('form-title').textContent=d.modal_new;
-  };
-  document.getElementById('modal-new').classList.add('open');
+  const ft=document.getElementById('form-title'); if(ft) ft.textContent=d.tip_edit+' #'+(typeof t.id==='number'?t.id:t.id);
+  const btnSave=document.querySelector('.btn-save'); if(btnSave){ const sp=btnSave.querySelector('span'); if(sp) sp.textContent=d.btn_save||'Salvar'; }
+  const btnSaveEl=document.querySelector('.btn-save');
+  if(btnSaveEl){
+    btnSaveEl.onclick=()=>{
+      tickets[idx].requester = (document.getElementById('f-name')?document.getElementById('f-name').value.trim():'')||t.requester;
+      tickets[idx].subject   = (document.getElementById('f-subject')?document.getElementById('f-subject').value.trim():'')||t.subject||'';
+      tickets[idx].desc      = (document.getElementById('f-desc')?document.getElementById('f-desc').value.trim():'')||t.desc;
+      tickets[idx].priority  = document.getElementById('f-priority')?document.getElementById('f-priority').value:t.priority;
+      const chamadoId = typeof t.id === 'string' ? parseInt(t.id.replace('#','')) : t.id;
+      timeline.unshift({type:'edit',text:`Chamado <strong>#${chamadoId}</strong> atualizado`,time:'Agora'});
+      closeModal('modal-new'); renderAll(); showToast(d.toast_saved,'info');
+      btnSaveEl.onclick=registerTicket;
+      const sp2=btnSaveEl.querySelector('span'); if(sp2) sp2.textContent=d.btn_register;
+      const ft2=document.getElementById('form-title'); if(ft2) ft2.textContent=d.modal_new;
+    };
+  }
+  const mn=document.getElementById('modal-new'); if(mn) mn.classList.add('open');
 }
 
 /* ══ FAKE UPLOAD ══ */
@@ -614,6 +635,28 @@ function loadChamados(){
 
 /* ══ RENDER ALL ══ */
 function renderAll(){ updateStats(); renderTable(); renderTimeline(); renderKanban(); }
+
+/* ══ LOAD DATA ══ */
+async function loadData(){
+  try {
+    const resp = await API.listar(0);
+    const items = resp.content || resp || [];
+    tickets = items.map(c => API.normalize(c));
+    renderAll();
+  } catch(e) {
+    console.error('Erro ao carregar chamados:', e);
+  }
+}
+
+async function loadSession(){
+  try {
+    currentUser = await API.session();
+    const userName=document.getElementById('user-name-display');
+    if(userName) userName.textContent = currentUser.nome;
+  } catch(e) {
+    console.error('Erro ao carregar sessão:', e);
+  }
+}
 
 /* ══ INIT ══ */
 initTheme(); initLang();

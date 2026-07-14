@@ -128,13 +128,17 @@ function T(k){return(TR[CL]||TR.pt)[k]||TR.pt[k]||k}
 const AVC=['#005691','#002B5B','#2D9E6B','#6B46C1','#E8A020','#0072BC','#C0392B','#1ABC9C'];
 function ini(n){const p=n.trim().split(' ');return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():(p[0][0]||'?').toUpperCase()}
 function avC(n){let h=0;for(const c of n)h=(h<<5)-h+c.charCodeAt(0);return AVC[Math.abs(h)%AVC.length]}
-let opUser={name:localStorage.getItem('bat-op-name')||'João Pedro Silva',email:localStorage.getItem('bat-op-email')||'joao.pedro@bat.com'};
+let opUser={name:localStorage.getItem('bat-op-name')||'',email:localStorage.getItem('bat-op-email')||''};
 
 /* DATA */
+<<<<<<< HEAD
 localStorage.removeItem('bat-op-tickets');
 localStorage.removeItem('bat-tech-tickets');
 let tickets = [];
 function saveTickets(){localStorage.setItem('bat-op-tickets',JSON.stringify(tickets))}
+=======
+let tickets=[];
+>>>>>>> a2dad3963eddf71d7b8e1c8381bf6dbe10e5db29
 
 /* LOAD CHAMADOS FROM BACKEND */
 function loadTickets(){
@@ -155,8 +159,25 @@ function loadTickets(){
 }
 
 /* NOTIFICATIONS */
+<<<<<<< HEAD
 let notifs = [];
 let tlEvents = [];
+=======
+let notifs=[];
+let tlEvents=[];
+let currentUser=null;
+
+async function loadSession(){
+  try{currentUser=await API.session()}catch(e){console.error('Erro ao carregar sessão:',e)}
+}
+
+async function loadData(){
+  try{
+    const data=await API.listar(0);
+    tickets=data.map(ch=>API.normalize(ch));
+  }catch(e){console.error('Erro ao carregar chamados:',e)}
+}
+>>>>>>> a2dad3963eddf71d7b8e1c8381bf6dbe10e5db29
 
 /* ============================================================ THEME */
 function initTheme(){
@@ -410,25 +431,20 @@ function viewTicket(id){
 }
 
 /* ============================================================ NEW TICKET */
-let ticketCounter=4826;
-function submitTicket(){
+async function submitTicket(){
   const sector=document.getElementById('nc-sector').value;
   const priority=document.getElementById('nc-priority').value;
   const equip=document.getElementById('nc-equip').value.trim();
   const problem=document.getElementById('nc-problem').value.trim();
+  const cat=document.getElementById('nc-cat').value;
   if(!equip||!problem){showToast('Preencha todos os campos.','err');return}
-  const now=new Date();
-  const dateStr=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const nt={id:`#${ticketCounter++}`,equip,sector,problem,priority,status:'aberto',tech:null,date:dateStr,dateEnd:null};
-  tickets.unshift(nt);saveTickets();
-  // Add timeline event
-  tlEvents.unshift({type:'info',icon:'fa-plus-circle',text:`Chamado <strong>${nt.id}</strong> aberto`,sub:`${equip} — ${sector}`,time:'Agora'});
-  // Add notification
-  notifs.unshift({type:'info',icon:'fa-ticket',t:'notif_title',d:'modal_new_sub',time:'Agora',unread:true});
-  closeModal('modal-new');
-  document.getElementById('nc-equip').value='';document.getElementById('nc-problem').value='';
-  updateStats();renderDashTable();renderBarChart();renderDonut();renderTL();initNotifs();
-  showToast(T('toast_ticket_created'),'suc');
+  try{
+    await API.criar({operadorId:currentUser.id,setor:sector,maquina:equip,categoria:cat,prioridade:priority.toUpperCase(),descricao:problem});
+    closeModal('modal-new');
+    document.getElementById('nc-equip').value='';document.getElementById('nc-problem').value='';
+    await loadData();renderAll();
+    showToast(T('toast_ticket_created'),'suc');
+  }catch(e){showToast('Erro ao criar chamado: '+e.message,'err')}
 }
 
 /* ============================================================ USER */
@@ -463,9 +479,14 @@ function restoreA11y(){
 function renderAll(){applyTR();updateStats();renderDashTable();renderBarChart();renderDonut();renderTL();renderMyTickets();renderHistory();renderNotifs()}
 
 /* ============================================================ INIT */
-function init(){
+async function init(){
   initTheme();initLang();restoreA11y();
-  // Set user info
+  await loadSession();
+  if(currentUser&&currentUser.nome){
+    opUser.name=currentUser.nome;
+    if(currentUser.email)opUser.email=currentUser.email;
+  }
+  await loadData();
   const n=opUser.name;const iv=ini(n);
   ['sb-av','hdr-av','prof-av'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=iv});
   ['sb-name','hdr-name','prof-name'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=n});

@@ -17,36 +17,39 @@ DROP TABLE IF EXISTS configuracoes    CASCADE;
 --  USUÁRIOS
 -- =====================================================================
 CREATE TABLE administradores (
-  id        SERIAL PRIMARY KEY,
-  nome      VARCHAR(120) NOT NULL,
-  email     VARCHAR(160) NOT NULL UNIQUE,
-  senha     VARCHAR(255) NOT NULL,
-  foto      VARCHAR(255),
-  ativo     BOOLEAN NOT NULL DEFAULT TRUE,
-  criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE operadores (
-  id        SERIAL PRIMARY KEY,
-  nome      VARCHAR(120) NOT NULL,
-  email     VARCHAR(160) NOT NULL UNIQUE,
-  senha     VARCHAR(255) NOT NULL,
-  telefone  VARCHAR(40),
-  foto      VARCHAR(255),
-  ativo     BOOLEAN NOT NULL DEFAULT TRUE,
-  criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE tecnicos (
   id           SERIAL PRIMARY KEY,
   nome         VARCHAR(120) NOT NULL,
   email        VARCHAR(160) NOT NULL UNIQUE,
+  nome_usuario VARCHAR(60) NOT NULL UNIQUE,
   senha        VARCHAR(255) NOT NULL,
-  especialidade VARCHAR(80),
+  foto         VARCHAR(255),
+  ativo        BOOLEAN NOT NULL DEFAULT TRUE,
+  criado_em    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE operadores (
+  id           SERIAL PRIMARY KEY,
+  nome         VARCHAR(120) NOT NULL,
+  email        VARCHAR(160) NOT NULL UNIQUE,
+  nome_usuario VARCHAR(60) NOT NULL UNIQUE,
+  senha        VARCHAR(255) NOT NULL,
   telefone     VARCHAR(40),
   foto         VARCHAR(255),
   ativo        BOOLEAN NOT NULL DEFAULT TRUE,
   criado_em    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE tecnicos (
+  id            SERIAL PRIMARY KEY,
+  nome          VARCHAR(120) NOT NULL,
+  email         VARCHAR(160) NOT NULL UNIQUE,
+  nome_usuario  VARCHAR(60) NOT NULL UNIQUE,
+  senha         VARCHAR(255) NOT NULL,
+  especialidade VARCHAR(80),
+  telefone      VARCHAR(40),
+  foto          VARCHAR(255),
+  ativo         BOOLEAN NOT NULL DEFAULT TRUE,
+  criado_em     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- =====================================================================
