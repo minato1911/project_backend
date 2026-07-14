@@ -21,7 +21,7 @@ const TR = {
     prio_high:'Alta', prio_medium:'Média', prio_low:'Baixa',
     status_open:'Aberto', status_progress:'Em andamento', status_resolved:'Resolvido',
     col_id:'Nº', col_subject:'Assunto', col_requester:'Solicitante', col_sector:'Setor',
-    col_priority:'Prioridade', col_status:'Status', col_date:'Data', col_actions:'Ações',
+    col_priority:'Prioridade', col_status:'Status', col_date:'Data', col_time:'Tempo', col_actions:'Ações',
     col_category:'Categoria', col_description:'Descrição', col_attach:'Anexo',
     table_title:'Lista de Chamados',
     btn_view:'Ver', btn_assume:'Assumir', btn_finish:'Finalizar', btn_edit:'Editar',
@@ -62,7 +62,7 @@ const TR = {
     prio_high:'High', prio_medium:'Medium', prio_low:'Low',
     status_open:'Open', status_progress:'In progress', status_resolved:'Resolved',
     col_id:'No.', col_subject:'Subject', col_requester:'Requester', col_sector:'Sector',
-    col_priority:'Priority', col_status:'Status', col_date:'Date', col_actions:'Actions',
+    col_priority:'Priority', col_status:'Status', col_date:'Date', col_time:'Time', col_actions:'Actions',
     col_category:'Category', col_description:'Description', col_attach:'Attachment',
     table_title:'Ticket List',
     btn_view:'View', btn_assume:'Assume', btn_finish:'Finish', btn_edit:'Edit',
@@ -103,7 +103,7 @@ const TR = {
     prio_high:'Alta', prio_medium:'Media', prio_low:'Baja',
     status_open:'Abierto', status_progress:'En progreso', status_resolved:'Resuelto',
     col_id:'N°', col_subject:'Asunto', col_requester:'Solicitante', col_sector:'Sector',
-    col_priority:'Prioridad', col_status:'Estado', col_date:'Fecha', col_actions:'Acciones',
+    col_priority:'Prioridad', col_status:'Estado', col_date:'Fecha', col_time:'Tiempo', col_actions:'Acciones',
     col_category:'Categoría', col_description:'Descripción', col_attach:'Adjunto',
     table_title:'Lista de Tickets',
     btn_view:'Ver', btn_assume:'Asumir', btn_finish:'Finalizar', btn_edit:'Editar',
@@ -144,7 +144,7 @@ const TR = {
     prio_high:'Hoch', prio_medium:'Mittel', prio_low:'Niedrig',
     status_open:'Offen', status_progress:'In Bearbeitung', status_resolved:'Gelöst',
     col_id:'Nr.', col_subject:'Betreff', col_requester:'Antragsteller', col_sector:'Bereich',
-    col_priority:'Priorität', col_status:'Status', col_date:'Datum', col_actions:'Aktionen',
+    col_priority:'Priorität', col_status:'Status', col_date:'Datum', col_time:'Zeit', col_actions:'Aktionen',
     col_category:'Kategorie', col_description:'Beschreibung', col_attach:'Anhang',
     table_title:'Ticket-Liste',
     btn_view:'Anzeigen', btn_assume:'Übernehmen', btn_finish:'Abschließen', btn_edit:'Bearbeiten',
@@ -185,7 +185,7 @@ const TR = {
     prio_high:'Высокий', prio_medium:'Средний', prio_low:'Низкий',
     status_open:'Открыта', status_progress:'В работе', status_resolved:'Решена',
     col_id:'№', col_subject:'Тема', col_requester:'Заявитель', col_sector:'Отдел',
-    col_priority:'Приоритет', col_status:'Статус', col_date:'Дата', col_actions:'Действия',
+    col_priority:'Приоритет', col_status:'Статус', col_date:'Дата', col_time:'Время', col_actions:'Действия',
     col_category:'Категория', col_description:'Описание', col_attach:'Вложение',
     table_title:'Список заявок',
     btn_view:'Просмотр', btn_assume:'Взять', btn_finish:'Закрыть', btn_edit:'Изменить',
@@ -226,7 +226,7 @@ const TR = {
     prio_high:'高', prio_medium:'中', prio_low:'低',
     status_open:'开放', status_progress:'处理中', status_resolved:'已解决',
     col_id:'编号', col_subject:'主题', col_requester:'申请人', col_sector:'部门',
-    col_priority:'优先级', col_status:'状态', col_date:'日期', col_actions:'操作',
+    col_priority:'优先级', col_status:'状态', col_date:'日期', col_time:'时间', col_actions:'操作',
     col_category:'类别', col_description:'描述', col_attach:'附件',
     table_title:'工单列表',
     btn_view:'查看', btn_assume:'接单', btn_finish:'完成', btn_edit:'编辑',
@@ -258,26 +258,9 @@ const AV_COLORS = ['#005691','#002B5B','#2D9E6B','#6B46C1','#E8A020','#0072BC','
 function initials(n){ const p=n.trim().split(' '); return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0][0].toUpperCase(); }
 function avColor(n){ let h=0; for(let c of n) h=(h<<5)-h+c.charCodeAt(0); return AV_COLORS[Math.abs(h)%AV_COLORS.length]; }
 
-let tickets = [
-  {id:'#4821',subject:'Falha no sensor da Máq. L-03',requester:'João Mendes',sector:'Produção A',category:'Hardware',desc:'O sensor de temperatura da máquina L-03 apresenta leitura incorreta, gerando alarmes falsos na linha de produção.',priority:'alta',status:'aberto',date:'25/05/2026'},
-  {id:'#4819',subject:'Atualização de firmware — Linha 7',requester:'Carla Souza',sector:'Tecnologia',category:'Software',desc:'Necessidade de atualização do firmware dos controladores da Linha 7 para versão 3.2.1.',priority:'media',status:'andamento',date:'24/05/2026'},
-  {id:'#4818',subject:'Impressora da recepção não imprime',requester:'Ana Lima',sector:'RH',category:'Impressora',desc:'A impressora HP LaserJet da recepção parou de imprimir. Já tentei reinstalar o driver sem sucesso.',priority:'baixa',status:'aberto',date:'24/05/2026'},
-  {id:'#4817',subject:'Sistema interno travando — módulo fiscal',requester:'Ricardo Alves',sector:'Financeiro',category:'Sistema Interno',desc:'O módulo fiscal do ERP apresenta travamentos frequentes ao gerar NF-e acima de 50 itens.',priority:'alta',status:'andamento',date:'23/05/2026'},
-  {id:'#4815',subject:'Sem acesso à rede Wi-Fi — sala 203',requester:'Fernanda Costa',sector:'Compliance',category:'Rede',desc:'Os dispositivos da sala 203 perderam acesso à rede Wi-Fi corporativa após a atualização do roteador.',priority:'media',status:'aberto',date:'23/05/2026'},
-  {id:'#4814',subject:'Substituição teclado — estação 12',requester:'Paulo Neto',sector:'Logística',category:'Hardware',desc:'Teclado com teclas travadas. Solicito substituição imediata pois afeta produtividade.',priority:'baixa',status:'resolvido',date:'22/05/2026'},
-  {id:'#4813',subject:'Erro 403 no portal de fornecedores',requester:'Mariana Ferreira',sector:'Produção B',category:'Sistema Interno',desc:'Todos os usuários do setor recebem erro 403 ao tentar acessar o portal de fornecedores.',priority:'alta',status:'aberto',date:'22/05/2026'},
-  {id:'#4812',subject:'Notebook sem bateria — diretoria',requester:'Carlos Rocha',sector:'Operações',category:'Hardware',desc:'Notebook da diretora não carrega mais. Bateria precisa de substituição urgente.',priority:'media',status:'resolvido',date:'21/05/2026'},
-  {id:'#4811',subject:'Instalar VPN corporativa — novo colaborador',requester:'Thiago Santos',sector:'Tecnologia',category:'Software',desc:'Novo colaborador precisa de VPN configurada para trabalho remoto. Favor instalar e testar.',priority:'baixa',status:'andamento',date:'21/05/2026'},
-  {id:'#4810',subject:'Câmera de segurança offline — portaria',requester:'Luisa Pinto',sector:'Manutenção',category:'Rede',desc:'Câmera da portaria principal ficou offline após queda de energia. Necessário verificar switch PoE.',priority:'alta',status:'resolvido',date:'20/05/2026'},
-  {id:'#4809',subject:'Mouse sem fio — bateria fraca',requester:'Bruno Castro',sector:'Marketing',category:'Hardware',desc:'Mouse sem fio apresenta comportamento errático. Suspeito de bateria descarregada.',priority:'baixa',status:'resolvido',date:'20/05/2026'},
-  {id:'#4808',subject:'Email corporativo bloqueado',requester:'Camila Melo',sector:'Jurídico',category:'Sistema Interno',desc:'Não consigo enviar emails externos. Recebo mensagem de que minha conta foi bloqueada pelo sistema.',priority:'media',status:'aberto',date:'19/05/2026'},
-];
+let tickets = [];
 
 let timeline = [
-  {type:'finish', text:'Chamado <strong>#4810</strong> finalizado por <strong>Admin</strong>', time:'Hoje, 09:14'},
-  {type:'assume', text:'<strong>Carla Souza</strong> assumiu o chamado <strong>#4819</strong>', time:'Hoje, 08:50'},
-  {type:'new',    text:'Novo chamado <strong>#4821</strong> aberto por <strong>João Mendes</strong>', time:'Hoje, 08:32'},
-  {type:'edit',   text:'Chamado <strong>#4817</strong> atualizado para Em andamento', time:'Ontem, 17:10'},
   {type:'finish', text:'Chamado <strong>#4814</strong> finalizado com sucesso', time:'Ontem, 15:45'},
   {type:'new',    text:'Novo chamado <strong>#4813</strong> aberto — prioridade alta', time:'Ontem, 14:20'},
   {type:'assume', text:'<strong>Admin</strong> assumiu o chamado <strong>#4811</strong>', time:'Ontem, 11:05'},
@@ -321,9 +304,11 @@ function updateStats(){
   const prog  = tickets.filter(t=>t.status==='andamento').length;
   const done  = tickets.filter(t=>t.status==='resolvido').length;
   const urg   = tickets.filter(t=>t.priority==='alta' && t.status!=='resolvido').length;
-  animVal('cnt-open', open); animVal('cnt-urgent', urg);
-  animVal('cnt-progress', prog); animVal('cnt-done', done);
-  document.getElementById('sb-count').textContent = open+prog;
+  const elOpen=document.getElementById('cnt-open'); if(elOpen) animVal('cnt-open', open);
+  const elUrg=document.getElementById('cnt-urgent'); if(elUrg) animVal('cnt-urgent', urg);
+  const elProg=document.getElementById('cnt-progress'); if(elProg) animVal('cnt-progress', prog);
+  const elDone=document.getElementById('cnt-done'); if(elDone) animVal('cnt-done', done);
+  const elSb=document.getElementById('sb-count'); if(elSb) elSb.textContent = open+prog;
 }
 function animVal(id,target){ const el=document.getElementById(id); if(!el) return; const from=parseInt(el.textContent)||0; const dur=700; const start=performance.now(); function step(now){ const p=Math.min((now-start)/dur,1); const e=1-Math.pow(1-p,3); el.textContent=Math.round(from+(target-from)*e); if(p<1)requestAnimationFrame(step); } requestAnimationFrame(step); }
 
@@ -339,6 +324,43 @@ function statusBadge(st){
   const map={aberto:{cls:'aberto',label:d.status_open,icon:'fa-clock'},andamento:{cls:'andamento',label:d.status_progress,icon:'fa-rotate'},resolvido:{cls:'resolvido',label:d.status_resolved,icon:'fa-check'}};
   const s=map[st]||{cls:st,label:st,icon:'fa-circle'};
   return `<span class="status-badge ${s.cls}"><i class="fa-solid ${s.icon}"></i>${s.label}</span>`;
+}
+
+function parseTicketDate(t){
+  if(!t || !t.date) return new Date();
+  const parts = t.date.split(' ');
+  const dateParts = parts[0].split('/');
+  const year = +dateParts[2] || new Date().getFullYear();
+  const month = (+dateParts[1] || 1) - 1;
+  const day = +dateParts[0] || 1;
+  if(parts[1]){
+    const timeParts = parts[1].split(':');
+    const hour = +timeParts[0] || 0;
+    const minute = +timeParts[1] || 0;
+    const second = +timeParts[2] || 0;
+    return new Date(year, month, day, hour, minute, second);
+  }
+  return new Date(year, month, day, 0, 0, 0);
+}
+function formatElapsed(start, end){
+  const diff = Math.max(0, Math.floor((end - start) / 1000));
+  const h = String(Math.floor(diff / 3600)).padStart(2,'0');
+  const m = String(Math.floor((diff % 3600) / 60)).padStart(2,'0');
+  const s = String(diff % 60).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+function getTicketTimer(t){
+  if(!t) return {text:'--:--', running:false};
+  if(!t._timerStart){
+    t._timerStart = parseTicketDate(t);
+  }
+  if(t.status === 'resolvido'){
+    if(!t._finalTimer){
+      t._finalTimer = formatElapsed(t._timerStart, t._resolvedAt || new Date());
+    }
+    return {text:t._finalTimer, running:false};
+  }
+  return {text:formatElapsed(t._timerStart, new Date()), running:true};
 }
 
 /* ══ FILTER ══ */
@@ -364,31 +386,33 @@ function renderTable(){
   const start=(currentPage-1)*PER_PAGE;
   const page=fi.slice(start,start+PER_PAGE);
   const tbody=document.getElementById('table-body');
-  tbody.innerHTML = page.map(t=>{
+  if(!tb) return;
+  tbody.innerHTML = page.map((t,pgIdx)=>{
     const ri=tickets.indexOf(t);
     const ini=initials(t.requester); const col=avColor(t.requester);
-    const canFinish = t.status!=='resolvido';
+    const displayId = typeof t.id === 'number' ? '#'+t.id : t.id;
     return `<tr>
-      <td class="td-id">${t.id}</td>
-      <td><div class="td-subject" title="${t.subject}">${t.subject}</div></td>
+      <td class="td-id">${displayId}</td>
+      <td><div class="td-subject" title="${t.subject||t.desc}">${t.subject||t.desc||'—'}</div></td>
       <td><div class="td-user"><div class="td-av" style="background:${col}">${ini}</div><span>${t.requester}</span></div></td>
       <td style="font-size:12px">${t.sector}</td>
       <td>${prioBadge(t.priority)}</td>
       <td>${statusBadge(t.status)}</td>
       <td style="font-size:12px;color:var(--text-muted)">${t.date}</td>
+      <td>${getTicketTimer(t).text}</td>
       <td>
         <div class="act-btns">
           <button class="act-btn view"   onclick="viewTicket(${ri})"   title="${d.tip_view}"><i class="fa-solid fa-eye"></i> ${d.btn_view}</button>
           <button class="act-btn assume" onclick="assumeTicket(${ri})" title="${d.tip_assume}" ${t.status==='resolvido'?'disabled style="opacity:.4;cursor:not-allowed"':''}><i class="fa-solid fa-hand-pointer"></i> ${d.btn_assume}</button>
-          <button class="act-btn finish" onclick="finishTicket(${ri})" title="${d.tip_finish}" ${!canFinish?'disabled style="opacity:.4;cursor:not-allowed"':''}><i class="fa-solid fa-check"></i> ${d.btn_finish}</button>
+          <button class="act-btn finish" onclick="finishTicket(${ri})" title="${d.tip_finish}" ${t.status==='resolvido'?'disabled style="opacity:.4;cursor:not-allowed"':''}><i class="fa-solid fa-check"></i> ${d.btn_finish}</button>
           <button class="act-btn edit"   onclick="editTicket(${ri})"   title="${d.tip_edit}"><i class="fa-solid fa-pen"></i> ${d.btn_edit}</button>
         </div>
       </td>
     </tr>`;
   }).join('');
-  const info=`${d.showing} <strong>${Math.min(start+1,tot)}-${Math.min(start+PER_PAGE,tot)}</strong> ${d.of} <strong>${tot}</strong> ${d.records}`;
-  document.getElementById('pag-info').innerHTML = info;
-  document.getElementById('tbl-info').innerHTML = `${tot} ${d.records}`;
+  const info=start===0&&tot===0?`0 ${d.records}`:`${d.showing} <strong>${Math.min(start+1,tot)}-${Math.min(start+PER_PAGE,tot)}</strong> ${d.of} <strong>${tot}</strong> ${d.records}`;
+  const pagInfo=document.getElementById('pag-info'); if(pagInfo) pagInfo.innerHTML = info;
+  const tblInfo=document.getElementById('tbl-info'); if(tblInfo) tblInfo.innerHTML = `${tot} ${d.records}`;
   renderPagination(totalPages);
 }
 function renderPagination(total){
@@ -441,58 +465,72 @@ function renderKanban(){
 /* ══ NOVO CHAMADO ══ */
 function openNewModal(){
   const now=new Date(); const d=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
-  document.getElementById('f-date').value=d;
-  document.getElementById('f-name').value='';
-  document.getElementById('f-subject').value='';
-  document.getElementById('f-desc').value='';
-  document.getElementById('upload-name').style.display='none';
-  document.getElementById('modal-new').classList.add('open');
+  const elDate=document.getElementById('f-date'); if(elDate) elDate.value=d;
+  const elName=document.getElementById('f-name'); if(elName) elName.value='';
+  const elSubject=document.getElementById('f-subject'); if(elSubject) elSubject.value='';
+  const elDesc=document.getElementById('f-desc'); if(elDesc) elDesc.value='';
+  const elUpload=document.getElementById('upload-name'); if(elUpload) elUpload.style.display='none';
+  const modalNew=document.getElementById('modal-new'); if(modalNew) modalNew.classList.add('open');
+  const formTitle=document.getElementById('form-title');
+  if(formTitle){ const dTr=TR[currentLang]||TR['pt-BR']; formTitle.textContent=dTr.modal_new; }
+  const btnSave=document.querySelector('.btn-save'); if(btnSave){ const dTr=TR[currentLang]||TR['pt-BR']; const sp=btnSave.querySelector('span'); if(sp) sp.textContent=dTr.btn_register; btnSave.onclick=registerTicket; }
 }
-function registerTicket(){
+async function registerTicket(){
   const d=TR[currentLang]||TR['pt-BR'];
   const name    = document.getElementById('f-name').value.trim();
   const subject = document.getElementById('f-subject').value.trim();
   const desc    = document.getElementById('f-desc').value.trim();
   let valid=true;
-  ['f-name','f-subject','f-desc'].forEach(id=>{ document.getElementById(id).classList.remove('err'); });
-  if(!name)    { document.getElementById('f-name').classList.add('err');    valid=false; }
-  if(!subject) { document.getElementById('f-subject').classList.add('err'); valid=false; }
-  if(!desc)    { document.getElementById('f-desc').classList.add('err');    valid=false; }
+  ['f-name','f-subject','f-desc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('err'); });
+  if(!name)    { const el=document.getElementById('f-name'); if(el) el.classList.add('err');    valid=false; }
+  if(!subject) { const el=document.getElementById('f-subject'); if(el) el.classList.add('err'); valid=false; }
+  if(!desc)    { const el=document.getElementById('f-desc'); if(el) el.classList.add('err');    valid=false; }
   if(!valid) return;
-  const newId = '#' + (parseInt(tickets[0].id.replace('#',''))+1);
-  const now=new Date(); const dateStr=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
-  const t = {
-    id:newId, subject, requester:name,
-    sector: document.getElementById('f-sector').value,
-    category: document.getElementById('f-category').value,
-    desc, priority: document.getElementById('f-priority').value,
-    status:'aberto', date:dateStr
-  };
-  tickets.unshift(t);
-  timeline.unshift({type:'new', text:`Novo chamado <strong>${newId}</strong> aberto por <strong>${name}</strong>`, time:'Agora'});
-  closeModal('modal-new'); renderAll();
-  showToast(d.toast_registered,'suc');
+  try {
+    const sectorEl=document.getElementById('f-sector');
+    const categoriaEl=document.getElementById('f-category');
+    const prioridadeEl=document.getElementById('f-priority');
+    const payload = {
+      operadorId: currentUser ? currentUser.id : 1,
+      setor: sectorEl ? sectorEl.value : 'Geral',
+      maquina: subject,
+      categoria: categoriaEl ? categoriaEl.value : 'Outros',
+      prioridade: (prioridadeEl ? prioridadeEl.value : 'media').toUpperCase(),
+      descricao: desc
+    };
+    const created = await API.criar(payload);
+    tickets.unshift(API.normalize(created));
+    timeline.unshift({type:'new', text:`Novo chamado <strong>#${created.id}</strong> aberto por <strong>${name}</strong>`, time:'Agora'});
+    closeModal('modal-new'); renderAll();
+    showToast(d.toast_registered,'suc');
+  } catch(e) {
+    showToast('Erro ao criar chamado: ' + e.message, 'err');
+  }
 }
 
 /* ══ VISUALIZAR ══ */
 function viewTicket(idx){
   const t=tickets[idx]; const d=TR[currentLang]||TR['pt-BR'];
-  document.getElementById('view-id').textContent = t.id;
-  document.getElementById('view-body').innerHTML = `
-    <div class="view-row"><span class="view-lbl">${d.view_lbl_id}</span><span class="view-val">${t.id}</span></div>
+  if(!t) return;
+  const displayId = typeof t.id === 'number' ? '#'+t.id : t.id;
+  const elId=document.getElementById('view-id'); if(elId) elId.textContent = displayId;
+  const elBody=document.getElementById('view-body');
+  if(!elBody) return;
+  elBody.innerHTML = `
+    <div class="view-row"><span class="view-lbl">${d.view_lbl_id}</span><span class="view-val">${displayId}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_req}</span><span class="view-val">${t.requester}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_sector}</span><span class="view-val">${t.sector}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_cat}</span><span class="view-val">${t.category}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_prio}</span><span class="view-val">${prioBadge(t.priority)}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_status}</span><span class="view-val">${statusBadge(t.status)}</span></div>
     <div class="view-row"><span class="view-lbl">${d.view_lbl_date}</span><span class="view-val">${t.date}</span></div>
-    <div class="view-row" style="flex-direction:column;gap:8px"><span class="view-lbl">${d.view_lbl_desc}</span><div class="view-desc">${t.desc}</div></div>`;
-  document.getElementById('modal-view').classList.add('open');
+    <div class="view-row" style="flex-direction:column;gap:8px"><span class="view-lbl">${d.view_lbl_desc}</span><div class="view-desc">${t.desc||t.subject||'—'}</div></div>`;
+  const modalView=document.getElementById('modal-view'); if(modalView) modalView.classList.add('open');
 }
 
 /* ══ ASSUMIR ══ */
 function assumeTicket(idx){
-  if(tickets[idx].status==='resolvido') return;
+  if(!tickets[idx] || tickets[idx].status==='resolvido') return;
   actionIdx=idx;
   const d=TR[currentLang]||TR['pt-BR'];
   const ci=document.getElementById('confirm-ico'); ci.className='confirm-ico assume';
@@ -500,13 +538,17 @@ function assumeTicket(idx){
   document.getElementById('confirm-title').textContent=d.confirm_assume_title;
   document.getElementById('confirm-msg').textContent=d.confirm_assume_msg;
   const btn=document.getElementById('btn-confirm-action'); btn.className='btn-cd gld'; btn.textContent=d.btn_confirm;
-  btn.onclick=()=>{ tickets[actionIdx].status='andamento'; timeline.unshift({type:'assume',text:`<strong>Admin</strong> assumiu o chamado <strong>${tickets[actionIdx].id}</strong>`,time:'Agora'}); closeModal('modal-confirm'); renderAll(); showToast(d.toast_assumed,'info'); };
+  btn.onclick=()=>{ 
+    if(!tickets[actionIdx]._timerStart) tickets[actionIdx]._timerStart = parseTicketDate(tickets[actionIdx]);
+    tickets[actionIdx].status='andamento'; 
+    timeline.unshift({type:'assume',text:`<strong>Admin</strong> assumiu o chamado <strong>${tickets[actionIdx].id}</strong>`,time:'Agora'}); 
+    closeModal('modal-confirm'); renderAll(); showToast(d.toast_assumed,'info'); };
   document.getElementById('modal-confirm').classList.add('open');
 }
 
 /* ══ FINALIZAR ══ */
 function finishTicket(idx){
-  if(tickets[idx].status==='resolvido') return;
+  if(!tickets[idx] || tickets[idx].status==='resolvido') return;
   actionIdx=idx;
   const d=TR[currentLang]||TR['pt-BR'];
   const ci=document.getElementById('confirm-ico'); ci.className='confirm-ico finish';
@@ -514,35 +556,44 @@ function finishTicket(idx){
   document.getElementById('confirm-title').textContent=d.confirm_finish_title;
   document.getElementById('confirm-msg').textContent=d.confirm_finish_msg;
   const btn=document.getElementById('btn-confirm-action'); btn.className='btn-cd ok'; btn.textContent=d.btn_confirm;
-  btn.onclick=()=>{ tickets[actionIdx].status='resolvido'; timeline.unshift({type:'finish',text:`Chamado <strong>${tickets[actionIdx].id}</strong> finalizado por <strong>Admin</strong>`,time:'Agora'}); closeModal('modal-confirm'); renderAll(); showToast(d.toast_finished,'suc'); };
+  btn.onclick=()=>{ 
+    if(!tickets[actionIdx]._timerStart) tickets[actionIdx]._timerStart = parseTicketDate(tickets[actionIdx]);
+    tickets[actionIdx].status='resolvido';
+    tickets[actionIdx]._resolvedAt = new Date();
+    tickets[actionIdx]._finalTimer = formatElapsed(tickets[actionIdx]._timerStart, tickets[actionIdx]._resolvedAt);
+    timeline.unshift({type:'finish',text:`Chamado <strong>${tickets[actionIdx].id}</strong> finalizado por <strong>Admin</strong>`,time:'Agora'}); closeModal('modal-confirm'); renderAll(); showToast(d.toast_finished,'suc'); };
   document.getElementById('modal-confirm').classList.add('open');
 }
 
 /* ══ EDITAR ══ */
 function editTicket(idx){
-  const t=tickets[idx];
-  document.getElementById('f-name').value    = t.requester;
-  document.getElementById('f-subject').value = t.subject;
-  document.getElementById('f-desc').value    = t.desc;
-  document.getElementById('f-sector').value  = t.sector;
-  document.getElementById('f-priority').value= t.priority;
-  document.getElementById('f-date').value    = t.date;
-  document.getElementById('upload-name').style.display='none';
+  const t=tickets[idx]; if(!t) return;
+  const fName=document.getElementById('f-name'); if(fName) fName.value = t.requester;
+  const fSubj=document.getElementById('f-subject'); if(fSubj) fSubj.value = t.subject||t.desc||'';
+  const fDesc=document.getElementById('f-desc'); if(fDesc) fDesc.value = t.desc||'';
+  const fSec=document.getElementById('f-sector'); if(fSec) fSec.value = t.sector;
+  const fPri=document.getElementById('f-priority'); if(fPri) fPri.value = t.priority;
+  const fDate=document.getElementById('f-date'); if(fDate) fDate.value = t.date;
+  const upName=document.getElementById('upload-name'); if(upName) upName.style.display='none';
   const d=TR[currentLang]||TR['pt-BR'];
-  document.getElementById('form-title').textContent=d.tip_edit+' '+t.id;
-  document.querySelector('.btn-save span').textContent=d.btn_save||'Salvar';
-  document.querySelector('.btn-save').onclick=()=>{
-    tickets[idx].requester = document.getElementById('f-name').value.trim()||t.requester;
-    tickets[idx].subject   = document.getElementById('f-subject').value.trim()||t.subject;
-    tickets[idx].desc      = document.getElementById('f-desc').value.trim()||t.desc;
-    tickets[idx].priority  = document.getElementById('f-priority').value;
-    timeline.unshift({type:'edit',text:`Chamado <strong>${t.id}</strong> atualizado`,time:'Agora'});
-    closeModal('modal-new'); renderAll(); showToast(d.toast_saved,'info');
-    document.querySelector('.btn-save').onclick=registerTicket;
-    document.querySelector('.btn-save span').textContent=d.btn_register;
-    document.getElementById('form-title').textContent=d.modal_new;
-  };
-  document.getElementById('modal-new').classList.add('open');
+  const ft=document.getElementById('form-title'); if(ft) ft.textContent=d.tip_edit+' #'+(typeof t.id==='number'?t.id:t.id);
+  const btnSave=document.querySelector('.btn-save'); if(btnSave){ const sp=btnSave.querySelector('span'); if(sp) sp.textContent=d.btn_save||'Salvar'; }
+  const btnSaveEl=document.querySelector('.btn-save');
+  if(btnSaveEl){
+    btnSaveEl.onclick=()=>{
+      tickets[idx].requester = (document.getElementById('f-name')?document.getElementById('f-name').value.trim():'')||t.requester;
+      tickets[idx].subject   = (document.getElementById('f-subject')?document.getElementById('f-subject').value.trim():'')||t.subject||'';
+      tickets[idx].desc      = (document.getElementById('f-desc')?document.getElementById('f-desc').value.trim():'')||t.desc;
+      tickets[idx].priority  = document.getElementById('f-priority')?document.getElementById('f-priority').value:t.priority;
+      const chamadoId = typeof t.id === 'string' ? parseInt(t.id.replace('#','')) : t.id;
+      timeline.unshift({type:'edit',text:`Chamado <strong>#${chamadoId}</strong> atualizado`,time:'Agora'});
+      closeModal('modal-new'); renderAll(); showToast(d.toast_saved,'info');
+      btnSaveEl.onclick=registerTicket;
+      const sp2=btnSaveEl.querySelector('span'); if(sp2) sp2.textContent=d.btn_register;
+      const ft2=document.getElementById('form-title'); if(ft2) ft2.textContent=d.modal_new;
+    };
+  }
+  const mn=document.getElementById('modal-new'); if(mn) mn.classList.add('open');
 }
 
 /* ══ FAKE UPLOAD ══ */
@@ -564,8 +615,50 @@ function showToast(msg,type='suc'){
   clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3200);
 }
 
+/* ══ LOAD CHAMADOS FROM BACKEND ══ */
+function loadChamados(){
+  return fetch('/api/chamados?page=0&size=100').then(r=>r.json()).then(data=>{
+    const items = data.content || data || [];
+    tickets = items.map(c=>({ 
+      id:'#'+c.id, 
+      subject:c.subject||c.descricao, 
+      requester:c.requesterName||'Desconhecido',
+      sector:c.sector||'—',
+      priority:(c.priority||'baixa').toLowerCase(),
+      status:c.status||'aberto',
+      date: new Date(c.createdAt||new Date()).toLocaleDateString('pt-BR'),
+      notes:c.notes||''
+    }));
+    updateStats();
+  }).catch(e=>{ console.warn('Erro ao carregar chamados:', e); });
+}
+
 /* ══ RENDER ALL ══ */
 function renderAll(){ updateStats(); renderTable(); renderTimeline(); renderKanban(); }
 
+/* ══ LOAD DATA ══ */
+async function loadData(){
+  try {
+    const resp = await API.listar(0);
+    const items = resp.content || resp || [];
+    tickets = items.map(c => API.normalize(c));
+    renderAll();
+  } catch(e) {
+    console.error('Erro ao carregar chamados:', e);
+  }
+}
+
+async function loadSession(){
+  try {
+    currentUser = await API.session();
+    const userName=document.getElementById('user-name-display');
+    if(userName) userName.textContent = currentUser.nome;
+  } catch(e) {
+    console.error('Erro ao carregar sessão:', e);
+  }
+}
+
 /* ══ INIT ══ */
-initTheme(); initLang(); startLiveClock(); renderAll();
+initTheme(); initLang();
+loadChamados().then(()=>renderAll());
+setInterval(function(){ renderTable(); }, 1000);

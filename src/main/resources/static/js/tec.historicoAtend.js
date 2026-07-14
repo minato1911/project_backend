@@ -193,52 +193,37 @@ function initUser(){
 
 /* ============ DATA ============ */
 var atendimentos=[], sortCol='end', sortDir='desc', page=1, PER=10, modalId=null;
+let currentUser = null;
 var SERVICE_LIMIT=30*60;
 function parseDate(ds){ if(!ds) return new Date(0); var p=ds.split(' '),dp=p[0].split('/'); return new Date(dp[2]+'-'+dp[1]+'-'+dp[0]+(p[1]?'T'+p[1]:'')); }
 function toSec(s){ if(!s) return 0; var p=s.split(':'); return (+p[0])*3600+(+p[1])*60+(+(p[2]||0)); }
 function fmtDur(sec){ var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60); return (h>0?h+'h ':'')+m+'min'; }
 function fmtHMS(sec){ var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60; return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
 
-function loadData(){
-  var op=JSON.parse(localStorage.getItem('bat-op-tickets')||'[]');
-  var tech=JSON.parse(localStorage.getItem('bat-tech-tickets')||'[]');
-  var all=op.slice();
-  tech.forEach(function(tt){ var i=all.findIndex(function(x){return x.id===tt.id;}); if(i>=0) all[i]=Object.assign({},all[i],tt); else all.push(tt); });
-  var finished=all.filter(function(t){ return (String(t.status)==='4'||t.finalStatus||t.dateEnd) && t.tech; });
-  if(!finished.length) finished=makeSamples();
-  atendimentos=finished.map(function(t){
-    var trvSec=toSec(t.travelTime), svcSec=toSec(t.serviceTime);
-    var late=svcSec>SERVICE_LIMIT;
-    return {
-      id:t.id,operator:t.operator||'João Pedro Silva',matricula:t.matricula||'BAT-OP-0128',
-      sector:t.sector||'—',equip:t.equip||'—',category:t.category||'—',priority:t.priority||'media',
-      problem:t.problem||'—',tech:t.tech||'—',dateOpen:t.date||'—',dateEnd:t.dateEnd||t.date||'—',
-      travelTime:t.travelTime||'00:00:00',serviceTime:t.serviceTime||'00:00:00',trvSec:trvSec,svcSec:svcSec,
-      late:late,finalStatus:(t.finalStatus==='cancelled'?'cancelled':'done'),
-      obs:t.obs||[],files:t.files||[],parts:t.parts||extractParts(t),history:t.history||[],solution:t.solution||''
-    };
-  });
-}
-function extractParts(t){
-  // attempt to extract parts from obs of type containing "Peça"
-  var parts=[];
-  (t.obs||[]).forEach(function(o){ if(o.type && /pe[çc]a|part|teil|деталь|pieza/i.test(o.type)) parts.push({name:o.text||o.type,qty:1}); });
-  return parts;
+async function loadData(){
+  try {
+    var resp = await API.listar(0);
+    var items = resp.content || resp || [];
+    var finished = items
+      .map(function(c){ return API.normalize(c); })
+      .filter(function(t){ return t.status==='resolvido' && t.tech; });
+    atendimentos = finished.map(function(t){
+      var trvSec=toSec(t.travelTime), svcSec=toSec(t.serviceTime);
+      var late=svcSec>SERVICE_LIMIT;
+      return {
+        id:'#'+t.id, operator:t.operator||'—', matricula:t.operatorId?'BAT-OP-'+String(t.operatorId).padStart(4,'0'):'—',
+        sector:t.sector||'—', equip:t.equip||'—', category:t.category||'—', priority:t.priority||'media',
+        problem:t.problem||'—', tech:t.tech||'—', dateOpen:t.date||'—', dateEnd:t.dateEnd||t.date||'—',
+        travelTime:t.travelTime||'00:00:00', serviceTime:t.serviceTime||'00:00:00', trvSec:trvSec, svcSec:svcSec,
+        late:late, finalStatus:t.statusOriginal==='CANCELADO'?'cancelled':'done',
+        obs:[], files:t.imagem?[t.imagem]:[], parts:[], history:[], solution:t.desc||''
+      };
+    });
+  } catch(e) {
+    console.error('Erro ao carregar historico:', e);
+  }
 }
 
-function makeSamples(){
-  var now=new Date();
-  function f(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-  function ago(m){ return f(new Date(now-m*60000)); }
-  return [
-    {id:'#4821',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção A',equip:'Máquina L-03',category:'Hardware',priority:'alta',problem:'Sensor de temperatura com leitura incorreta, gerando alarmes falsos.',tech:'Carlos Mendes',date:ago(1440),dateEnd:ago(1340),travelTime:'00:15:00',serviceTime:'00:25:00',obs:[{type:'Diagnóstico',text:'Sensor PT100 com resistência fora do padrão.',tech:'Carlos Mendes',time:ago(1420)},{type:'Peça substituída',text:'Sensor PT100 novo instalado e calibrado.',tech:'Carlos Mendes',time:ago(1360)}],files:['sensor.jpg','medicao.jpg'],parts:[{name:'Sensor PT100',qty:1},{name:'Cabo blindado 2m',qty:1}],history:[{st:'0',time:ago(1440)},{st:'1',time:ago(1425)},{st:'2',time:ago(1410)},{st:'3',time:ago(1405)},{st:'4',time:ago(1340)}],solution:'Sensor substituído e calibrado. Sistema testado sem alarmes falsos.'},
-    {id:'#4819',operator:'Maria Santos',matricula:'BAT-OP-0143',sector:'Produção B',equip:'Linha de Envase B7',category:'Elétrica',priority:'alta',problem:'Válvula solenóide travada em posição fechada. Produção parada.',tech:'Carlos Mendes',date:ago(4320),dateEnd:ago(4140),travelTime:'00:12:00',serviceTime:'00:48:00',obs:[{type:'Diagnóstico',text:'Bobina da válvula VS-07 queimada.',tech:'Carlos Mendes',time:ago(4300)}],files:[],parts:[{name:'Bobina solenóide 24V',qty:1}],history:[{st:'0',time:ago(4320)},{st:'1',time:ago(4308)},{st:'2',time:ago(4296)},{st:'3',time:ago(4290)},{st:'4',time:ago(4140)}],solution:'Bobina substituída e válvula testada.'},
-    {id:'#4815',operator:'Pedro Alves',matricula:'BAT-OP-0091',sector:'Embalagem',equip:'Seladora SL-03',category:'Mecânica',priority:'baixa',problem:'Seladora não atinge temperatura ideal de selagem.',tech:'Carlos Mendes',date:ago(7200),dateEnd:ago(7100),travelTime:'00:09:00',serviceTime:'00:35:00',obs:[{type:'Procedimento',text:'Resistência de aquecimento substituída.',tech:'Carlos Mendes',time:ago(7150)}],files:['seladora.jpg'],parts:[{name:'Resistência cerâmica 220V',qty:2}],history:[{st:'0',time:ago(7200)},{st:'1',time:ago(7180)},{st:'2',time:ago(7170)},{st:'3',time:ago(7165)},{st:'4',time:ago(7100)}],solution:'Resistências trocadas, temperatura normalizada.'},
-    {id:'#4810',operator:'Ana Costa',matricula:'BAT-OP-0177',sector:'Logística',equip:'Empilhadeira EL-02',category:'Mecânica',priority:'media',problem:'Bateria não carrega. Indicador de falha aceso.',tech:'Carlos Mendes',date:ago(10080),dateEnd:ago(9870),travelTime:'00:20:00',serviceTime:'02:10:00',obs:[{type:'Diagnóstico',text:'Carregador com placa queimada.',tech:'Carlos Mendes',time:ago(10000)}],files:[],parts:[{name:'Placa do carregador',qty:1},{name:'Fusível 30A',qty:3}],history:[{st:'0',time:ago(10080)},{st:'1',time:ago(10060)},{st:'2',time:ago(10040)},{st:'3',time:ago(10030)},{st:'4',time:ago(9870)}],solution:'Carregador reparado, bateria carregando normalmente.'},
-    {id:'#4805',operator:'Carlos Souza',matricula:'BAT-OP-0205',sector:'Tecnologia',equip:'Switch de Rede SW-04',category:'Rede',priority:'media',problem:'Perda intermitente de conexão na rede administrativa.',tech:'Pedro Lima',date:ago(14400),dateEnd:ago(14320),travelTime:'00:08:00',serviceTime:'00:22:00',obs:[{type:'Procedimento',text:'Porta 12 do switch desativada por defeito.',tech:'Pedro Lima',time:ago(14360)}],files:[],parts:[],history:[{st:'0',time:ago(14400)},{st:'1',time:ago(14390)},{st:'2',time:ago(14385)},{st:'3',time:ago(14380)},{st:'4',time:ago(14320)}],solution:'Porta com defeito isolada, conexão estabilizada.'},
-    {id:'#4801',operator:'Maria Santos',matricula:'BAT-OP-0143',sector:'Manutenção',equip:'Compressor Atlas C-08',category:'Mecânica',priority:'alta',problem:'Vazamento de óleo no compressor principal.',tech:'Ana Técnica',date:ago(17280),dateEnd:ago(17100),travelTime:'00:14:00',serviceTime:'00:46:00',obs:[{type:'Procedimento',text:'Vedação do cárter substituída.',tech:'Ana Técnica',time:ago(17200)}],files:['compressor.jpg'],parts:[{name:'Kit vedação cárter',qty:1},{name:'Óleo lubrificante 5L',qty:2}],history:[{st:'0',time:ago(17280)},{st:'1',time:ago(17260)},{st:'2',time:ago(17250)},{st:'3',time:ago(17245)},{st:'4',time:ago(17100)}],solution:'Vedação trocada, vazamento eliminado.'}
-  ];
-}
 
 /* ============ BADGES ============ */
 function prioBadge(p){
@@ -448,16 +433,25 @@ function exportExcel(){
   showToast(T('toast_excel'),'suc');
 }
 
+async function loadSession(){
+  try {
+    currentUser = await API.session();
+  } catch(e) {
+    console.error('Erro ao carregar sessao:', e);
+  }
+}
+
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeModal(); document.getElementById('lm').classList.remove('open'); document.getElementById('lib-panel').classList.remove('open'); closeSB(); } });
 
 /* ============ INIT ============ */
-function init(){
+async function init(){
   initTheme();
   var lang=localStorage.getItem('bat-lang')||'pt'; CL=lang;
   document.getElementById('lang-lbl').textContent=lang.toUpperCase();
   document.querySelectorAll('.lo').forEach(function(el,i){ el.classList.toggle('active',['pt','en','es','de','ru'][i]===lang); });
   if(localStorage.getItem('bat-op-hc')==='1') document.documentElement.setAttribute('data-hc','1');
-  loadData();
+  await loadSession();
+  await loadData();
   applyTR();
   initUser();
   buildTechFilter();

@@ -119,12 +119,8 @@
           <div class="tbl-wrap">
             <table>
               <thead><tr><th>ID</th><th data-i18n="th_desc">Descrição</th><th data-i18n="th_priority">Prioridade</th><th data-i18n="th_responsible">Responsável</th><th>Status</th><th data-i18n="th_date">Data</th></tr></thead>
-              <tbody>
-                <tr><td class="td-id">#4821</td><td data-i18n="t1_desc">Falha no sensor da Máq. L-03</td><td><span class="prio-dot alta"></span><span data-i18n="high">Alta</span></td><td>João Mendes</td><td><span class="badge critico"><i class="fa-solid fa-circle-exclamation"></i><span data-i18n="critical">Crítico</span></span></td><td>25/05/2026</td></tr>
-                <tr><td class="td-id">#4819</td><td data-i18n="t2_desc">Atualização de firmware — Linha 7</td><td><span class="prio-dot media"></span><span data-i18n="medium">Média</span></td><td>Carla Souza</td><td><span class="badge andamento"><i class="fa-solid fa-rotate"></i><span data-i18n="in_progress">Em andamento</span></span></td><td>24/05/2026</td></tr>
-                <tr><td class="td-id">#4816</td><td data-i18n="t3_desc">Solicitação de acesso — RH</td><td><span class="prio-dot baixa"></span><span data-i18n="low">Baixa</span></td><td>Ana Lima</td><td><span class="badge pendente"><i class="fa-solid fa-clock"></i><span data-i18n="pending">Pendente</span></span></td><td>24/05/2026</td></tr>
-                <tr><td class="td-id">#4813</td><td data-i18n="t4_desc">Substituição de rolamento — B-11</td><td><span class="prio-dot alta"></span><span data-i18n="high">Alta</span></td><td>Ricardo Alves</td><td><span class="badge andamento"><i class="fa-solid fa-rotate"></i><span data-i18n="in_progress">Em andamento</span></span></td><td>23/05/2026</td></tr>
-                <tr><td class="td-id">#4810</td><td data-i18n="t5_desc">Reinicialização preventiva — Srv A2</td><td><span class="prio-dot media"></span><span data-i18n="medium">Média</span></td><td>Fernanda Costa</td><td><span class="badge resolvido"><i class="fa-solid fa-check"></i><span data-i18n="resolved">Resolvido</span></span></td><td>22/05/2026</td></tr>
+              <tbody id="dash-tickets-tbody">
+                <tr><td colspan="6" class="empty-msg" data-i18n="no_data">Carregando dados do servidor...</td></tr>
               </tbody>
             </table>
           </div>
@@ -139,14 +135,10 @@
             <div class="s-item"><span class="s-dot ok"></span><span class="s-name" data-i18n="database">Banco de Dados</span><span class="s-val ok" data-i18n="operational">Operacional</span></div>
             <div class="s-item"><span class="s-dot warn"></span><span class="s-name" data-i18n="network">Rede Interna</span><span class="s-val warn" data-i18n="slow">Lentidão</span></div>
           </div>
-          <div class="act-panel">
-            <h3 data-i18n="recent_activity">Atividade Recente</h3><p data-i18n="today_actions">Ações realizadas hoje</p>
-            <div class="act-item"><span class="act-dot" style="background:#C8A96B"></span><div class="act-txt"><strong>João Mendes</strong> <span data-i18n="act1">abriu chamado #4821</span></div><span class="act-time">09:14</span></div>
-            <div class="act-item"><span class="act-dot" style="background:#2D9E6B"></span><div class="act-txt"><strong data-i18n="system">Sistema</strong> <span data-i18n="act2">concluiu backup automático</span></div><span class="act-time">08:50</span></div>
-            <div class="act-item"><span class="act-dot" style="background:#005691"></span><div class="act-txt"><strong>Carla Souza</strong> <span data-i18n="act3">iniciou atualização Linha 7</span></div><span class="act-time">08:32</span></div>
-            <div class="act-item"><span class="act-dot" style="background:#E53E3E"></span><div class="act-txt"><span data-i18n="alert">Alerta:</span> <strong>RAM <span data-i18n="high_usage">alta</span></strong> <span data-i18n="act4">no Servidor B</span></div><span class="act-time">07:58</span></div>
-            <div class="act-item"><span class="act-dot" style="background:#2D9E6B"></span><div class="act-txt"><strong>Fernanda Costa</strong> <span data-i18n="act5">resolveu chamado #4810</span></div><span class="act-time">07:21</span></div>
-          </div>
+            <div class="act-panel">
+              <h3 data-i18n="recent_activity">Atividade Recente</h3><p data-i18n="today_actions">Ações realizadas hoje</p>
+              <div id="dash-activity-body"><div class="act-item"><div class="act-txt"><span data-i18n="no_activity">Nenhuma atividade recente.</span></div></div></div>
+            </div>
         </div>
       </div>
     </div>
@@ -154,10 +146,11 @@
     <!-- VIEWS PLACEHOLDER -->
     <div class="view" id="view-maquinas"><div class="placeholder"><i class="fa-solid fa-gears"></i><h3 data-i18n="nav_machines">Máquinas</h3><p data-i18n="ph_machines">Inventário, status operacional e histórico de manutenções.</p></div></div>
     <div class="view" id="view-usuarios"><div class="placeholder"><i class="fa-solid fa-users"></i><h3 data-i18n="nav_users">Usuários</h3><p data-i18n="ph_users">Cadastro, permissões e controle de acesso dos colaboradores.</p></div></div>
-    <div class="view" id="view-chamados"><div class="panel"><div class="panel-hd"><div><h3 data-i18n="nav_tickets">Chamados Pendentes</h3><p>18 <span data-i18n="pending">pendentes</span></p></div><button class="btn-sm" data-i18n="new_ticket">+ Novo chamado</button></div><div class="tbl-wrap"><table><thead><tr><th>ID</th><th data-i18n="th_desc">Descrição</th><th data-i18n="th_priority">Prioridade</th><th data-i18n="th_responsible">Responsável</th><th>Status</th><th data-i18n="th_date">Data</th></tr></thead><tbody><tr><td class="td-id">#4821</td><td data-i18n="t1_desc">Falha no sensor da Máq. L-03</td><td><span class="prio-dot alta"></span><span data-i18n="high">Alta</span></td><td>João Mendes</td><td><span class="badge critico"><i class="fa-solid fa-circle-exclamation"></i><span data-i18n="critical">Crítico</span></span></td><td>25/05/2026</td></tr><tr><td class="td-id">#4816</td><td data-i18n="t3_desc">Solicitação de acesso — RH</td><td><span class="prio-dot baixa"></span><span data-i18n="low">Baixa</span></td><td>Ana Lima</td><td><span class="badge pendente"><i class="fa-solid fa-clock"></i><span data-i18n="pending">Pendente</span></span></td><td>24/05/2026</td></tr></tbody></table></div></div></div>
+    <div class="view" id="view-chamados"><div class="panel"><div class="panel-hd"><div><h3 data-i18n="nav_tickets">Chamados Pendentes</h3><p><span id="chamados-view-count">0</span> <span data-i18n="pending">pendentes</span></p></div><button class="btn-sm" data-i18n="new_ticket">+ Novo chamado</button></div><div class="tbl-wrap"><table><thead><tr><th>ID</th><th data-i18n="th_desc">Descrição</th><th data-i18n="th_priority">Prioridade</th><th data-i18n="th_responsible">Responsável</th><th>Status</th><th data-i18n="th_date">Data</th></tr></thead><tbody id="chamados-view-tbody"><tr><td colspan="6" class="empty-msg">Carregando do servidor...</td></tr></tbody></table></div></div></div>
     <div class="view" id="view-perfil"><div class="placeholder"><i class="fa-solid fa-circle-user"></i><h3 data-i18n="nav_profile">Meu Perfil</h3><p data-i18n="ph_profile">Informações pessoais, senha e preferências do sistema.</p></div></div>
   </main>
 </div>
+<script src="/js/api.js"></script>
 <script src="/js/dashbord.adm.js"></script>
 </body>
 </html>

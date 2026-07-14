@@ -191,6 +191,7 @@ function initUser(){
 /* ============ DATA ============ */
 var tickets=[], sortCol='date', sortDir='desc', page=1, PER=10, modalId=null;
 var TECH_NAME='Carlos Mendes';
+let currentUser = null;
 var currentTimerId=null, currentTimerStart=null;
 function getTechName(){ return localStorage.getItem('bat-tech-name')||TECH_NAME||'Carlos Mendes'; }
 function getCurrentStorageKey(){ return 'bat-tech-current:' + encodeURIComponent(getTechName()); }
@@ -208,43 +209,65 @@ function startCurrentTimer(t){ stopCurrentTimer(); currentTimerStart=getTicketSt
 function stopCurrentTimer(){ if(currentTimerId){ clearInterval(currentTimerId); currentTimerId=null; } var panel=document.getElementById('m-timer-panel'); if(panel) panel.style.display='none'; }
 function setCurrentButtonState(isCurrent, status){ ['m-defer-btn','m-cancel-btn','m-finish-btn'].forEach(function(id){ var btn=document.getElementById(id); if(!btn) return; if(isCurrent && status==='inservice'){ btn.style.display='inline-flex'; btn.disabled=false; } else if(isCurrent){ btn.style.display='inline-flex'; btn.disabled=true; } else { btn.style.display='none'; } }); }
 function getNowString(){ var now=new Date(); return String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'); }
-function saveTechTicket(t){ var tech=JSON.parse(localStorage.getItem('bat-tech-tickets')||'[]'); var i=tech.findIndex(function(x){return x.id===t.id;}); var rec={id:t.id,tech:t.tech||getTechName(),status:t.status,history:t.history,dateEnd:t.dateEnd||null,files:t.files||[]}; if(i>=0) tech[i]=Object.assign({},tech[i],rec); else tech.push(rec); localStorage.setItem('bat-tech-tickets',JSON.stringify(tech)); }
-function finalizeCurrentTicket(){ var curId=getCurrentTicketId(); if(!curId) return; var t=tickets.find(function(x){return x.id===curId;}); if(!t) return; if(!confirm('Deseja finalizar este chamado?')) return; var nowStr=getNowString(); t.status='4'; t.dateEnd=nowStr; t.history=t.history||[]; t.history.push({st:'4',time:nowStr}); t.tech=getTechName(); saveTechTicket(t); clearCurrentTicket(); stopCurrentTimer(); closeModal(); render(); renderStats(); renderBanner(); showToast('Chamado finalizado!','suc'); }
-function cancelCurrentTicket(){ var curId=getCurrentTicketId(); if(!curId) return; var t=tickets.find(function(x){return x.id===curId;}); if(!t) return; if(!confirm('Deseja cancelar este chamado?')) return; var nowStr=getNowString(); t.status='0'; t.tech=null; t.history=t.history||[]; t.history.push({st:'0',time:nowStr}); saveTechTicket(t); clearCurrentTicket(); stopCurrentTimer(); closeModal(); render(); renderStats(); renderBanner(); showToast('Chamado cancelado!','info'); }
-function deferCurrentTicket(){ var curId=getCurrentTicketId(); if(!curId) return; var t=tickets.find(function(x){return x.id===curId;}); if(!t) return; if(!confirm('Deseja adiar este chamado?')) return; var nowStr=getNowString(); t.status='p'; t.history=t.history||[]; t.history.push({st:'p',time:nowStr}); saveTechTicket(t); clearCurrentTicket(); stopCurrentTimer(); render(); renderStats(); renderBanner(); showToast('Chamado adiado!','info'); }
+function saveTechTicket(t){}
+
+async function finalizeCurrentTicket(){
+  var curId=getCurrentTicketId();
+  if(!curId) return;
+  var t=tickets.find(function(x){return x.id===curId;});
+  if(!t) return;
+  if(!confirm('Deseja finalizar este chamado?')) return;
+  try {
+    var chamadoId = getChamadoId(t);
+    await API.finalizar(chamadoId, currentUser ? currentUser.id : 1);
+    clearCurrentTicket();
+    stopCurrentTimer();
+    closeModal();
+    await loadData();
+    render(); renderStats(); renderBanner();
+    showToast('Chamado finalizado!','suc');
+  } catch(e) {
+    showToast('Erro ao finalizar: ' + e.message, 'err');
+  }
+}
+function cancelCurrentTicket(){
+  var curId=getCurrentTicketId(); if(!curId) return;
+  if(!confirm('Deseja cancelar este chamado?')) return;
+  clearCurrentTicket(); stopCurrentTimer();
+  render(); renderStats(); renderBanner();
+  showToast('Chamado cancelado!','info');
+}
+function deferCurrentTicket(){
+  var curId=getCurrentTicketId(); if(!curId) return;
+  if(!confirm('Deseja adiar este chamado?')) return;
+  clearCurrentTicket(); stopCurrentTimer();
+  render(); renderStats(); renderBanner();
+  showToast('Chamado adiado!','info');
+}
 
 function timeAgo(ds){ var diff=Math.floor((Date.now()-parseDate(ds).getTime())/60000); if(diff<1) return T('now'); if(diff<60) return diff+' '+T('min_ago'); if(diff<1440) return Math.floor(diff/60)+' '+T('hour_ago'); return ds; }
 
 function loadData(){
-  var op=JSON.parse(localStorage.getItem('bat-op-tickets')||'[]');
-  var tech=JSON.parse(localStorage.getItem('bat-tech-tickets')||'[]');
-  var all=op.slice();
-  tech.forEach(function(tt){ var i=all.findIndex(function(x){return x.id===tt.id;}); if(i>=0) all[i]=Object.assign({},all[i],tt); else all.push(tt); });
-  if(!all.length){ all=makeSamples(); localStorage.setItem('bat-op-tickets',JSON.stringify(all)); }
-  tickets=all.map(function(t){
-    return {
-      id:t.id, operator:t.operator||'João Pedro Silva', matricula:t.matricula||'BAT-OP-0128',
-      sector:t.sector||'—', line:t.line||'', equip:t.equip||'—', location:t.location||'', category:t.category||'—',
-      priority:t.priority||'media', problem:t.problem||'—', tech:t.tech||null,
-      status:String(t.status!==undefined?t.status:'0'), date:t.date||'—', dateEnd:t.dateEnd||null,
-      files:normalizeFiles(t.files), history:t.history||[]
-    };
-  });
+  localStorage.removeItem('bat-op-tickets');
+  localStorage.removeItem('bat-tech-tickets');
+  fetch('/api/chamados/disponiveis').then(r=>r.json()).then(data=>{
+    var items = data || [];
+    tickets = items.map(c=>({ 
+      id:c.id,
+      equip:c.equip||c.equipment||'—',
+      setor:c.sector||'—',
+      prio:(c.priority||'baixa').toLowerCase(),
+      status:c.status||'0',
+      operador:c.requesterName||'—',
+      data:new Date(c.createdAt||new Date()).toLocaleDateString('pt-BR'),
+      desc:c.subject||c.descricao||''
+    }));
+  }).catch(e=>{ console.warn('Erro ao carregar chamados disponíveis:', e); tickets=[]; });
 }
 function makeSamples(){
-  var now=new Date();
-  function f(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-  function ago(m){ return f(new Date(now-m*60000)); }
-  return [
-    {id:'#4826',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção A',line:'Linha 5',equip:'Máquina L-09',location:'Galpão A - Linha 5',category:'Elétrica',priority:'alta',problem:'Parada total da linha de produção por falha elétrica no painel de comando.',tech:null,status:'0',date:ago(8),files:['painel_falha.jpg','quadro_eletrico.jpg'],history:[{st:'0',time:ago(8)}]},
-    {id:'#4824',operator:'Maria Santos',matricula:'BAT-OP-0143',sector:'Embalagem',line:'Linha 1',equip:'Esteira ET-03',location:'Galpão A - Embalagem',category:'Mecânica',priority:'media',problem:'Correia com desgaste excessivo causando paradas frequentes na linha.',tech:null,status:'0',date:ago(35),files:['correia.jpg'],history:[{st:'0',time:ago(35)}]},
-    {id:'#4823',operator:'Pedro Alves',matricula:'BAT-OP-0091',sector:'Manutenção',line:'',equip:'Compressor Atlas C-12',location:'Sala de Compressores',category:'Mecânica',priority:'media',problem:'Compressor não atinge pressão nominal. Possível vazamento na mangueira.',tech:null,status:'0',date:ago(52),files:[],history:[{st:'0',time:ago(52)}]},
-    {id:'#4822',operator:'Ana Costa',matricula:'BAT-OP-0177',sector:'Tecnologia',line:'',equip:'Servidor SRV-02',location:'Sala de Servidores',category:'Hardware',priority:'baixa',problem:'Servidor reiniciando sozinho a cada 2 horas. Logs indicam erro de RAM.',tech:null,status:'0',date:ago(120),files:['log.pdf'],history:[{st:'0',time:ago(120)}]},
-    {id:'#4821',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Logística',line:'',equip:'Empilhadeira EL-05',location:'Doca 3',category:'Mecânica',priority:'alta',problem:'Freio da empilhadeira falhando. Risco de segurança operacional.',tech:null,status:'0',date:ago(15),files:['freio.jpg','empilhadeira.jpg'],history:[{st:'0',time:ago(15)}]},
-    {id:'#4820',operator:'Carlos Souza',matricula:'BAT-OP-0205',sector:'Produção B',line:'Linha 7',equip:'Dosadora DS-04',location:'Produção B - Linha 7',category:'Automação',priority:'media',problem:'Dosadora com imprecisão no volume de enchimento.',tech:'Ana Técnica',status:'at',date:ago(200),files:[],history:[{st:'0',time:ago(200)},{st:'at',time:ago(180)}]},
-    {id:'#4815',operator:'Maria Santos',matricula:'BAT-OP-0143',sector:'Embalagem',line:'Linha 2',equip:'Seladora SL-03',location:'Embalagem - Linha 2',category:'Mecânica',priority:'baixa',problem:'Seladora não atinge temperatura ideal de selagem.',tech:'Pedro Lima',status:'4',date:ago(1440),dateEnd:ago(1300),files:[],history:[{st:'0',time:ago(1440)},{st:'4',time:ago(1300)}]}
-  ];
+  return [];
 }
+
 
 /* ============ BADGES ============ */
 function prioBadge(p){
@@ -254,9 +277,9 @@ function prioBadge(p){
   return '<span class="prio '+(cls[p]||'p-b')+'"><span class="dp" style="background:'+(dc[p]||'var(--bm)')+'"></span>'+(labels[p]||p)+'</span>';
 }
 function uiStatus(t){
-  if(t.status==='4'||t.status==='finalizado') return 'finished';
-  if(t.status==='0') return 'available';
-  if(t.status==='p') return 'postponed';
+  if(t.status==='resolvido') return 'finished';
+  if(t.status==='aberto') return 'available';
+  if(t.status==='cancelado') return 'finished';
   return 'inservice';
 }
 function statusBadge(t){
@@ -381,24 +404,23 @@ function render(){
 function goPage(p){ var fi=getFiltered(),tp=Math.max(1,Math.ceil(fi.length/PER)); if(p<1||p>tp) return; page=p; render(); }
 
 /* ============ ASSUME (CORE RULE) ============ */
-function assumeTicket(id){
+function getChamadoId(t){ return typeof t.id==='number'?t.id:parseInt(String(t.id).replace('#','')); }
+
+async function assumeTicket(id){
   if(hasCurrent()){ showToast(T('toast_already'),'warn'); return; }
   var t=tickets.find(function(x){return x.id===id;});
   if(!t || uiStatus(t)!=='available') return;
-  // 1. Vincular ao técnico + 2. status Em Atendimento
-  t.tech=getTechName();
-  t.status='at';
-  var now=new Date();
-  var nowStr=String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  t.history=t.history||[]; t.history.push({st:'1',time:nowStr});
-  // 4. Salvar no localStorage (bat-tech-tickets) + marcar chamado atual
-  saveTechTicket(t);
-  localStorage.setItem(getCurrentStorageKey(),id);
-  // 3. Bloquear demais botões (re-render aplica lock)
-  render(); renderStats(); renderBanner();
-  closeModal();
-  showToast(T('toast_assumed'),'suc');
-  // 5. "Enviar" para Meu Chamado Atual — já persistido em bat-tech-current
+  try {
+    var chamadoId = getChamadoId(t);
+    await API.assumir(chamadoId, currentUser ? currentUser.id : 1);
+    localStorage.setItem(getCurrentStorageKey(),id);
+    await loadData();
+    render(); renderStats(); renderBanner();
+    closeModal();
+    showToast(T('toast_assumed'),'suc');
+  } catch(e) {
+    showToast('Erro ao assumir: ' + e.message, 'err');
+  }
 }
 function assumeFromModal(){ if(modalId) assumeTicket(modalId); }
 function goToCurrent(){
@@ -466,13 +488,21 @@ function openModal(id){
 function closeModal(){ document.getElementById('modal').classList.remove('open'); modalId=null; }
 document.getElementById('modal').addEventListener('click',function(e){ if(e.target===document.getElementById('modal')) closeModal(); });
 
-function refreshData(){ loadData(); render(); renderStats(); renderBanner(); showToast(T('toast_refreshed'),'suc'); }
+async function refreshData(){ await loadData(); render(); renderStats(); renderBanner(); showToast(T('toast_refreshed'),'suc'); }
+
+async function loadSession(){
+  try {
+    currentUser = await API.session();
+  } catch(e) {
+    console.error('Erro ao carregar sessao:', e);
+  }
+}
 
 /* KEYBOARD */
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeModal(); document.getElementById('lm').classList.remove('open'); document.getElementById('lib-panel').classList.remove('open'); closeSB(); } });
 
 /* INIT */
-function init(){
+async function init(){
   initTheme();
   var lang=localStorage.getItem('bat-lang')||'pt'; CL=lang;
   document.getElementById('lang-lbl').textContent=lang.toUpperCase();
@@ -480,8 +510,9 @@ function init(){
   if(localStorage.getItem('bat-op-hc')==='1') document.documentElement.setAttribute('data-hc','1');
   applyTR();
   initUser();
-  loadData();
+  await loadSession();
+  await loadData();
   render(); renderStats(); renderBanner();
-  setInterval(function(){ loadData(); render(); renderStats(); renderBanner(); },30000);
+  setInterval(async function(){ await loadData(); render(); renderStats(); renderBanner(); },30000);
 }
 document.addEventListener('DOMContentLoaded',init);
