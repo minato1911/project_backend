@@ -322,29 +322,22 @@ function sumTimes(a, b){
 }
 
 function loadData(){
-  var stored = JSON.parse(localStorage.getItem('bat-op-tickets') || '[]');
-  if(!stored.length){ stored = makeSamples(); localStorage.setItem('bat-op-tickets', JSON.stringify(stored)); }
-  var tech = JSON.parse(localStorage.getItem('bat-tech-tickets') || '[]');
-  tech.forEach(function(tt){
-    var i = stored.findIndex(function(x){ return x.id===tt.id; });
-    if(i >= 0) stored[i] = Object.assign({}, stored[i], tt);
-  });
-  tickets = stored;
-}
-
-function makeSamples(){
-  var now = new Date();
-  function f(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-  function ago(m){ return f(new Date(now - m*60000)); }
-  return [
-    {id:'#4825',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção B',line:'Linha 3',equip:'Máquina L-07',location:'Galpão B - Linha 3',category:'Mecânica',priority:'alta',status:'3',tech:'Carlos Mendes',problem:'Ruído excessivo no eixo do motor principal. Vibração anormal detectada durante operação contínua.',date:ago(95),dateEnd:null,travelTime:'00:18:00',serviceTime:null,obs:[{type:'Diagnóstico inicial',text:'Motor com desgaste no rolamento dianteiro. Necessário substituição do rolamento 6205-ZZ.',tech:'Carlos Mendes',time:ago(30)},{type:'Peça substituída',text:'Rolamento substituído. Testando operação.',tech:'Carlos Mendes',time:ago(10)}],files:['foto_motor.jpg','vibracao.jpg'],history:[{st:'0',time:ago(95)},{st:'1',time:ago(77)},{st:'2',time:ago(59)},{st:'3',time:ago(52)}]},
-    {id:'#4824',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Embalagem',line:'Linha 1',equip:'Esteira ET-03',location:'Galpão A - Embalagem',category:'Mecânica',priority:'alta',status:'2',tech:'Ana Técnica',problem:'Correia com desgaste excessivo causando paradas frequentes na linha de embalagem.',date:ago(180),dateEnd:null,travelTime:'00:22:00',serviceTime:null,obs:[],files:['correia.jpg'],history:[{st:'0',time:ago(180)},{st:'1',time:ago(145)},{st:'2',time:ago(123)}]},
-    {id:'#4823',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Manutenção',line:'',equip:'Compressor Atlas C-12',location:'Sala de Compressores',category:'Mecânica',priority:'media',status:'1',tech:'Pedro Lima',problem:'Compressor não atinge pressão nominal. Possível vazamento na mangueira de saída.',date:ago(240),dateEnd:null,travelTime:null,serviceTime:null,obs:[],files:[],history:[{st:'0',time:ago(240)},{st:'1',time:ago(25)}]},
-    {id:'#4822',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Tecnologia',line:'',equip:'Servidor SRV-02',location:'Sala de Servidores',category:'Hardware',priority:'baixa',status:'0',tech:null,problem:'Servidor reiniciando sozinho a cada 2 horas. Logs indicam erro de memória RAM.',date:ago(360),dateEnd:null,travelTime:null,serviceTime:null,obs:[],files:['log.pdf'],history:[{st:'0',time:ago(360)}]},
-    {id:'#4821',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção A',line:'Linha 1',equip:'Máquina L-03',location:'Produção A - Linha 1',category:'Hardware',priority:'alta',status:'4',tech:'Carlos Mendes',problem:'Sensor de temperatura com leitura incorreta, gerando alarmes falsos na linha de produção.',date:ago(1440),dateEnd:ago(960),travelTime:'00:15:00',serviceTime:'01:45:00',obs:[{type:'Diagnóstico inicial',text:'Sensor PT100 com resistência fora do padrão.',tech:'Carlos Mendes',time:ago(1350)},{type:'Peça substituída',text:'Sensor PT100 substituído. Calibração realizada.',tech:'Carlos Mendes',time:ago(1080)},{type:'Conclusão do reparo',text:'Sistema testado 30 min sem alarmes falsos.',tech:'Carlos Mendes',time:ago(960)}],files:['sensor.jpg','medicao.jpg'],history:[{st:'0',time:ago(1440)},{st:'1',time:ago(1425)},{st:'2',time:ago(1410)},{st:'3',time:ago(1405)},{st:'4',time:ago(960)}]},
-    {id:'#4820',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Embalagem',line:'Linha 2',equip:'Impressora IR-02',location:'Embalagem - Linha 2',category:'Impressora',priority:'baixa',status:'4',tech:'Pedro Lima',problem:'Impressora imprimindo rótulos com qualidade ruim. Cabeçote com sujeira acumulada.',date:ago(2880),dateEnd:ago(2700),travelTime:'00:10:00',serviceTime:'00:45:00',obs:[{type:'Conclusão',text:'Cabeçote limpo com álcool isopropílico. Qualidade restaurada.',tech:'Pedro Lima',time:ago(2700)}],files:['cabecote.jpg'],history:[{st:'0',time:ago(2880)},{st:'1',time:ago(2800)},{st:'2',time:ago(2790)},{st:'3',time:ago(2785)},{st:'4',time:ago(2700)}]},
-    {id:'#4819',operator:'João Pedro Silva',matricula:'BAT-OP-0128',sector:'Produção B',line:'Linha 7',equip:'Linha de Envase B7',location:'Produção B - Linha 7',category:'Elétrica',priority:'alta',status:'4',tech:'Carlos Mendes',problem:'Válvula solenóide travada em posição fechada. Produção parada há 40 minutos.',date:ago(4320),dateEnd:ago(4050),travelTime:'00:12:00',serviceTime:'01:18:00',obs:[{type:'Diagnóstico inicial',text:'Bobina da válvula VS-07 queimada.',tech:'Carlos Mendes',time:ago(4250)},{type:'Peça substituída',text:'Bobina solenóide substituída e testada.',tech:'Carlos Mendes',time:ago(4060)}],files:[],history:[{st:'0',time:ago(4320)},{st:'1',time:ago(4308)},{st:'2',time:ago(4296)},{st:'3',time:ago(4290)},{st:'4',time:ago(4050)}]}
-  ];
+  localStorage.removeItem('bat-op-tickets');
+  localStorage.removeItem('bat-tech-tickets');
+  fetch('/api/chamados?page=0&size=100').then(r=>r.json()).then(data=>{
+    var items = data.content || data || [];
+    tickets = items.map(c=>({ 
+      id:c.id,
+      equip:c.equip||c.equipment||'—',
+      setor:c.sector||'—',
+      prio:(c.priority||'baixa').toLowerCase(),
+      status:c.status||'0',
+      tech:c.technicianName||'—',
+      data:new Date(c.createdAt||new Date()).toLocaleDateString('pt-BR'),
+      notas:c.notes||'',
+      desc:c.subject||c.descricao||''
+    }));
+  }).catch(e=>{ console.warn('Erro ao carregar chamados:', e); tickets=[]; });
 }
 
 /* ============================================================

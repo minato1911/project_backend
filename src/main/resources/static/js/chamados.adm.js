@@ -21,7 +21,7 @@ const TR = {
     prio_high:'Alta', prio_medium:'Média', prio_low:'Baixa',
     status_open:'Aberto', status_progress:'Em andamento', status_resolved:'Resolvido',
     col_id:'Nº', col_subject:'Assunto', col_requester:'Solicitante', col_sector:'Setor',
-    col_priority:'Prioridade', col_status:'Status', col_date:'Data', col_actions:'Ações',
+    col_priority:'Prioridade', col_status:'Status', col_date:'Data', col_time:'Tempo', col_actions:'Ações',
     col_category:'Categoria', col_description:'Descrição', col_attach:'Anexo',
     table_title:'Lista de Chamados',
     btn_view:'Ver', btn_assume:'Assumir', btn_finish:'Finalizar', btn_edit:'Editar',
@@ -62,7 +62,7 @@ const TR = {
     prio_high:'High', prio_medium:'Medium', prio_low:'Low',
     status_open:'Open', status_progress:'In progress', status_resolved:'Resolved',
     col_id:'No.', col_subject:'Subject', col_requester:'Requester', col_sector:'Sector',
-    col_priority:'Priority', col_status:'Status', col_date:'Date', col_actions:'Actions',
+    col_priority:'Priority', col_status:'Status', col_date:'Date', col_time:'Time', col_actions:'Actions',
     col_category:'Category', col_description:'Description', col_attach:'Attachment',
     table_title:'Ticket List',
     btn_view:'View', btn_assume:'Assume', btn_finish:'Finish', btn_edit:'Edit',
@@ -103,7 +103,7 @@ const TR = {
     prio_high:'Alta', prio_medium:'Media', prio_low:'Baja',
     status_open:'Abierto', status_progress:'En progreso', status_resolved:'Resuelto',
     col_id:'N°', col_subject:'Asunto', col_requester:'Solicitante', col_sector:'Sector',
-    col_priority:'Prioridad', col_status:'Estado', col_date:'Fecha', col_actions:'Acciones',
+    col_priority:'Prioridad', col_status:'Estado', col_date:'Fecha', col_time:'Tiempo', col_actions:'Acciones',
     col_category:'Categoría', col_description:'Descripción', col_attach:'Adjunto',
     table_title:'Lista de Tickets',
     btn_view:'Ver', btn_assume:'Asumir', btn_finish:'Finalizar', btn_edit:'Editar',
@@ -144,7 +144,7 @@ const TR = {
     prio_high:'Hoch', prio_medium:'Mittel', prio_low:'Niedrig',
     status_open:'Offen', status_progress:'In Bearbeitung', status_resolved:'Gelöst',
     col_id:'Nr.', col_subject:'Betreff', col_requester:'Antragsteller', col_sector:'Bereich',
-    col_priority:'Priorität', col_status:'Status', col_date:'Datum', col_actions:'Aktionen',
+    col_priority:'Priorität', col_status:'Status', col_date:'Datum', col_time:'Zeit', col_actions:'Aktionen',
     col_category:'Kategorie', col_description:'Beschreibung', col_attach:'Anhang',
     table_title:'Ticket-Liste',
     btn_view:'Anzeigen', btn_assume:'Übernehmen', btn_finish:'Abschließen', btn_edit:'Bearbeiten',
@@ -185,7 +185,7 @@ const TR = {
     prio_high:'Высокий', prio_medium:'Средний', prio_low:'Низкий',
     status_open:'Открыта', status_progress:'В работе', status_resolved:'Решена',
     col_id:'№', col_subject:'Тема', col_requester:'Заявитель', col_sector:'Отдел',
-    col_priority:'Приоритет', col_status:'Статус', col_date:'Дата', col_actions:'Действия',
+    col_priority:'Приоритет', col_status:'Статус', col_date:'Дата', col_time:'Время', col_actions:'Действия',
     col_category:'Категория', col_description:'Описание', col_attach:'Вложение',
     table_title:'Список заявок',
     btn_view:'Просмотр', btn_assume:'Взять', btn_finish:'Закрыть', btn_edit:'Изменить',
@@ -226,7 +226,7 @@ const TR = {
     prio_high:'高', prio_medium:'中', prio_low:'低',
     status_open:'开放', status_progress:'处理中', status_resolved:'已解决',
     col_id:'编号', col_subject:'主题', col_requester:'申请人', col_sector:'部门',
-    col_priority:'优先级', col_status:'状态', col_date:'日期', col_actions:'操作',
+    col_priority:'优先级', col_status:'状态', col_date:'日期', col_time:'时间', col_actions:'操作',
     col_category:'类别', col_description:'描述', col_attach:'附件',
     table_title:'工单列表',
     btn_view:'查看', btn_assume:'接单', btn_finish:'完成', btn_edit:'编辑',
@@ -258,26 +258,9 @@ const AV_COLORS = ['#005691','#002B5B','#2D9E6B','#6B46C1','#E8A020','#0072BC','
 function initials(n){ const p=n.trim().split(' '); return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():p[0][0].toUpperCase(); }
 function avColor(n){ let h=0; for(let c of n) h=(h<<5)-h+c.charCodeAt(0); return AV_COLORS[Math.abs(h)%AV_COLORS.length]; }
 
-let tickets = [
-  {id:'#4821',subject:'Falha no sensor da Máq. L-03',requester:'João Mendes',sector:'Produção A',category:'Hardware',desc:'O sensor de temperatura da máquina L-03 apresenta leitura incorreta, gerando alarmes falsos na linha de produção.',priority:'alta',status:'aberto',date:'25/05/2026'},
-  {id:'#4819',subject:'Atualização de firmware — Linha 7',requester:'Carla Souza',sector:'Tecnologia',category:'Software',desc:'Necessidade de atualização do firmware dos controladores da Linha 7 para versão 3.2.1.',priority:'media',status:'andamento',date:'24/05/2026'},
-  {id:'#4818',subject:'Impressora da recepção não imprime',requester:'Ana Lima',sector:'RH',category:'Impressora',desc:'A impressora HP LaserJet da recepção parou de imprimir. Já tentei reinstalar o driver sem sucesso.',priority:'baixa',status:'aberto',date:'24/05/2026'},
-  {id:'#4817',subject:'Sistema interno travando — módulo fiscal',requester:'Ricardo Alves',sector:'Financeiro',category:'Sistema Interno',desc:'O módulo fiscal do ERP apresenta travamentos frequentes ao gerar NF-e acima de 50 itens.',priority:'alta',status:'andamento',date:'23/05/2026'},
-  {id:'#4815',subject:'Sem acesso à rede Wi-Fi — sala 203',requester:'Fernanda Costa',sector:'Compliance',category:'Rede',desc:'Os dispositivos da sala 203 perderam acesso à rede Wi-Fi corporativa após a atualização do roteador.',priority:'media',status:'aberto',date:'23/05/2026'},
-  {id:'#4814',subject:'Substituição teclado — estação 12',requester:'Paulo Neto',sector:'Logística',category:'Hardware',desc:'Teclado com teclas travadas. Solicito substituição imediata pois afeta produtividade.',priority:'baixa',status:'resolvido',date:'22/05/2026'},
-  {id:'#4813',subject:'Erro 403 no portal de fornecedores',requester:'Mariana Ferreira',sector:'Produção B',category:'Sistema Interno',desc:'Todos os usuários do setor recebem erro 403 ao tentar acessar o portal de fornecedores.',priority:'alta',status:'aberto',date:'22/05/2026'},
-  {id:'#4812',subject:'Notebook sem bateria — diretoria',requester:'Carlos Rocha',sector:'Operações',category:'Hardware',desc:'Notebook da diretora não carrega mais. Bateria precisa de substituição urgente.',priority:'media',status:'resolvido',date:'21/05/2026'},
-  {id:'#4811',subject:'Instalar VPN corporativa — novo colaborador',requester:'Thiago Santos',sector:'Tecnologia',category:'Software',desc:'Novo colaborador precisa de VPN configurada para trabalho remoto. Favor instalar e testar.',priority:'baixa',status:'andamento',date:'21/05/2026'},
-  {id:'#4810',subject:'Câmera de segurança offline — portaria',requester:'Luisa Pinto',sector:'Manutenção',category:'Rede',desc:'Câmera da portaria principal ficou offline após queda de energia. Necessário verificar switch PoE.',priority:'alta',status:'resolvido',date:'20/05/2026'},
-  {id:'#4809',subject:'Mouse sem fio — bateria fraca',requester:'Bruno Castro',sector:'Marketing',category:'Hardware',desc:'Mouse sem fio apresenta comportamento errático. Suspeito de bateria descarregada.',priority:'baixa',status:'resolvido',date:'20/05/2026'},
-  {id:'#4808',subject:'Email corporativo bloqueado',requester:'Camila Melo',sector:'Jurídico',category:'Sistema Interno',desc:'Não consigo enviar emails externos. Recebo mensagem de que minha conta foi bloqueada pelo sistema.',priority:'media',status:'aberto',date:'19/05/2026'},
-];
+let tickets = [];
 
 let timeline = [
-  {type:'finish', text:'Chamado <strong>#4810</strong> finalizado por <strong>Admin</strong>', time:'Hoje, 09:14'},
-  {type:'assume', text:'<strong>Carla Souza</strong> assumiu o chamado <strong>#4819</strong>', time:'Hoje, 08:50'},
-  {type:'new',    text:'Novo chamado <strong>#4821</strong> aberto por <strong>João Mendes</strong>', time:'Hoje, 08:32'},
-  {type:'edit',   text:'Chamado <strong>#4817</strong> atualizado para Em andamento', time:'Ontem, 17:10'},
   {type:'finish', text:'Chamado <strong>#4814</strong> finalizado com sucesso', time:'Ontem, 15:45'},
   {type:'new',    text:'Novo chamado <strong>#4813</strong> aberto — prioridade alta', time:'Ontem, 14:20'},
   {type:'assume', text:'<strong>Admin</strong> assumiu o chamado <strong>#4811</strong>', time:'Ontem, 11:05'},
@@ -341,6 +324,43 @@ function statusBadge(st){
   return `<span class="status-badge ${s.cls}"><i class="fa-solid ${s.icon}"></i>${s.label}</span>`;
 }
 
+function parseTicketDate(t){
+  if(!t || !t.date) return new Date();
+  const parts = t.date.split(' ');
+  const dateParts = parts[0].split('/');
+  const year = +dateParts[2] || new Date().getFullYear();
+  const month = (+dateParts[1] || 1) - 1;
+  const day = +dateParts[0] || 1;
+  if(parts[1]){
+    const timeParts = parts[1].split(':');
+    const hour = +timeParts[0] || 0;
+    const minute = +timeParts[1] || 0;
+    const second = +timeParts[2] || 0;
+    return new Date(year, month, day, hour, minute, second);
+  }
+  return new Date(year, month, day, 0, 0, 0);
+}
+function formatElapsed(start, end){
+  const diff = Math.max(0, Math.floor((end - start) / 1000));
+  const h = String(Math.floor(diff / 3600)).padStart(2,'0');
+  const m = String(Math.floor((diff % 3600) / 60)).padStart(2,'0');
+  const s = String(diff % 60).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+function getTicketTimer(t){
+  if(!t) return {text:'--:--', running:false};
+  if(!t._timerStart){
+    t._timerStart = parseTicketDate(t);
+  }
+  if(t.status === 'resolvido'){
+    if(!t._finalTimer){
+      t._finalTimer = formatElapsed(t._timerStart, t._resolvedAt || new Date());
+    }
+    return {text:t._finalTimer, running:false};
+  }
+  return {text:formatElapsed(t._timerStart, new Date()), running:true};
+}
+
 /* ══ FILTER ══ */
 function getFiltered(){
   const q  = document.getElementById('search-input').value.toLowerCase();
@@ -376,6 +396,7 @@ function renderTable(){
       <td>${prioBadge(t.priority)}</td>
       <td>${statusBadge(t.status)}</td>
       <td style="font-size:12px;color:var(--text-muted)">${t.date}</td>
+      <td>${getTicketTimer(t).text}</td>
       <td>
         <div class="act-btns">
           <button class="act-btn view"   onclick="viewTicket(${ri})"   title="${d.tip_view}"><i class="fa-solid fa-eye"></i> ${d.btn_view}</button>
@@ -500,7 +521,11 @@ function assumeTicket(idx){
   document.getElementById('confirm-title').textContent=d.confirm_assume_title;
   document.getElementById('confirm-msg').textContent=d.confirm_assume_msg;
   const btn=document.getElementById('btn-confirm-action'); btn.className='btn-cd gld'; btn.textContent=d.btn_confirm;
-  btn.onclick=()=>{ tickets[actionIdx].status='andamento'; timeline.unshift({type:'assume',text:`<strong>Admin</strong> assumiu o chamado <strong>${tickets[actionIdx].id}</strong>`,time:'Agora'}); closeModal('modal-confirm'); renderAll(); showToast(d.toast_assumed,'info'); };
+  btn.onclick=()=>{ 
+    if(!tickets[actionIdx]._timerStart) tickets[actionIdx]._timerStart = parseTicketDate(tickets[actionIdx]);
+    tickets[actionIdx].status='andamento'; 
+    timeline.unshift({type:'assume',text:`<strong>Admin</strong> assumiu o chamado <strong>${tickets[actionIdx].id}</strong>`,time:'Agora'}); 
+    closeModal('modal-confirm'); renderAll(); showToast(d.toast_assumed,'info'); };
   document.getElementById('modal-confirm').classList.add('open');
 }
 
@@ -514,7 +539,12 @@ function finishTicket(idx){
   document.getElementById('confirm-title').textContent=d.confirm_finish_title;
   document.getElementById('confirm-msg').textContent=d.confirm_finish_msg;
   const btn=document.getElementById('btn-confirm-action'); btn.className='btn-cd ok'; btn.textContent=d.btn_confirm;
-  btn.onclick=()=>{ tickets[actionIdx].status='resolvido'; timeline.unshift({type:'finish',text:`Chamado <strong>${tickets[actionIdx].id}</strong> finalizado por <strong>Admin</strong>`,time:'Agora'}); closeModal('modal-confirm'); renderAll(); showToast(d.toast_finished,'suc'); };
+  btn.onclick=()=>{ 
+    if(!tickets[actionIdx]._timerStart) tickets[actionIdx]._timerStart = parseTicketDate(tickets[actionIdx]);
+    tickets[actionIdx].status='resolvido';
+    tickets[actionIdx]._resolvedAt = new Date();
+    tickets[actionIdx]._finalTimer = formatElapsed(tickets[actionIdx]._timerStart, tickets[actionIdx]._resolvedAt);
+    timeline.unshift({type:'finish',text:`Chamado <strong>${tickets[actionIdx].id}</strong> finalizado por <strong>Admin</strong>`,time:'Agora'}); closeModal('modal-confirm'); renderAll(); showToast(d.toast_finished,'suc'); };
   document.getElementById('modal-confirm').classList.add('open');
 }
 
@@ -564,8 +594,28 @@ function showToast(msg,type='suc'){
   clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3200);
 }
 
+/* ══ LOAD CHAMADOS FROM BACKEND ══ */
+function loadChamados(){
+  return fetch('/api/chamados?page=0&size=100').then(r=>r.json()).then(data=>{
+    const items = data.content || data || [];
+    tickets = items.map(c=>({ 
+      id:'#'+c.id, 
+      subject:c.subject||c.descricao, 
+      requester:c.requesterName||'Desconhecido',
+      sector:c.sector||'—',
+      priority:(c.priority||'baixa').toLowerCase(),
+      status:c.status||'aberto',
+      date: new Date(c.createdAt||new Date()).toLocaleDateString('pt-BR'),
+      notes:c.notes||''
+    }));
+    updateStats();
+  }).catch(e=>{ console.warn('Erro ao carregar chamados:', e); });
+}
+
 /* ══ RENDER ALL ══ */
 function renderAll(){ updateStats(); renderTable(); renderTimeline(); renderKanban(); }
 
 /* ══ INIT ══ */
-initTheme(); initLang(); startLiveClock(); renderAll();
+initTheme(); initLang();
+loadChamados().then(()=>renderAll());
+setInterval(function(){ renderTable(); }, 1000);

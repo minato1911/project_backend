@@ -205,37 +205,13 @@ function timeAgo(ds){
 }
 
 function loadData(){
-  var op=JSON.parse(localStorage.getItem('bat-op-tickets')||'[]');
-  var tech=JSON.parse(localStorage.getItem('bat-tech-tickets')||'[]');
-  var all=op.slice();
-  tech.forEach(function(tt){ var i=all.findIndex(function(x){return x.id===tt.id;}); if(i>=0) all[i]=Object.assign({},all[i],tt); else all.push(tt); });
-  if(!all.length) all=makeSamples();
-  allTickets=all.map(function(t){
-    return {
-      id:t.id, sector:t.sector||'—', equip:t.equip||'—', priority:t.priority||'media',
-      problem:t.problem||'—', tech:t.tech||null, status:String(t.status!==undefined?t.status:'0'),
-      date:t.date||'—', dateEnd:t.dateEnd||null,
-      travelTime:t.travelTime||null, serviceTime:t.serviceTime||null
-    };
-  });
+  localStorage.removeItem('bat-op-tickets');
+  localStorage.removeItem('bat-tech-tickets');
+  allTickets = [];
 }
 
 function makeSamples(){
-  var now=new Date();
-  function f(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-  function ago(m){ return f(new Date(now-m*60000)); }
-  var today=ago(0).split(' ')[0];
-  return [
-    {id:'#4826',sector:'Produção A',equip:'Máquina L-09',priority:'alta',problem:'Parada total da linha de produção por falha elétrica.',tech:null,status:'0',date:ago(8)},
-    {id:'#4825',sector:'Produção B',equip:'Máquina L-07',priority:'alta',problem:'Ruído excessivo no eixo do motor principal.',tech:'Carlos Mendes',status:'3',date:ago(95),travelTime:'00:18:00'},
-    {id:'#4824',sector:'Embalagem',equip:'Esteira ET-03',priority:'media',problem:'Correia com desgaste causando paradas frequentes.',tech:null,status:'0',date:ago(35)},
-    {id:'#4823',sector:'Manutenção',equip:'Compressor Atlas C-12',priority:'media',problem:'Compressor não atinge pressão nominal.',tech:null,status:'0',date:ago(52)},
-    {id:'#4822',sector:'Tecnologia',equip:'Servidor SRV-02',priority:'baixa',problem:'Servidor reiniciando sozinho periodicamente.',tech:null,status:'0',date:ago(120)},
-    {id:'#4821',sector:'Produção A',equip:'Máquina L-03',priority:'alta',problem:'Sensor de temperatura com leitura incorreta.',tech:'Carlos Mendes',status:'4',date:today+' 07:10',dateEnd:today+' 08:55',travelTime:'00:15:00',serviceTime:'01:45:00'},
-    {id:'#4820',sector:'Embalagem',equip:'Impressora IR-02',priority:'baixa',problem:'Impressora com qualidade de impressão ruim.',tech:'Carlos Mendes',status:'4',date:today+' 06:30',dateEnd:today+' 07:15',travelTime:'00:10:00',serviceTime:'00:45:00'},
-    {id:'#4819',sector:'Produção B',equip:'Linha de Envase B7',priority:'alta',problem:'Válvula solenóide travada. Produção parada.',tech:'Carlos Mendes',status:'4',date:today+' 05:00',dateEnd:today+' 06:30',travelTime:'00:12:00',serviceTime:'01:18:00'},
-    {id:'#4818',sector:'Logística',equip:'Empilhadeira EL-02',priority:'media',problem:'Bateria não carrega.',tech:'Ana Técnica',status:'4',date:ago(1440),dateEnd:ago(1300),travelTime:'00:20:00',serviceTime:'02:00:00'}
-  ];
+  return [];
 }
 
 /* ============ STATS ============ */

@@ -131,33 +131,32 @@ function avC(n){let h=0;for(const c of n)h=(h<<5)-h+c.charCodeAt(0);return AVC[M
 let opUser={name:localStorage.getItem('bat-op-name')||'João Pedro Silva',email:localStorage.getItem('bat-op-email')||'joao.pedro@bat.com'};
 
 /* DATA */
-let tickets=JSON.parse(localStorage.getItem('bat-op-tickets')||'null')||[
-  {id:'#4825',equip:'Máquina L-07',sector:'Produção B',problem:'Ruído excessivo no eixo do motor principal.',priority:'alta',status:'aberto',tech:null,date:'26/05/2026 11:20',dateEnd:null},
-  {id:'#4824',equip:'Esteira ET-03',sector:'Embalagem',problem:'Correia com desgaste excessivo causando paradas.',priority:'alta',status:'atendimento',tech:'Ana Técnica',date:'26/05/2026 09:45',dateEnd:null},
-  {id:'#4823',equip:'Compressor Atlas C-12',sector:'Manutenção',problem:'Pressão não atinge nível nominal.',priority:'media',status:'aberto',tech:null,date:'25/05/2026 16:30',dateEnd:null},
-  {id:'#4822',equip:'Servidor SRV-02',sector:'Tecnologia',problem:'Reiniciando a cada 2h. Logs com erro de RAM.',priority:'baixa',status:'aberto',tech:null,date:'25/05/2026 14:15',dateEnd:null},
-  {id:'#4821',equip:'Máquina L-03',sector:'Produção A',problem:'Sensor de temperatura com leitura incorreta.',priority:'alta',status:'atendimento',tech:'Carlos Mendes',date:'25/05/2026 09:14',dateEnd:null},
-  {id:'#4820',equip:'Impressora IR-02',sector:'Embalagem',problem:'Cabeçote sujo. Qualidade ruim.',priority:'baixa',status:'finalizado',tech:'Pedro Lima',date:'24/05/2026 11:00',dateEnd:'24/05/2026 14:30'},
-  {id:'#4819',equip:'Linha de Envase B7',sector:'Produção B',problem:'Válvula solenóide travada.',priority:'alta',status:'finalizado',tech:'Carlos Mendes',date:'24/05/2026 08:00',dateEnd:'24/05/2026 11:45'},
-  {id:'#4818',equip:'Empilhadeira EL-02',sector:'Logística',problem:'Bateria não carrega. Indicador de falha.',priority:'media',status:'finalizado',tech:'Ana Técnica',date:'23/05/2026 15:00',dateEnd:'23/05/2026 17:20'},
-];
+localStorage.removeItem('bat-op-tickets');
+localStorage.removeItem('bat-tech-tickets');
+let tickets = [];
 function saveTickets(){localStorage.setItem('bat-op-tickets',JSON.stringify(tickets))}
 
+/* LOAD CHAMADOS FROM BACKEND */
+function loadTickets(){
+  return fetch('/api/chamados?page=0&size=100').then(r=>r.json()).then(data=>{
+    const items = data.content || data || [];
+    tickets = items.map(c=>({ 
+      id:'#'+c.id, 
+      equip:c.equip||c.equipment||'—',
+      setor:c.sector||'—',
+      problema:c.subject||c.descricao||'',
+      prioridade:(c.priority||'baixa').toLowerCase(),
+      status:(c.status||'aberto').toLowerCase(),
+      tecnico:c.technicianName||'—',
+      data: new Date(c.createdAt||new Date()).toLocaleDateString('pt-BR'),
+      notas:c.notes||''
+    }));
+  }).catch(e=>{ console.warn('Erro ao carregar tickets:', e); });
+}
+
 /* NOTIFICATIONS */
-let notifs=[
-  {type:'ok',icon:'fa-flag-checkered',t:'notif_4',d:'notif_4d',time:'Hoje, 11:30',unread:true},
-  {type:'info',icon:'fa-location-dot',t:'notif_3',d:'notif_3d',time:'Hoje, 10:15',unread:true},
-  {type:'warn',icon:'fa-truck-moving',t:'notif_2',d:'notif_2d',time:'Hoje, 09:30',unread:true},
-  {type:'done',icon:'fa-hand-pointer',t:'notif_1',d:'notif_1d',time:'Ontem, 15:45',unread:false},
-];
-let tlEvents=[
-  {type:'ok',icon:'fa-flag-checkered',text:'Chamado <strong>#4819</strong> finalizado',sub:'Carlos Mendes — Produção B',time:'24/05, 11:45'},
-  {type:'info',icon:'fa-location-dot',text:'Técnico chegou ao local — <strong>#4821</strong>',sub:'Carlos Mendes em Produção A',time:'Hoje, 10:15'},
-  {type:'warn',icon:'fa-truck-moving',text:'Técnico a caminho — <strong>#4821</strong>',sub:'Estimativa 15 min',time:'Hoje, 09:30'},
-  {type:'ok',icon:'fa-hand-pointer',text:'Chamado <strong>#4821</strong> assumido',sub:'Carlos Mendes',time:'Hoje, 09:20'},
-  {type:'info',icon:'fa-plus-circle',text:'Chamado <strong>#4825</strong> aberto',sub:'Ruído no motor — Produção B',time:'Hoje, 11:20'},
-  {type:'ok',icon:'fa-plus-circle',text:'Chamado <strong>#4824</strong> aberto',sub:'Esteira ET-03 — Embalagem',time:'Hoje, 09:45'},
-];
+let notifs = [];
+let tlEvents = [];
 
 /* ============================================================ THEME */
 function initTheme(){
@@ -473,8 +472,11 @@ function init(){
   const pe=document.getElementById('prof-email');if(pe)pe.textContent=opUser.email;
   const pni=document.getElementById('pf-name');if(pni)pni.value=n;
   const pei=document.getElementById('pf-email');if(pei)pei.value=opUser.email;
-  document.getElementById('dash-greet').textContent=`${T('btn_new_ticket')}: ${tickets.filter(t=>t.status!=='finalizado').length} ${T('stat_open')}`;
-  initNotifs();renderAll();
+  // Load tickets from backend
+  loadTickets().then(()=>{
+    document.getElementById('dash-greet').textContent=`${T('btn_new_ticket')}: ${tickets.filter(t=>t.status!=='finalizado').length} ${T('stat_open')}`;
+    initNotifs();renderAll();
+  });
 }
 document.addEventListener('DOMContentLoaded',init);
 
