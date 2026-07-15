@@ -145,6 +145,7 @@ let currentLang='pt-BR';
 
 /* ═══ DATA ═══ */
 let machines=[];
+let sectors=[];
 const STATUS_MAP = { 'ATIVA': 'online', 'INATIVA': 'offline', 'MANUTENCAO': 'manutencao' };
 const STATUS_REV = { 'online': 'ATIVA', 'offline': 'INATIVA', 'manutencao': 'MANUTENCAO' };
 
@@ -155,16 +156,18 @@ function mapFromApi(m) {
     name: m.nome || '—',
     model: m.codigo || '—',
     sector: m.setor ? m.setor.nome : '—',
+    sectorId: m.setor ? m.setor.id : null,
     status: STATUS_MAP[m.status] || 'online',
     last_maint: '—',
   };
 }
 
 function mapToApi(m) {
+  const sectorId = sectors.length > 0 ? Number(document.getElementById('f-sector').value) || null : null;
   return {
     nome: m.name,
-    codigo: m.model !== '—' ? m.model : null,
-    setorId: null,
+    codigo: m.model !== '—' ? m.model : m.name.replace(/\s+/g, '_').substring(0, 50),
+    setorId: sectorId,
     status: STATUS_REV[m.status] || 'ATIVA',
   };
 }
@@ -178,6 +181,29 @@ async function loadMachines() {
     machines = [];
   }
 }
+
+async function loadSectores() {
+  try {
+    const data = await API.setores();
+    sectors = (data || []).map(s => ({ id: s.id, nome: s.nome }));
+    populateSectorSelect();
+  } catch(e) {
+    console.error('Erro ao carregar setores:', e);
+  }
+}
+
+function populateSectorSelect() {
+  const el = document.getElementById('f-sector');
+  if (!el) return;
+  el.innerHTML = '';
+  sectors.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.nome;
+    el.appendChild(opt);
+  });
+}
+
 let editIdx=-1;
 let currentPage=1;
 const PER_PAGE=6;
@@ -316,7 +342,7 @@ function openEditModal(idx){
   document.getElementById('modal-title').textContent=d.modal_edit;
   document.getElementById('f-name').value=m.name;
   document.getElementById('f-model').value=m.model;
-  document.getElementById('f-sector').value=m.sector;
+  document.getElementById('f-sector').value=m.sectorId || '';
   document.getElementById('f-status').value=m.status;
   document.getElementById('f-date').value=m.last_maint.split('/').reverse().join('-');
   document.getElementById('modal').classList.add('open');
@@ -341,7 +367,8 @@ async function saveMachine(){
       return;
     }
     const codigo = model || name.replace(/\s+/g, '_').substring(0, 50);
-    const payload = { nome: m.name, codigo: codigo, setorId: null, status: STATUS_REV[m.status] || 'ATIVA' };
+    const sectorId = sectors.length > 0 ? Number(document.getElementById('f-sector').value) || null : null;
+    const payload = { nome: m.name, codigo: codigo, setorId: sectorId, status: STATUS_REV[m.status] || 'ATIVA' };
     await API.criarMaquina(payload);
     closeModal();
     await loadMachines();
@@ -380,5 +407,5 @@ function showToast(msg,isErr){
 }
 
 /* ═══ INIT ═══ */
-async function init(){ initTheme(); initLang(); startLiveClock(); await loadMachines(); updateStats(); renderHighlights(); renderTable(); }
+async function init(){ initTheme(); initLang(); startLiveClock(); await loadMachines(); await loadSectores(); updateStats(); renderHighlights(); renderTable(); }
 init();

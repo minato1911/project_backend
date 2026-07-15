@@ -645,6 +645,8 @@ async function loadData(){
   }
 }
 
+let currentUser = null;
+
 async function loadSession(){
   try {
     currentUser = await API.session();
@@ -657,5 +659,6 @@ async function loadSession(){
 
 /* ══ INIT ══ */
 initTheme(); initLang();
+loadSession();
 loadChamados().then(()=>renderAll());
 setInterval(function(){ renderTable(); }, 1000);

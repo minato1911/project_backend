@@ -54,6 +54,9 @@ const API = {
   tecnicos() { return this.get('/usuarios/tecnicos'); },
   usuarios() { return this.get('/usuarios'); },
 
+  /* ── SECTORS ── */
+  setores() { return this.get('/setores'); },
+
   /* ── MACHINES ── */
   maquinas() { return this.get('/maquinas'); },
   criarMaquina(data) { return this.post('/maquinas', data); },
