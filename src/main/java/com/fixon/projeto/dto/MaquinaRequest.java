@@ -16,7 +16,6 @@ public record MaquinaRequest(
         @Size(max = 150, message = "O nome deve ter no máximo 150 caracteres")
         String nome,
 
-        @NotNull(message = "O setor é obrigatório")
         Long setorId,
 
         @NotNull(message = "O status é obrigatório")

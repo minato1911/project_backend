@@ -327,9 +327,10 @@ document.getElementById('modal').addEventListener('click',e=>{if(e.target===docu
 async function saveMachine(){
   const name=document.getElementById('f-name').value.trim();
   if(!name){document.getElementById('f-name').focus();return;}
+  const model=document.getElementById('f-model').value.trim();
   const m={
     name,
-    model:document.getElementById('f-model').value||'—',
+    model:model||'—',
     sector:document.getElementById('f-sector').value,
     status:document.getElementById('f-status').value,
     last_maint:'—',
@@ -339,8 +340,9 @@ async function saveMachine(){
       showToast('Edição via API não disponível. Remova e recrie.', true);
       return;
     }
-    const payload = { nome: m.name, codigo: m.model !== '—' ? m.model : null, status: STATUS_REV[m.status] || 'ATIVA' };
-    const saved = await API.criarMaquina(payload);
+    const codigo = model || name.replace(/\s+/g, '_').substring(0, 50);
+    const payload = { nome: m.name, codigo: codigo, setorId: null, status: STATUS_REV[m.status] || 'ATIVA' };
+    await API.criarMaquina(payload);
     closeModal();
     await loadMachines();
     updateStats(); renderHighlights(); renderTable();
